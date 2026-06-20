@@ -29,9 +29,9 @@
                 Formule choisie :
                 <strong class="text-teal-700">
                     @if($offer === 'livre')
-                        Le livre seul &mdash; 37&nbsp;€
+                        Le livre seul · 37&nbsp;€
                     @else
-                        Le livre + coaching &mdash; 70&nbsp;€
+                        Le livre + coaching · 70&nbsp;€
                     @endif
                 </strong>
             </div>

@@ -39,7 +39,7 @@
     <h2>4. Conception & maintenance</h2>
     <p>
         Site conçu et maintenu par <strong>{{ $webmaster['name'] }}</strong>
-        – <a href="mailto:{{ $webmaster['email'] }}">{{ $webmaster['email'] }}</a>.
+        - <a href="mailto:{{ $webmaster['email'] }}">{{ $webmaster['email'] }}</a>.
     </p>
 
     <h2>5. Propriété intellectuelle</h2>

@@ -13,7 +13,7 @@
 
     if ($isProcessingPayment) {
         $title = 'Paiement reçu !';
-        $message = 'Votre paiement a bien été pris en compte. Votre rendez-vous se confirme à l\'instant – vous allez recevoir un email de confirmation dans quelques secondes.';
+        $message = 'Votre paiement a bien été pris en compte. Votre rendez-vous se confirme à l\'instant - vous allez recevoir un email de confirmation dans quelques secondes.';
     } elseif ($isPending) {
         $title = 'Demande bien reçue !';
         $message = 'Votre demande est en attente de confirmation. Je reviens vers vous très vite par email.';
@@ -26,7 +26,7 @@
     $gcalEnd = CarbonImmutable::parse($appointment->ends_at)->utc()->format('Ymd\THis\Z');
     $gcalUrl = 'https://calendar.google.com/calendar/render?'.http_build_query([
         'action' => 'TEMPLATE',
-        'text' => 'RDV – '.$appointment->service->name,
+        'text' => 'RDV - '.$appointment->service->name,
         'dates' => $gcalStart.'/'.$gcalEnd,
         'details' => 'Rendez-vous en visioconférence avec Laura Baechlé. Référence : '.$appointment->reference,
     ]);
@@ -85,7 +85,7 @@
                     </div>
                     <div class="flex justify-between gap-4">
                         <dt class="text-ink-muted">Heure</dt>
-                        <dd class="text-ink font-medium">{{ $appointment->starts_at->format('H:i') }} – {{ $appointment->ends_at->format('H:i') }}</dd>
+                        <dd class="text-ink font-medium">{{ $appointment->starts_at->format('H:i') }} - {{ $appointment->ends_at->format('H:i') }}</dd>
                     </div>
                     @if ($isPaidService)
                         <div class="flex justify-between gap-4">

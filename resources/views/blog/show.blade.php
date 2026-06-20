@@ -227,7 +227,7 @@
                 <a href="{{ route('blog.show', $pillar->slug) }}" class="group block py-6">
                     <p class="text-ink-muted text-sm">Vous avez aimé cet article&nbsp;?</p>
                     <div class="mt-4 flex items-start gap-5 sm:gap-8">
-                        <svg class="mt-1 size-10 shrink-0 text-teal-700/70 transition group-hover:-translate-y-1 group-hover:translate-x-1 group-hover:text-teal-700 sm:size-14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
+                        <svg class="mt-1 size-10 shrink-0 text-teal-700/70 transition group-hover:translate-x-1 group-hover:-translate-y-1 group-hover:text-teal-700 sm:size-14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M7 17 17 7M9 7h8v8"/>
                         </svg>
                         <div class="min-w-0">

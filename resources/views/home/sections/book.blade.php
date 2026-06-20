@@ -50,7 +50,7 @@
 
                     <div class="mt-8 flex flex-wrap items-center justify-center gap-3 sm:gap-4 lg:justify-start">
                         <a href="{{ route('book.show') }}" class="group hover:bg-cream-50 inline-flex items-center gap-2 rounded-full bg-white px-7 py-3.5 text-sm font-medium text-teal-800 shadow-lg transition sm:text-base">
-                            Découvrir le livre &mdash; 37&nbsp;€
+                            Découvrir le livre · 37&nbsp;€
                             <span class="transition group-hover:translate-x-0.5" aria-hidden="true">→</span>
                         </a>
                         <span class="inline-flex items-center gap-1.5 text-xs text-teal-100 sm:text-sm">

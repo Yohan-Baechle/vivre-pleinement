@@ -7,7 +7,7 @@
 @source '../**/*.js';
 
 /* ════════════════════════════════════════════════════════════
-   Design tokens — identité Vivre Pleinement
+   Design tokens - identité Vivre Pleinement
    ════════════════════════════════════════════════════════════ */
 @theme {
     --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
@@ -76,7 +76,7 @@
     .delay-n90 { animation-delay: -90s; }
 
     /* ════════════════════════════════════════════════════════════
-       Nuages — dérive horizontale + balancement
+       Nuages - dérive horizontale + balancement
        ════════════════════════════════════════════════════════════ */
     @keyframes cloud-drift-left  { to { transform: translateX(-115vw); } }
     @keyframes cloud-drift-right { to { transform: translateX(115vw); } }
@@ -104,7 +104,7 @@
     .cloud-s-17 { animation-duration: 17s; }
 
     /* ════════════════════════════════════════════════════════════
-       Oiseaux origami (SVG) — trajectoire + battement d'ailes
+       Oiseaux origami (SVG) - trajectoire + battement d'ailes
        ════════════════════════════════════════════════════════════ */
     @keyframes bird-path-up-right {
         0%, 100% { transform: translate(0, 0); }
@@ -159,7 +159,7 @@
     .bird-f-43 { animation-duration: 4.3s; }
 
     /* ════════════════════════════════════════════════════════════
-       Oiseaux sprite — .bird-fly traverse le ciel, .bird bat des ailes
+       Oiseaux sprite - .bird-fly traverse le ciel, .bird bat des ailes
        (10 poses côte à côte dans birds-sprite.svg, défilées en steps(10))
        ════════════════════════════════════════════════════════════ */
     .bird {
@@ -213,7 +213,7 @@
     }
 
     /* ════════════════════════════════════════════════════════════
-       Indice de scroll — chevron qui respire
+       Indice de scroll - chevron qui respire
        ════════════════════════════════════════════════════════════ */
     @keyframes scroll-hint {
         0%, 100% { transform: translateY(0);   opacity: 0.5; }
@@ -222,7 +222,7 @@
     .scroll-hint { animation: scroll-hint 2.4s ease-in-out infinite; }
 
     /* ════════════════════════════════════════════════════════════
-       Accordéon — hauteur animée via grid-template-rows
+       Accordéon - hauteur animée via grid-template-rows
        ════════════════════════════════════════════════════════════ */
     .accordion-item > .accordion-content {
         display: grid;
