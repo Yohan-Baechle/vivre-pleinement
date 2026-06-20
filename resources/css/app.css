@@ -1,0 +1,273 @@
+@import 'tailwindcss';
+@plugin '@tailwindcss/typography';
+
+@source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
+@source '../../storage/framework/views/*.php';
+@source '../**/*.blade.php';
+@source '../**/*.js';
+
+/* ════════════════════════════════════════════════════════════
+   Design tokens — identité Vivre Pleinement
+   ════════════════════════════════════════════════════════════ */
+@theme {
+    --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
+        'Segoe UI Symbol', 'Noto Color Emoji';
+    --font-serif: 'Crimson Pro', ui-serif, Georgia, serif;
+
+    --color-teal-50: #effafb;
+    --color-teal-100: #d6f1f3;
+    --color-teal-200: #b1e3e7;
+    --color-teal-300: #7dccd3;
+    --color-teal-400: #46aeb8;
+    --color-teal-500: #2592a0;
+    --color-teal-600: #1a8593;
+    --color-teal-700: #117d89;
+    --color-teal-800: #126773;
+    --color-teal-900: #135561;
+
+    --color-cream-50: #fdfcf9;
+    --color-cream-100: #faf7f0;
+    --color-cream-200: #f3ecdd;
+    --color-cream-300: #e8dcc4;
+
+    --color-rose-soft: #f5d8d8;
+    --color-ink: #1f2a2a;
+    --color-ink-soft: #4a5757;
+    --color-ink-muted: #687373;
+
+    --drop-shadow-cloud-sm: 0 3px 10px rgba(17, 125, 137, 0.15);
+    --drop-shadow-cloud-md: 0 4px 12px rgba(17, 125, 137, 0.18);
+    --drop-shadow-cloud-lg: 0 5px 14px rgba(17, 125, 137, 0.20);
+    --drop-shadow-cloud-xl: 0 6px 16px rgba(17, 125, 137, 0.22);
+
+    --radius-5xl: 2.5rem;
+
+    --text-hero: clamp(2.25rem, 6.5vw, 4.5rem);
+    --text-hero--line-height: 1.05;
+    --text-lead: clamp(0.95rem, 1.5vw, 1.125rem);
+    --text-lead--line-height: 1.625;
+
+    --site-max-width: 90rem;
+}
+
+/* ─── Conteneur centré du site (remplace mx-auto max-w-* px-*) ─── */
+@utility site-container {
+    width: 100%;
+    max-width: var(--site-max-width);
+    margin-inline: auto;
+    padding-inline: 1rem;
+    @media (min-width: 640px)  { padding-inline: 1.5rem; }
+    @media (min-width: 1024px) { padding-inline: 2.5rem; }
+}
+
+@layer utilities {
+    /* ════════════════════════════════════════════════════════════
+       Délais partagés (départs désynchronisés des animations en boucle)
+       ════════════════════════════════════════════════════════════ */
+    .delay-n1  { animation-delay:  -1s; }
+    .delay-n15 { animation-delay:  -1.5s; }
+    .delay-n2  { animation-delay:  -2s; }
+    .delay-n3  { animation-delay:  -3s; }
+    .delay-n5  { animation-delay:  -5s; }
+    .delay-n7  { animation-delay:  -7s; }
+    .delay-n8  { animation-delay:  -8s; }
+    .delay-n45 { animation-delay: -45s; }
+    .delay-n70 { animation-delay: -70s; }
+    .delay-n90 { animation-delay: -90s; }
+
+    /* ════════════════════════════════════════════════════════════
+       Nuages — dérive horizontale + balancement
+       ════════════════════════════════════════════════════════════ */
+    @keyframes cloud-drift-left  { to { transform: translateX(-115vw); } }
+    @keyframes cloud-drift-right { to { transform: translateX(115vw); } }
+    @keyframes cloud-sway {
+        0%, 100% { transform: translateY(0)    scale(1); }
+        25%      { transform: translateY(-6px) scale(1.01); }
+        50%      { transform: translateY(2px)  scale(0.995); }
+        75%      { transform: translateY(-3px) scale(1.005); }
+    }
+    .cloud-l, .cloud-r, .cloud-sway { animation-iteration-count: infinite; }
+    .cloud-l    { animation-name: cloud-drift-left;  animation-timing-function: linear; }
+    .cloud-r    { animation-name: cloud-drift-right; animation-timing-function: linear; }
+    .cloud-sway { animation-name: cloud-sway;        animation-timing-function: ease-in-out; }
+
+    .cloud-d-110 { animation-duration: 110s; }
+    .cloud-d-125 { animation-duration: 125s; }
+    .cloud-d-140 { animation-duration: 140s; }
+    .cloud-d-160 { animation-duration: 160s; }
+    .cloud-d-175 { animation-duration: 175s; }
+
+    .cloud-s-11 { animation-duration: 11s; }
+    .cloud-s-12 { animation-duration: 12s; }
+    .cloud-s-13 { animation-duration: 13s; }
+    .cloud-s-15 { animation-duration: 15s; }
+    .cloud-s-17 { animation-duration: 17s; }
+
+    /* ════════════════════════════════════════════════════════════
+       Oiseaux origami (SVG) — trajectoire + battement d'ailes
+       ════════════════════════════════════════════════════════════ */
+    @keyframes bird-path-up-right {
+        0%, 100% { transform: translate(0, 0); }
+        25%      { transform: translate(18px, -22px); }
+        50%      { transform: translate(35px, -10px); }
+        75%      { transform: translate(20px, -28px); }
+    }
+    @keyframes bird-path-up-left {
+        0%, 100% { transform: translate(0, 0); }
+        25%      { transform: translate(-18px, -22px); }
+        50%      { transform: translate(-35px, -10px); }
+        75%      { transform: translate(-20px, -28px); }
+    }
+    @keyframes bird-path-hover {
+        0%, 100% { transform: translate(0, 0); }
+        33%      { transform: translate(8px, -10px); }
+        66%      { transform: translate(-6px, -4px); }
+    }
+    .bird-up-r, .bird-up-l, .bird-hover {
+        animation-iteration-count: infinite;
+        animation-timing-function: ease-in-out;
+    }
+    .bird-up-r  { animation-name: bird-path-up-right; }
+    .bird-up-l  { animation-name: bird-path-up-left; }
+    .bird-hover { animation-name: bird-path-hover; }
+
+    .bird-p-11 { animation-duration: 11s; }
+    .bird-p-15 { animation-duration: 15s; }
+    .bird-p-17 { animation-duration: 17s; }
+    .bird-p-19 { animation-duration: 19s; }
+    .bird-p-21 { animation-duration: 21s; }
+
+    /* Une keyframe par angle initial : deux transforms parallèles ne se cumulent pas. */
+    @keyframes bird-flap-r0   { 0%,100% { transform: rotate(0deg)    translateY(0); }  25% { transform: rotate(5deg)   translateY(-3px); } 50% { transform: rotate(-2deg)  translateY(2px); } 75% { transform: rotate(4deg)   translateY(-2px); } }
+    @keyframes bird-flap-rm5  { 0%,100% { transform: rotate(-5deg)   translateY(0); }  25% { transform: rotate(0deg)   translateY(-3px); } 50% { transform: rotate(-7deg)  translateY(2px); } 75% { transform: rotate(-1deg)  translateY(-2px); } }
+    @keyframes bird-flap-rm10 { 0%,100% { transform: rotate(-10deg)  translateY(0); }  25% { transform: rotate(-5deg)  translateY(-3px); } 50% { transform: rotate(-12deg) translateY(2px); } 75% { transform: rotate(-6deg)  translateY(-2px); } }
+    @keyframes bird-flap-rp8  { 0%,100% { transform: rotate(8deg)    translateY(0); }  25% { transform: rotate(13deg)  translateY(-3px); } 50% { transform: rotate(6deg)   translateY(2px); } 75% { transform: rotate(12deg)  translateY(-2px); } }
+
+    .bird-flap-r0, .bird-flap-rm5, .bird-flap-rm10, .bird-flap-rp8 {
+        animation-iteration-count: infinite;
+        animation-timing-function: ease-in-out;
+    }
+    .bird-flap-r0   { animation-name: bird-flap-r0; }
+    .bird-flap-rm5  { animation-name: bird-flap-rm5; }
+    .bird-flap-rm10 { animation-name: bird-flap-rm10; }
+    .bird-flap-rp8  { animation-name: bird-flap-rp8; }
+
+    .bird-f-28 { animation-duration: 2.8s; }
+    .bird-f-34 { animation-duration: 3.4s; }
+    .bird-f-36 { animation-duration: 3.6s; }
+    .bird-f-41 { animation-duration: 4.1s; }
+    .bird-f-43 { animation-duration: 4.3s; }
+
+    /* ════════════════════════════════════════════════════════════
+       Oiseaux sprite — .bird-fly traverse le ciel, .bird bat des ailes
+       (10 poses côte à côte dans birds-sprite.svg, défilées en steps(10))
+       ════════════════════════════════════════════════════════════ */
+    .bird {
+        width: 88px;
+        height: 125px;
+        background-image: url('../images/birds-sprite.svg');
+        background-size: auto 100%;
+        will-change: background-position;
+        animation: bird-flap steps(10) infinite;
+    }
+    @keyframes bird-flap { to { background-position: -900px 0; } }
+
+    .bird-flap-1 { animation-duration: 1s;    animation-delay: -0.5s; }
+    .bird-flap-2 { animation-duration: 0.9s;  animation-delay: -0.75s; }
+    .bird-flap-3 { animation-duration: 1.25s; animation-delay: -0.25s; }
+    .bird-flap-4 { animation-duration: 1.1s;  animation-delay: -0.5s; }
+
+    .bird-fly {
+        position: absolute;
+        top: 12%;
+        left: -10%;
+        will-change: transform;
+        transform: scale(0) translateX(-10vw);
+        animation-timing-function: linear;
+        animation-iteration-count: infinite;
+    }
+    .bird-fly-1 { animation-name: bird-path-a; animation-duration: 15s;   animation-delay: 0s; }
+    .bird-fly-2 { animation-name: bird-path-b; animation-duration: 16s;   animation-delay: 1s; }
+    .bird-fly-3 { animation-name: bird-path-a; animation-duration: 14.6s; animation-delay: 9.5s; }
+    .bird-fly-4 { animation-name: bird-path-b; animation-duration: 16s;   animation-delay: 10.25s; }
+
+    @keyframes bird-path-a {
+        0%   { transform: scale(0.3) translateX(-10vw); }
+        10%  { transform: translateY(2vh)  translateX(10vw)  scale(0.4); }
+        20%  { transform: translateY(0)    translateX(30vw)  scale(0.5); }
+        30%  { transform: translateY(4vh)  translateX(50vw)  scale(0.6); }
+        40%  { transform: translateY(2vh)  translateX(70vw)  scale(0.6); }
+        50%  { transform: translateY(0)    translateX(90vw)  scale(0.6); }
+        60%  { transform: translateY(0)    translateX(110vw) scale(0.6); }
+        100% { transform: translateY(0)    translateX(110vw) scale(0.6); }
+    }
+    @keyframes bird-path-b {
+        0%   { transform: translateY(-2vh)   translateX(-10vw) scale(0.5); }
+        10%  { transform: translateY(0)      translateX(10vw)  scale(0.4); }
+        20%  { transform: translateY(-4vh)   translateX(30vw)  scale(0.6); }
+        30%  { transform: translateY(1vh)    translateX(50vw)  scale(0.45); }
+        40%  { transform: translateY(-2.5vh) translateX(70vw)  scale(0.5); }
+        50%  { transform: translateY(0)      translateX(90vw)  scale(0.45); }
+        60%  { transform: translateY(0)      translateX(110vw) scale(0.45); }
+        100% { transform: translateY(0)      translateX(110vw) scale(0.45); }
+    }
+
+    /* ════════════════════════════════════════════════════════════
+       Indice de scroll — chevron qui respire
+       ════════════════════════════════════════════════════════════ */
+    @keyframes scroll-hint {
+        0%, 100% { transform: translateY(0);   opacity: 0.5; }
+        50%      { transform: translateY(6px); opacity: 1; }
+    }
+    .scroll-hint { animation: scroll-hint 2.4s ease-in-out infinite; }
+
+    /* ════════════════════════════════════════════════════════════
+       Accordéon — hauteur animée via grid-template-rows
+       ════════════════════════════════════════════════════════════ */
+    .accordion-item > .accordion-content {
+        display: grid;
+        grid-template-rows: 0fr;
+        transition: grid-template-rows 320ms cubic-bezier(.4, 0, .2, 1);
+    }
+    .accordion-item[open] > .accordion-content {
+        grid-template-rows: 1fr;
+    }
+    .accordion-item .accordion-inner {
+        overflow: hidden;
+        padding: 0 4px 6px;
+        margin: 0 -4px -6px;
+    }
+    .accordion-item summary::-webkit-details-marker { display: none; }
+    .accordion-item summary::marker { content: ''; }
+
+    /* ════════════════════════════════════════════════════════════
+       Préférence « moins d'animation »
+       ════════════════════════════════════════════════════════════ */
+    @media (prefers-reduced-motion: reduce) {
+        .cloud-l, .cloud-r, .cloud-sway,
+        .bird-up-r, .bird-up-l, .bird-hover,
+        .bird-flap-r0, .bird-flap-rm5, .bird-flap-rm10, .bird-flap-rp8,
+        .bird, .bird-fly,
+        .scroll-hint { animation: none; }
+
+        .accordion-item > .accordion-content { transition: none; }
+
+        /* Oiseaux sprite figés hors champ pour ne pas masquer le hero. */
+        .bird-fly { transform: translateX(-100vw); }
+    }
+}
+
+/* ════════════════════════════════════════════════════════════
+   Images dans le corps des articles (.prose)
+   Plafond de largeur ET de hauteur (pour les images portrait) + centrage,
+   pour les images migrées de WordPress souvent en pleine résolution.
+   Pas de !important : une image redimensionnée à la main dans l'éditeur
+   (style inline) reste prioritaire.
+   ════════════════════════════════════════════════════════════ */
+.prose :where(img):not([style*="width"]):not([style*="height"]) {
+    max-width: min(100%, 37.5rem);
+    max-height: 28rem;
+    width: auto;
+    height: auto;
+    margin-inline: auto;
+}
