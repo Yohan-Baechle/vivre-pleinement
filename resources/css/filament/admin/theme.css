@@ -1,0 +1,175 @@
+@import '../../../../vendor/filament/filament/resources/css/theme.css';
+
+@source '../../../../app/Filament/Admin/**/*';
+@source '../../../../resources/views/filament/admin/**/*';
+
+/* ════════════════════════════════════════════════════════════
+   Thème admin — identité Vivre Pleinement
+   Aligné sur le frontend : teal / crème / ink,
+   Crimson Pro (titres) + Instrument Sans (texte), coins arrondis doux.
+   ════════════════════════════════════════════════════════════ */
+
+/* ─── Polices locales variables (woff2, partagées avec le frontend) ─── */
+@font-face {
+    font-family: "Instrument Sans";
+    font-style: normal;
+    font-weight: 100 900;
+    font-display: swap;
+    src: url("../../../../public/fonts/instrument-sans-latin-wght-normal.woff2") format("woff2-variations");
+}
+
+@font-face {
+    font-family: "Crimson Pro";
+    font-style: normal;
+    font-weight: 200 900;
+    font-display: swap;
+    src: url("../../../../public/fonts/crimson-pro-latin-wght-normal.woff2") format("woff2-variations");
+}
+
+@font-face {
+    font-family: "Crimson Pro";
+    font-style: italic;
+    font-weight: 200 900;
+    font-display: swap;
+    src: url("../../../../public/fonts/crimson-pro-latin-wght-italic.woff2") format("woff2-variations");
+}
+
+/* ─── Variables de marque ─── */
+@theme {
+    --font-sans: "Instrument Sans", ui-sans-serif, system-ui, sans-serif;
+    --font-serif: "Crimson Pro", ui-serif, Georgia, serif;
+
+    /* Palette teal (identique au frontend) */
+    --color-teal-50: #effafb;
+    --color-teal-100: #d6f1f3;
+    --color-teal-200: #b1e3e7;
+    --color-teal-300: #7dccd3;
+    --color-teal-400: #46aeb8;
+    --color-teal-500: #2592a0;
+    --color-teal-600: #1a8593;
+    --color-teal-700: #117d89;
+    --color-teal-800: #126773;
+    --color-teal-900: #135561;
+
+    --color-cream-50: #fdfcf9;
+    --color-cream-100: #faf7f0;
+    --color-cream-200: #f3ecdd;
+    --color-cream-300: #e8dcc4;
+
+    --color-ink: #1f2a2a;
+    --color-ink-soft: #4a5757;
+    --color-ink-muted: #7c8888;
+}
+
+/* ─── Typographie : titres en serif ─── */
+.fi-header-heading,
+.fi-section-header-heading,
+.fi-modal-heading,
+.fi-page-heading,
+.fi-ta-empty-state-heading,
+.fi-simple-header-heading {
+    font-family: var(--font-serif);
+    font-weight: 500;
+    letter-spacing: 0.005em;
+}
+
+/* Logo / nom de marque dans la sidebar */
+.fi-logo {
+    font-family: var(--font-serif);
+    font-weight: 600;
+    letter-spacing: 0.01em;
+}
+
+.fi-sidebar-group-label {
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    font-size: 0.6875rem;
+}
+
+/* ─── Surfaces : ambiance crème en mode clair ─── */
+.fi-main-ctn,
+.fi-body {
+    background-color: var(--color-cream-50);
+}
+
+.fi-sidebar,
+.fi-sidebar-header,
+.fi-topbar > nav {
+    background-color: #ffffff;
+}
+
+.fi-section {
+    border: 1px solid var(--color-cream-200);
+}
+
+/* En-tête de page : filet de séparation discret */
+.fi-header {
+    border-bottom: 1px solid var(--color-cream-200);
+    padding-bottom: 1rem;
+}
+
+/* ─── Élément de navigation actif : accent teal ─── */
+.fi-sidebar-item-active .fi-sidebar-item-button {
+    background-color: var(--color-teal-50);
+    box-shadow: inset 3px 0 0 0 var(--color-teal-700);
+}
+
+.fi-sidebar-item-active .fi-sidebar-item-label {
+    font-weight: 600;
+}
+
+/* ─── Boutons : graisse et tracking nets ─── */
+.fi-btn {
+    letter-spacing: 0.01em;
+    font-weight: 500;
+}
+
+/* ─── Page de connexion : ambiance ciel teal (rappel du hero) ─── */
+.fi-simple-layout {
+    background:
+        linear-gradient(
+            160deg,
+            var(--color-teal-200) 0%,
+            var(--color-teal-100) 35%,
+            var(--color-cream-50) 100%
+        );
+}
+
+.fi-simple-main {
+    border: 1px solid var(--color-cream-200);
+    box-shadow: 0 25px 50px -12px rgb(19 85 97 / 0.25);
+}
+
+/* ════════════════════════════════════════════════════════════
+   Mode sombre : teinté teal profond plutôt que gris neutre
+   ════════════════════════════════════════════════════════════ */
+.dark .fi-main-ctn,
+.dark .fi-body {
+    background-color: #0c1f23;
+}
+
+.dark .fi-sidebar,
+.dark .fi-sidebar-header,
+.dark .fi-topbar > nav {
+    background-color: var(--color-teal-900);
+}
+
+.dark .fi-section {
+    background-color: #103039;
+    border-color: rgb(255 255 255 / 0.06);
+}
+
+.dark .fi-wi-stats-overview-stat {
+    background-color: #0c1f23;
+    border-color: rgb(255 255 255 / 0.06);
+}
+
+.dark .fi-sidebar-item-active .fi-sidebar-item-button {
+    background-color: rgb(255 255 255 / 0.06);
+    box-shadow: inset 3px 0 0 0 var(--color-teal-400);
+}
+
+.dark .fi-simple-layout {
+    background:
+        linear-gradient(160deg, #08171a 0%, var(--color-teal-900) 100%);
+}
