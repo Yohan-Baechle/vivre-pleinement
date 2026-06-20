@@ -118,7 +118,7 @@
                         <path stroke-linecap="round" stroke-linejoin="round" d="m10 9 5 3-5 3z"/>
                     </svg>
                     <p class="text-ink mt-4 font-serif text-xl">Aucune vidéo pour l'instant.</p>
-                    <p class="text-ink-soft mt-2 text-sm">Les vidéos arriveront bientôt – revenez nous voir !</p>
+                    <p class="text-ink-soft mt-2 text-sm">Les vidéos arriveront bientôt - revenez nous voir !</p>
                 </div>
             @endif
         </div>

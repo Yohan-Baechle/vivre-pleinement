@@ -24,9 +24,9 @@
         Ils ne stockent aucune information personnelle identifiante.
     </p>
     <ul>
-        <li><strong>laravel_session</strong> – Sessions utilisateur, sécurité (durée : 2 heures).</li>
-        <li><strong>XSRF-TOKEN</strong> – Protection contre les attaques CSRF (durée : 2 heures).</li>
-        <li><strong>cookie-consent</strong> – Mémorise vos préférences de consentement (durée : 6 mois).</li>
+        <li><strong>laravel_session</strong> - Sessions utilisateur, sécurité (durée : 2 heures).</li>
+        <li><strong>XSRF-TOKEN</strong> - Protection contre les attaques CSRF (durée : 2 heures).</li>
+        <li><strong>cookie-consent</strong> - Mémorise vos préférences de consentement (durée : 6 mois).</li>
     </ul>
 
     <h3>2.2 Cookies de mesure d'audience (soumis à consentement)</h3>
@@ -35,7 +35,7 @@
         collectant et rapportant des informations de manière anonyme.
     </p>
     <ul>
-        <li><strong>_ga, _ga_*</strong> (Google Analytics) – Distinguer les utilisateurs et sessions
+        <li><strong>_ga, _ga_*</strong> (Google Analytics) - Distinguer les utilisateurs et sessions
             (durée : 13 mois maximum). Anonymisation d'IP activée.</li>
     </ul>
 

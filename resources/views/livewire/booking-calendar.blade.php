@@ -25,7 +25,7 @@
         @endif
     </p>
 
-    {{-- Étape 1 – Calendrier + créneaux --}}
+    {{-- Étape 1 - Calendrier + créneaux --}}
     <section class="ring-ink/5 relative rounded-4xl bg-white p-6 shadow-xs ring-1 sm:p-8"
              aria-label="Choisir une date et un horaire">
 
@@ -136,7 +136,7 @@
         @endif
     </section>
 
-    {{-- Étape 2 – Récap + coordonnées --}}
+    {{-- Étape 2 - Récap + coordonnées --}}
     @if ($selectedSlot)
         @php $slotStart = CarbonImmutable::parse($selectedSlot); @endphp
         <section id="booking-form" class="ring-ink/5 rounded-4xl bg-white p-6 shadow-xs ring-1 sm:p-8"

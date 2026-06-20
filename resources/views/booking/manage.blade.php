@@ -38,7 +38,7 @@
                     </div>
                     <div class="flex justify-between gap-4">
                         <dt class="text-ink-muted">Heure</dt>
-                        <dd class="text-ink @if ($cancelled) @endif font-medium line-through">{{ $appointment->starts_at->format('H:i') }} – {{ $appointment->ends_at->format('H:i') }}</dd>
+                        <dd class="text-ink @if ($cancelled) @endif font-medium line-through">{{ $appointment->starts_at->format('H:i') }} - {{ $appointment->ends_at->format('H:i') }}</dd>
                     </div>
                     <div class="border-ink/5 flex justify-between gap-4 border-t pt-4">
                         <dt class="text-ink-muted">Référence</dt>

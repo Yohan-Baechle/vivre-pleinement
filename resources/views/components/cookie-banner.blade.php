@@ -48,7 +48,7 @@
                         <label class="flex cursor-pointer items-start justify-between gap-4">
                             <div>
                                 <p class="text-ink text-sm font-medium">Mesure d'audience</p>
-                                <p class="text-ink-soft mt-1 text-xs">Google Analytics – nous aide à comprendre comment vous utilisez le site, de manière anonymisée.</p>
+                                <p class="text-ink-soft mt-1 text-xs">Google Analytics - nous aide à comprendre comment vous utilisez le site, de manière anonymisée.</p>
                             </div>
                             <input type="checkbox" data-cookie-category="analytics"
                                    class="border-ink/20 mt-1 size-5 shrink-0 rounded-sm text-teal-700 focus:ring-2 focus:ring-teal-500">

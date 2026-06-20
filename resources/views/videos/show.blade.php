@@ -189,7 +189,7 @@
                             <path stroke-linecap="round" stroke-linejoin="round" d="m6 9 6 6 6-6"/>
                         </svg>
                     </summary>
-                    <div class="prose prose-ink border-ink/10 max-w-none border-t px-5 py-5 sm:px-6">
+                    <div class="prose prose-ink border-ink/10 max-w-none border-t p-5 sm:px-6">
                         {!! $video->transcript !!}
                     </div>
                 </details>

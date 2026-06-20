@@ -1,6 +1,6 @@
 @extends('layouts.site')
 
-@section('title', 'Message envoyé – Merci · Vivre Pleinement')
+@section('title', 'Message envoyé - Merci · Vivre Pleinement')
 
 @push('head')
     <meta name="robots" content="noindex, follow">

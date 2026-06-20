@@ -5,7 +5,7 @@
     $site = config('legal.site');
 
     $title = 'Politique de confidentialité';
-    $intro = "Nous attachons une grande importance au respect de votre vie privée. Cette politique décrit comment nous collectons, utilisons et protégeons vos données personnelles, conformément au Règlement Général sur la Protection des Données (RGPD – UE 2016/679) et à la loi Informatique et Libertés modifiée.";
+    $intro = "Nous attachons une grande importance au respect de votre vie privée. Cette politique décrit comment nous collectons, utilisons et protégeons vos données personnelles, conformément au Règlement Général sur la Protection des Données (RGPD - UE 2016/679) et à la loi Informatique et Libertés modifiée.";
     $breadcrumb = [['label' => 'Politique de confidentialité']];
 @endphp
 
@@ -75,9 +75,9 @@
         besoins du service :
     </p>
     <ul>
-        <li><strong>Hetzner Online GmbH</strong> (hébergement) – UE, conforme RGPD ;</li>
-        <li><strong>Brevo</strong> (envoi des emails marketing et transactionnels) – UE, conforme RGPD ;</li>
-        <li><strong>Google Ireland Limited</strong> (mesure d'audience via Google Analytics) – sous réserve de votre consentement.</li>
+        <li><strong>Hetzner Online GmbH</strong> (hébergement) - UE, conforme RGPD ;</li>
+        <li><strong>Brevo</strong> (envoi des emails marketing et transactionnels) - UE, conforme RGPD ;</li>
+        <li><strong>Google Ireland Limited</strong> (mesure d'audience via Google Analytics) - sous réserve de votre consentement.</li>
     </ul>
     <p>
         Aucune donnée n'est vendue ou cédée à des tiers à des fins commerciales.

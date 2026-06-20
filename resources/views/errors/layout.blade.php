@@ -20,7 +20,7 @@
             <div class="relative mx-auto max-w-2xl text-center">
                 {{-- Numéro d'erreur géant en filigrane, derrière le contenu --}}
                 <span
-                    class="text-teal-600/20 pointer-events-none absolute -top-12 left-1/2 -z-10 -translate-x-1/2 text-[12rem] leading-none font-bold tracking-tighter select-none sm:-top-20 sm:text-[20rem]"
+                    class="pointer-events-none absolute -top-12 left-1/2 -z-10 -translate-x-1/2 text-[12rem] leading-none font-bold tracking-tighter text-teal-600/20 select-none sm:-top-20 sm:text-[20rem]"
                     aria-hidden="true"
                 >
                     {{ $code ?? '' }}

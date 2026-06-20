@@ -273,7 +273,7 @@
         lead="Choisissez votre créneau ci-dessous, je vous contacte au moment indiqué."
         headerWidth="max-w-4xl">
         @if (! $primaryService)
-            <p class="bg-white text-ink-soft ring-ink/5 mx-auto max-w-xl rounded-3xl p-8 text-center ring-1">
+            <p class="text-ink-soft ring-ink/5 mx-auto max-w-xl rounded-3xl bg-white p-8 text-center ring-1">
                 Aucun créneau n'est disponible à la réservation pour le moment.
                 <a href="mailto:contact@vivre-pleinement.fr" class="font-medium text-teal-700 hover:text-teal-800">Écrivez-moi</a> directement.
             </p>
@@ -302,7 +302,7 @@
         >
             <a
                 href="#reserver"
-                class="bg-teal-700 shadow-teal-900/30 flex items-center justify-center gap-2 rounded-full px-6 py-3.5 text-center text-sm font-medium text-white shadow-lg transition hover:bg-teal-800"
+                class="flex items-center justify-center gap-2 rounded-full bg-teal-700 px-6 py-3.5 text-center text-sm font-medium text-white shadow-lg shadow-teal-900/30 transition hover:bg-teal-800"
             >
                 Prendre rendez-vous
                 <span aria-hidden="true">→</span>

@@ -28,7 +28,7 @@
             </h2>
             <div class="text-ink-soft mt-6 space-y-4 text-base leading-relaxed">
                 <p>
-                    Je m'appelle Laura Baechlé. Je ne suis pas médecin, je ne suis pas psychologue. Je suis quelqu'un qui a vécu la phobie d'impulsion et les pensées intrusives de l'intérieur, pendant plus de dix ans &mdash; et qui en est sortie.
+                    Je m'appelle Laura Baechlé. Je ne suis pas médecin, je ne suis pas psychologue. Je suis quelqu'un qui a vécu la phobie d'impulsion et les pensées intrusives de l'intérieur, pendant plus de dix ans, et qui en est sortie.
                 </p>
                 <p>
                     J'ai testé sur moi-même tout ce qui existe : TCC, médicaments, hypnose, méditation, sophrologie, EMDR, naturopathie, travail somatique, écriture, ennéagramme&hellip; J'ai gardé ce qui marchait vraiment et écarté le reste.

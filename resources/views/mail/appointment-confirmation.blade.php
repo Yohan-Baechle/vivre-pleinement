@@ -12,7 +12,7 @@ Votre rendez-vous est **confirmé**. Voici le récapitulatif :
 **Prestation :** {{ $appointment->service->name }}
 **Format :** {{ $appointment->channel->getLabel() }}
 **Date :** {{ $appointment->starts_at->locale('fr')->isoFormat('dddd D MMMM YYYY') }}
-**Heure :** {{ $appointment->starts_at->format('H:i') }} – {{ $appointment->ends_at->format('H:i') }}
+**Heure :** {{ $appointment->starts_at->format('H:i') }} - {{ $appointment->ends_at->format('H:i') }}
 @if ($appointment->channel === \App\Enums\AppointmentChannel::Phone)
 **Modalité :** Je vous appellerai au numéro indiqué à l'heure du rendez-vous.
 @elseif ($appointment->meeting_url)

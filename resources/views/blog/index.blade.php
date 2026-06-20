@@ -9,7 +9,7 @@
     if (! $hasFilters && $page === 1) {
         $metaTitle = 'Blog · Outils et ressources contre l\'anxiété | Vivre Pleinement';
     } elseif ($hasFilters) {
-        $metaTitle = 'Blog · résultats – Vivre Pleinement';
+        $metaTitle = 'Blog · résultats - Vivre Pleinement';
     } else {
         $metaTitle = 'Le blog (page '.$page.') · Vivre Pleinement';
     }
@@ -29,7 +29,7 @@
     @if ($hasFilters || $page > 1)
         <meta name="robots" content="noindex, follow">
     @endif
-    <link rel="alternate" type="application/rss+xml" title="Vivre Pleinement – Blog" href="{{ route('blog.rss') }}">
+    <link rel="alternate" type="application/rss+xml" title="Vivre Pleinement - Blog" href="{{ route('blog.rss') }}">
 
     <meta property="og:type" content="website">
     <meta property="og:title" content="{{ $metaTitle }}">
