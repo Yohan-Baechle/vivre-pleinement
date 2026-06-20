@@ -10,9 +10,9 @@ services:
         restart: unless-stopped
         env_file: ${ENV_FILE:-.env}
         ports:
-            # Exposé uniquement sur l'interface Tailscale de la VM.
-            # Remplace 100.x.y.z par l'IP Tailscale de la VM (ou 127.0.0.1 si reverse-proxy local).
-            - '${BIND_IP:-127.0.0.1}:8080:80'
+            # Exposé uniquement sur l'interface Tailscale de la VM (BIND_IP = IP tailnet).
+            # APP_PORT : port d'écoute sur l'hôte (défaut 8080).
+            - '${BIND_IP:-127.0.0.1}:${APP_PORT:-8080}:80'
         volumes:
             - storage-public:/var/www/html/storage/app/public
         depends_on:
@@ -21,6 +21,8 @@ services:
 
     worker:
         image: vivre-pleinement:prod
+        # Réutilise l'image construite par le service app, sans tenter de la pull.
+        pull_policy: never
         restart: unless-stopped
         env_file: ${ENV_FILE:-.env}
         command: php artisan queue:work --tries=3 --timeout=90 --sleep=3

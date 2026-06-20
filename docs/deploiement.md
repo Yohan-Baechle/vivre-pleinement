@@ -34,7 +34,7 @@ cp .env.production.example .env
 Éditer `.env` et définir au minimum :
 
 - `DB_PASSWORD` — un mot de passe fort
-- `APP_URL` — le nom Tailscale de la VM, ex. `http://ma-vm.ton-tailnet.ts.net:8080`
+- `APP_URL` — le nom Tailscale de la VM, ex. `http://ma-vm.ton-tailnet.ts.net:48080`
 - `BIND_IP` — l'IP Tailscale de la VM (`tailscale ip -4`) pour n'exposer que sur le tailnet
 
 `APP_KEY` est laissée vide : elle est générée automatiquement au premier démarrage.
