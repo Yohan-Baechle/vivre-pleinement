@@ -1,0 +1,51 @@
+# Déploiement de production (VM Proxmox / Docker, derrière Tailscale).
+# Build sur la VM : docker compose -f compose.prod.yaml up -d --build
+
+services:
+    app:
+        build:
+            context: .
+            dockerfile: docker/Dockerfile
+        image: vivre-pleinement:prod
+        restart: unless-stopped
+        env_file: ${ENV_FILE:-.env}
+        ports:
+            # Exposé uniquement sur l'interface Tailscale de la VM.
+            # Remplace 100.x.y.z par l'IP Tailscale de la VM (ou 127.0.0.1 si reverse-proxy local).
+            - '${BIND_IP:-127.0.0.1}:8080:80'
+        volumes:
+            - storage-public:/var/www/html/storage/app/public
+        depends_on:
+            mariadb:
+                condition: service_healthy
+
+    worker:
+        image: vivre-pleinement:prod
+        restart: unless-stopped
+        env_file: ${ENV_FILE:-.env}
+        command: php artisan queue:work --tries=3 --timeout=90 --sleep=3
+        volumes:
+            - storage-public:/var/www/html/storage/app/public
+        depends_on:
+            app:
+                condition: service_started
+
+    mariadb:
+        image: mariadb:11
+        restart: unless-stopped
+        environment:
+            MYSQL_DATABASE: '${DB_DATABASE}'
+            MYSQL_USER: '${DB_USERNAME}'
+            MYSQL_PASSWORD: '${DB_PASSWORD}'
+            MYSQL_ROOT_PASSWORD: '${DB_PASSWORD}'
+        volumes:
+            - mariadb-data:/var/lib/mysql
+        healthcheck:
+            test: ['CMD', 'healthcheck.sh', '--connect', '--innodb_initialized']
+            interval: 10s
+            timeout: 5s
+            retries: 10
+
+volumes:
+    mariadb-data:
+    storage-public:
