@@ -56,6 +56,7 @@ class ContentSeeder extends Seeder
             '--port='.$config['port'],
             '--user='.$config['username'],
             '--password='.$config['password'],
+            '--default-character-set=utf8mb4',
             $config['database'],
         ]);
 
