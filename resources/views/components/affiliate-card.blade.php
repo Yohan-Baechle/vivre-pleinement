@@ -16,14 +16,14 @@
     $iconPath = $icons[$icon] ?? $icons['sparkles'];
 @endphp
 
-<div class="not-prose relative mt-12 mb-8 rounded-3xl border border-teal-700/10 bg-gradient-to-br from-teal-50/80 to-cream-50 shadow-sm">
-    <div class="absolute -top-6 left-1/2 flex size-14 -translate-x-1/2 items-center justify-center rounded-2xl bg-teal-700 text-white shadow-lg shadow-teal-700/25 ring-4 ring-cream-50 sm:left-8 sm:translate-x-0">
+<div class="not-prose to-cream-50 relative mt-12 mb-8 rounded-3xl border border-teal-700/10 bg-linear-to-br from-teal-50/80 shadow-sm">
+    <div class="ring-cream-50 absolute -top-6 left-1/2 flex size-14 -translate-x-1/2 items-center justify-center rounded-2xl bg-teal-700 text-white shadow-lg ring-4 shadow-teal-700/25 sm:left-8 sm:translate-x-0">
         <svg class="size-7" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
             {!! $iconPath !!}
         </svg>
     </div>
 
-    <div class="flex flex-col gap-4 px-5 pt-12 pb-5 sm:flex-row sm:items-center sm:gap-6 sm:px-6 sm:pt-6 sm:pb-6 sm:pl-28">
+    <div class="flex flex-col gap-4 px-5 pt-12 pb-5 sm:flex-row sm:items-center sm:gap-6 sm:px-6 sm:py-6 sm:pl-28">
         <div class="min-w-0 flex-1 text-center sm:text-left">
             <p class="text-xs font-semibold tracking-wider text-teal-700 uppercase">{{ $eyebrow }}</p>
             <p class="text-ink mt-1 font-serif text-lg leading-snug font-medium">{{ $label }}</p>

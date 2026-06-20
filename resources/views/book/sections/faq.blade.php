@@ -10,11 +10,11 @@
         ],
         [
             'q' => "C'est un livre numérique ou papier ?",
-            'a' => "C'est un PDF de 77 pages, que vous recevez par email immédiatement après votre paiement. Vous pouvez le lire sur ordinateur, smartphone, tablette ou liseuse. Et bien sûr, vous pouvez l'imprimer chez vous si vous préférez le papier &mdash; les 12 fiches pratiques sont d'ailleurs conçues pour ça.",
+            'a' => "C'est un PDF de 77 pages, que vous recevez par email immédiatement après votre paiement. Vous pouvez le lire sur ordinateur, smartphone, tablette ou liseuse. Et bien sûr, vous pouvez l'imprimer chez vous si vous préférez le papier : les 12 fiches pratiques sont d'ailleurs conçues pour ça.",
         ],
         [
             'q' => "Combien de temps faut-il pour voir des résultats ?",
-            'a' => "Ça dépend de votre situation. Certaines personnes ressentent un soulagement dès la lecture des premiers chapitres, simplement parce qu'elles comprennent enfin ce qui leur arrive. Pour les changements profonds, comptez plusieurs semaines de pratique régulière des fiches. Ce n'est pas une méthode miracle, c'est un chemin &mdash; mais c'est un chemin qui marche.",
+            'a' => "Ça dépend de votre situation. Certaines personnes ressentent un soulagement dès la lecture des premiers chapitres, simplement parce qu'elles comprennent enfin ce qui leur arrive. Pour les changements profonds, comptez plusieurs semaines de pratique régulière des fiches. Ce n'est pas une méthode miracle, c'est un chemin, mais un chemin qui marche.",
         ],
         [
             'q' => "Le coaching à 70 € est-il vraiment utile en plus du livre ?",
@@ -26,11 +26,11 @@
         ],
         [
             'q' => "Et si le livre ne me convient pas ?",
-            'a' => "Vous avez 30 jours pour le lire, l'essayer, vous faire votre propre idée. Si vous estimez qu'il ne vous a rien apporté, vous m'envoyez un simple email et je vous rembourse intégralement. Sans justification à donner. C'est ma façon de vous dire que je crois en ce livre &mdash; et que le risque, c'est moi qui le prends, pas vous.",
+            'a' => "Vous avez 30 jours pour le lire, l'essayer, vous faire votre propre idée. Si vous estimez qu'il ne vous a rien apporté, vous m'envoyez un simple email et je vous rembourse intégralement. Sans justification à donner. C'est ma façon de vous dire que je crois en ce livre : le risque, c'est moi qui le prends, pas vous.",
         ],
         [
             'q' => "Vous n'êtes ni médecin ni psychologue. Pourquoi devrais-je vous écouter ?",
-            'a' => "Vous avez raison de poser la question. Je ne remplace pas un suivi médical et je le dis clairement dans le livre : si vous êtes en grande souffrance, consultez. Mon expertise vient d'ailleurs : plus de dix ans à vivre ce trouble, à tester des dizaines d'approches, à lire, à me former. C'est l'expertise du vécu &mdash; celle qu'aucun manuel ne contient. À vous de voir si elle peut vous parler.",
+            'a' => "Vous avez raison de poser la question. Je ne remplace pas un suivi médical et je le dis clairement dans le livre : si vous êtes en grande souffrance, consultez. Mon expertise vient d'ailleurs : plus de dix ans à vivre ce trouble, à tester des dizaines d'approches, à lire, à me former. C'est l'expertise du vécu, celle qu'aucun manuel ne contient. À vous de voir si elle peut vous parler.",
         ],
     ];
 @endphp

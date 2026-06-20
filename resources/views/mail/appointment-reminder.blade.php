@@ -11,7 +11,7 @@ Je vous rappelle votre rendez-vous **prévu demain**. Voici le récapitulatif :
 
 **Prestation :** {{ $appointment->service->name }}
 **Date :** {{ $appointment->starts_at->locale('fr')->isoFormat('dddd D MMMM YYYY') }}
-**Heure :** {{ $appointment->starts_at->format('H:i') }} – {{ $appointment->ends_at->format('H:i') }}
+**Heure :** {{ $appointment->starts_at->format('H:i') }} - {{ $appointment->ends_at->format('H:i') }}
 @if ($appointment->meeting_url)
 **Lien visio :** [{{ $appointment->meeting_url }}]({{ $appointment->meeting_url }})
 @endif

@@ -1,6 +1,6 @@
 @extends('layouts.site')
 
-@section('title', $service->name.' · Prendre rendez-vous – Vivre Pleinement')
+@section('title', $service->name.' · Prendre rendez-vous - Vivre Pleinement')
 
 @push('head')
     <meta name="description" content="Réservez « {{ $service->name }} » avec Laura Baechlé : choisissez votre créneau en ligne, en visioconférence.">
