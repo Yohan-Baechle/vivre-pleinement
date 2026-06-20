@@ -25,7 +25,7 @@
 
 <x-section bg="bg-cream-50" eyebrow="Le livre" title="Une méthode douce, en quatre temps.">
     <p class="text-ink-soft mx-auto -mt-8 mb-12 max-w-2xl text-center text-base sm:text-lg">
-        Le fruit de plus de dix ans de recherches, d'essais et d'erreurs &mdash; condensé dans <strong class="text-ink font-medium">77 pages claires</strong>, avec <strong class="text-ink font-medium">12 fiches pratiques</strong> à appliquer dès la première lecture.
+        Le fruit de plus de dix ans de recherches, d'essais et d'erreurs, condensé dans <strong class="text-ink font-medium">77 pages claires</strong>, avec <strong class="text-ink font-medium">12 fiches pratiques</strong> à appliquer dès la première lecture.
     </p>
 
     <ol class="grid grid-cols-1 gap-6 md:grid-cols-2 md:gap-8">

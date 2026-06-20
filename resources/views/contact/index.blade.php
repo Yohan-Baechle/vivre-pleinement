@@ -32,7 +32,7 @@
     ];
 @endphp
 
-@section('title', 'Contact · Laura Baechlé – Vivre Pleinement')
+@section('title', 'Contact · Laura Baechlé - Vivre Pleinement')
 @section('description', "Une question, une demande d'accompagnement ? Contactez Laura Baechlé via le formulaire, par email, par téléphone ou sur les réseaux sociaux.")
 @section('canonical', route('contact'))
 
@@ -130,7 +130,7 @@
                             <label for="subject" class="text-ink-muted block text-xs font-medium tracking-wider uppercase">Objet *</label>
                             <select id="subject" name="subject" required
                                     class="{{ $fieldClasses }} @error('subject') {{ $fieldError }} @enderror">
-                                <option value="">– Choisir l'objet –</option>
+                                <option value="">- Choisir l'objet -</option>
                                 <option value="rdv" @selected(old('subject', request('subject')) ==='rdv')>Prendre rendez-vous</option>
                                 <option value="question" @selected(old('subject', request('subject')) ==='question')>Question sur l'accompagnement</option>
                                 <option value="partenariat" @selected(old('subject', request('subject')) ==='partenariat')>Partenariat</option>

@@ -37,7 +37,7 @@
             </ul>
 
             <a href="{{ route('book.checkout', 'livre') }}" class="group bg-ink shadow-ink/20 mt-8 inline-flex w-full items-center justify-center gap-2 rounded-full px-7 py-3.5 text-sm font-medium text-white shadow-lg transition hover:bg-teal-800 sm:text-base">
-                Obtenir le livre &mdash; 37&nbsp;€
+                Obtenir le livre · 37&nbsp;€
                 <span class="transition group-hover:translate-x-0.5" aria-hidden="true">→</span>
             </a>
         </article>
@@ -82,7 +82,7 @@
             </ul>
 
             <a href="{{ route('book.checkout', 'livre-coaching') }}" class="group hover:bg-cream-50 mt-8 inline-flex w-full items-center justify-center gap-2 rounded-full bg-white px-7 py-3.5 text-sm font-medium text-teal-800 shadow-lg transition sm:text-base">
-                Obtenir le livre + coaching &mdash; 70&nbsp;€
+                Obtenir le livre + coaching · 70&nbsp;€
                 <span class="transition group-hover:translate-x-0.5" aria-hidden="true">→</span>
             </a>
         </article>

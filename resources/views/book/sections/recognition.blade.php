@@ -3,7 +3,7 @@
         [
             'icon' => 'M12 8v4l3 3m6-3a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z',
             'title' => 'Des pensées que vous n\'osez dire à personne',
-            'desc' => "Faire du mal à votre enfant, à votre conjoint, à vous-même. Des images qui surgissent sans prévenir et vous terrifient – alors que vous n'avez aucune envie de les vivre.",
+            'desc' => "Faire du mal à votre enfant, à votre conjoint, à vous-même. Des images qui surgissent sans prévenir et vous terrifient, alors que vous n'avez aucune envie de les vivre.",
         ],
         [
             'icon' => 'M13 10V3L4 14h7v7l9-11h-7z',
@@ -18,7 +18,7 @@
         [
             'icon' => 'M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8m0 0V3m0 5h5',
             'title' => 'Le sentiment que ça empire',
-            'desc' => "Les TCC n'ont pas marché ou vous ont épuisé. Les antidépresseurs vous engourdissent sans résoudre le fond. Vous voulez une autre approche – mais vous ne savez plus où chercher.",
+            'desc' => "Les TCC n'ont pas marché ou vous ont épuisé. Les antidépresseurs vous engourdissent sans résoudre le fond. Vous voulez une autre approche, mais vous ne savez plus où chercher.",
         ],
     ];
 @endphp
@@ -40,6 +40,6 @@
 
     <p class="text-ink-soft mt-12 text-center text-base sm:text-lg">
         Vous n'êtes <strong class="text-ink font-medium">ni fou, ni dangereux, ni seul</strong>.<br class="hidden sm:block">
-        Ces pensées portent un nom &mdash; et elles se soignent.
+        Ces pensées portent un nom, et elles se soignent.
     </p>
 </x-section>

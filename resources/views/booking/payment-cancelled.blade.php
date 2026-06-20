@@ -17,7 +17,7 @@
 
             <h1 class="text-ink mt-8 font-serif text-3xl font-medium tracking-tight">Paiement annulé</h1>
             <p class="text-ink-soft mt-4 max-w-md text-base">
-                Votre rendez-vous n'a pas été confirmé car le paiement n'a pas abouti. Vous pouvez réessayer quand vous le souhaitez – le créneau reste disponible quelques instants.
+                Votre rendez-vous n'a pas été confirmé car le paiement n'a pas abouti. Vous pouvez réessayer quand vous le souhaitez - le créneau reste disponible quelques instants.
             </p>
 
             <div class="mt-8 flex flex-col items-center gap-3 sm:flex-row">
