@@ -1,0 +1,10 @@
+User-agent: *
+Allow: /
+
+# Pas d'indexation des pages admin
+Disallow: /espace-pro/
+Disallow: /livewire/
+
+# Sitemaps
+Sitemap: https://vivre-pleinement.fr/sitemap.xml
+Sitemap: https://vivre-pleinement.fr/sitemap-videos.xml
