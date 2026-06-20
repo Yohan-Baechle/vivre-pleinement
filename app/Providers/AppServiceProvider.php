@@ -4,6 +4,7 @@ namespace App\Providers;
 
 use App\Observers\MediaObserver;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\URL;
 use Illuminate\Support\ServiceProvider;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
@@ -19,5 +20,9 @@ class AppServiceProvider extends ServiceProvider
         Media::observe(MediaObserver::class);
 
         Model::shouldBeStrict(! $this->app->isProduction());
+
+        if ($this->app->isProduction()) {
+            URL::forceRootUrl(config('app.url'));
+        }
     }
 }
