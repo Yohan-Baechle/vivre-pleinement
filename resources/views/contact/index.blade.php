@@ -23,7 +23,7 @@
         ],
         [
             'q' => "Comment prendre rendez-vous plutôt que d'écrire ?",
-            'a' => "Si vous souhaitez directement réserver votre rendez-vous découverte gratuit, vous pouvez le faire en quelques clics depuis la page de réservation. Le formulaire de contact, lui, est parfait pour une question avant de vous lancer.",
+            'a' => "Si vous souhaitez directement réserver une séance, vous pouvez le faire en quelques clics depuis la page de réservation. Le formulaire de contact, lui, est parfait pour une question avant de vous lancer.",
         ],
         [
             'q' => "Vous avez déjà la réponse à ma question ?",

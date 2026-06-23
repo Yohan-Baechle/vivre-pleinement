@@ -36,29 +36,45 @@
 <x-section
     id="troubles"
     eyebrow="Troubles accompagnés"
-    title="Vous reconnaissez-vous ?"
-    lead="L'anxiété prend des formes très différentes. Quelle que soit la vôtre, vous n'êtes pas seule à la vivre, et des solutions existent."
+    title="Pour quels troubles puis-je vous être utile ?"
+    lead="Je peux vous accompagner dans les troubles et problèmes émotionnels suivants. Quel que soit le vôtre, vous n'êtes pas seule à le vivre, et des solutions existent."
 >
-    <div class="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
+    <ul class="mx-auto max-w-3xl">
         @foreach ($troubles as $trouble)
-            <article class="group ring-ink/5 relative rounded-3xl bg-white p-6 shadow-xs ring-1 transition hover:-translate-y-1 hover:shadow-xl hover:shadow-teal-700/10 hover:ring-teal-200">
-                <div class="flex size-12 items-center justify-center rounded-2xl bg-teal-50 text-teal-700 ring-1 ring-teal-100">
-                    <svg class="size-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
+            <li
+                data-reveal
+                style="--reveal-delay: {{ $loop->index * 90 }}ms"
+                class="group flex items-start gap-5 border-t border-ink/8 py-7 first:border-t-0 sm:items-center sm:gap-7"
+            >
+                <div class="flex size-14 shrink-0 items-center justify-center rounded-2xl bg-teal-50 text-teal-700 ring-1 ring-teal-100 transition group-hover:bg-teal-100 group-hover:ring-teal-200">
+                    <svg class="size-7" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
                         <path stroke-linecap="round" stroke-linejoin="round" d="{{ $trouble['icon'] }}"/>
                     </svg>
                 </div>
-                <h3 class="text-ink mt-5 font-serif text-xl font-medium">{{ $trouble['title'] }}</h3>
-                <p class="text-ink-soft mt-2 text-sm leading-relaxed">{{ $trouble['desc'] }}</p>
-            </article>
+                <div class="min-w-0">
+                    <h3 class="text-ink font-serif text-xl font-medium">{{ $trouble['title'] }}</h3>
+                    <p class="text-ink-soft mt-1 text-sm leading-relaxed">{{ $trouble['desc'] }}</p>
+                </div>
+            </li>
         @endforeach
-    </div>
+    </ul>
 
-    <div class="ring-ink/5 mt-10 rounded-3xl bg-white/60 p-6 text-center ring-1 sm:p-8">
+    <div class="mx-auto mt-12 max-w-3xl border-t border-ink/8 pt-10 text-center">
         <p class="text-ink-soft text-sm leading-relaxed">
             J'accompagne aussi les <strong class="text-ink font-medium">crises d'angoisse</strong>, l'anxiété matinale et l'angoisse nocturne, l'<strong class="text-ink font-medium">agoraphobie</strong> et la phobie sociale, l'hypocondrie, la phobie d'impulsion, la dépersonnalisation/déréalisation, le manque de confiance et d'estime de soi, les addictions, le stress lié au travail ainsi que le trouble anxio-dépressif.
         </p>
         <p class="text-ink mt-3 text-sm font-medium">
             Vous ne vous retrouvez dans aucune de ces cases&nbsp;? Parlons-en, chaque parcours est unique.
         </p>
+
+        <div class="mt-8 flex flex-wrap items-center justify-center gap-3 sm:gap-4">
+            <a href="{{ route('booking.index') }}" class="group inline-flex items-center gap-2 rounded-full bg-teal-700 px-7 py-3.5 text-sm font-medium text-white shadow-lg shadow-teal-700/20 transition hover:bg-teal-800 sm:text-base">
+                Prendre rendez-vous
+                <span class="transition group-hover:translate-x-0.5" aria-hidden="true">→</span>
+            </a>
+            <a href="{{ route('blog.index') }}" class="text-ink-soft inline-flex items-center gap-2 text-sm font-medium transition hover:text-teal-700 sm:text-base">
+                Découvrir mes articles
+            </a>
+        </div>
     </div>
 </x-section>

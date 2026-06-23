@@ -38,15 +38,14 @@
         nécessaire (ordinateur ou smartphone, connexion internet, espace calme).
     </p>
     <p>
-        Le premier rendez-vous (« rendez-vous découverte ») d'une durée de 30 minutes est <strong>gratuit
-        et sans engagement</strong>. Il permet de définir si l'accompagnement est adapté à la situation
-        du Client.
+        Chaque séance d'accompagnement individuel dure une heure. Les séances se réservent à l'unité,
+        sans abonnement ni engagement de durée : le Client choisit librement le rythme qui lui convient.
     </p>
 
     <h2>4. Tarifs</h2>
     <p>
-        Les tarifs en vigueur sont communiqués au Client lors du rendez-vous découverte ou sur demande.
-        Ils sont exprimés en euros, toutes taxes comprises. {{ $editor['name'] }} bénéficie de la
+        Une séance individuelle d'une heure est facturée 50 € (cinquante euros). Les tarifs sont
+        exprimés en euros, toutes taxes comprises. {{ $editor['name'] }} bénéficie de la
         franchise en base de TVA (article 293 B du Code général des impôts) ; la TVA n'est donc pas
         applicable.
     </p>
