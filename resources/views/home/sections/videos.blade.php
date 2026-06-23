@@ -13,7 +13,7 @@
         eyebrow="Sur YouTube"
         title="Apprendre en vidéo."
         lead="Conseils et exercices courts pour avancer entre les séances."
-        bg="bg-white"
+        bg="bg-cream-50"
     >
         <div class="grid grid-cols-1 gap-6 md:grid-cols-3">
             @foreach ($videos as $video)

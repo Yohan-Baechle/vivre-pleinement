@@ -22,17 +22,20 @@
                 Qui suis-je
             </p>
             <h2 class="text-ink mt-5 font-serif text-3xl font-medium tracking-tight sm:text-4xl lg:text-5xl">
-                J'ai vécu l'anxiété de l'intérieur.
+                Pourquoi suis-je habilitée à vous accompagner&nbsp;?
             </h2>
             <div class="text-ink-soft mt-6 space-y-4 text-base leading-relaxed">
                 <p>
-                    Pendant des années, j'ai vécu de nombreux troubles anxieux. Je me suis vraiment prise en main le jour où ils sont devenus trop handicapants. Je sais donc précisément ce que vous traversez, parce que j'ai été à votre place.
+                    Ayant eu de nombreux troubles anxieux, je me suis réellement prise en main à partir du moment où ils devenaient trop handicapants. Et comment y suis-je parvenue&nbsp;? Grâce à la découverte de l'<strong class="text-ink font-medium">ACT</strong> (thérapie d'acceptation et d'engagement), laquelle a marqué un véritable tournant dans mon parcours.
                 </p>
                 <p>
-                    Le tournant&nbsp;? La découverte de l'<strong class="text-ink font-medium">ACT</strong>, la thérapie d'acceptation et d'engagement. Cette approche a littéralement transformé mon rapport à l'anxiété. C'est pour cela que je suis devenue praticienne ACT&nbsp;: pour transmettre, à mon tour, ce qui m'a aidée.
+                    Aujourd'hui, étant devenue praticienne ACT, c'est avec beaucoup de sens et de conviction que je souhaite transmettre cette approche à mon tour, puisque celle-ci a littéralement changé mes troubles anxieux.
                 </p>
                 <p>
-                    L'ACT est une approche dont l'efficacité est <strong class="text-ink font-medium">validée scientifiquement</strong>. Elle fait partie des thérapies cognitives et comportementales de 3<sup>e</sup> vague, et vise à réduire l'emprise des mécanismes qui entretiennent la souffrance, en douceur et à votre rythme.
+                    L'ACT est une approche thérapeutique dont l'efficacité est <strong class="text-ink font-medium">validée scientifiquement</strong>. Elle fait partie des TCC de 3<sup>e</sup> vague, qui enrichissent les thérapies cognitives et comportementales classiques. L'objectif&nbsp;? Réduire l'impact des mécanismes et apprentissages qui entretiennent la souffrance psychologique.
+                </p>
+                <p>
+                    N'ayant que trop connu les troubles anxieux, je ne peux que comprendre ce que vous ressentez, puisque j'ai été à votre place.
                 </p>
             </div>
 
@@ -52,7 +55,7 @@
             </dl>
 
             <a href="{{ route('contact') }}" class="group mt-8 inline-flex items-center gap-2 text-sm font-medium text-teal-700 transition hover:text-teal-800">
-                <span class="border-b border-teal-700/30 transition group-hover:border-teal-700">Me contacter</span>
+                <span class="border-b border-teal-700/30 transition group-hover:border-teal-700">Qui suis-je&nbsp;?</span>
                 <span class="transition group-hover:translate-x-0.5" aria-hidden="true">→</span>
             </a>
         </div>

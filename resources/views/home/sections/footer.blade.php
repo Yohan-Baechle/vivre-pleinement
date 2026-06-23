@@ -11,7 +11,7 @@
             ['Le blog', route('blog.index')],
             ['Les vidéos', route('videos.index')],
             ['Vidéo offerte', $home.'#capture'],
-            ['FAQ', $home.'#faq'],
+            ['FAQ', route('faq')],
         ],
         'À propos' => [
             ['Qui suis-je', $home.'#a-propos'],
@@ -29,12 +29,7 @@
 @endphp
 
 <footer class="text-cream-100 relative overflow-hidden bg-teal-900">
-    <div class="pointer-events-none absolute inset-0 -z-0 opacity-30">
-        <div class="absolute -top-32 -right-32 size-96 rounded-full bg-teal-700 blur-3xl"></div>
-        <div class="absolute -bottom-32 -left-32 size-96 rounded-full bg-teal-800 blur-3xl"></div>
-    </div>
-
-    <div class="site-container relative pt-20 pb-10 lg:pt-24">
+    <div class="site-container relative pt-6 pb-10 lg:pt-12">
         <div class="grid grid-cols-1 gap-12 lg:grid-cols-12 lg:gap-16">
             <div class="lg:col-span-4">
                 <a href="/" class="inline-flex items-center" aria-label="Accueil">

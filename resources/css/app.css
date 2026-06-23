@@ -241,6 +241,69 @@
     .accordion-item summary::marker { content: ''; }
 
     /* ════════════════════════════════════════════════════════════
+       Apparition au scroll - éléments marqués [data-reveal]
+       ════════════════════════════════════════════════════════════ */
+    [data-reveal] {
+        opacity: 0;
+        transform: translateY(1.25rem);
+        transition: opacity 600ms ease, transform 600ms cubic-bezier(.4, 0, .2, 1);
+        transition-delay: var(--reveal-delay, 0ms);
+    }
+    [data-reveal].is-revealed {
+        opacity: 1;
+        transform: none;
+    }
+
+    /* ════════════════════════════════════════════════════════════
+       Frise « méthode » - ligne verticale qui se trace au scroll
+       ════════════════════════════════════════════════════════════ */
+    .timeline-line {
+        transform-origin: top;
+        transform: scaleY(0);
+        transition: transform 900ms cubic-bezier(.4, 0, .2, 1);
+        transition-delay: var(--reveal-delay, 0ms);
+    }
+    .timeline-step.is-revealed .timeline-line { transform: scaleY(1); }
+    .timeline-step .timeline-dot {
+        opacity: 0;
+        transform: scale(.4);
+        transition: opacity 500ms ease, transform 500ms cubic-bezier(.34, 1.56, .64, 1);
+        transition-delay: var(--reveal-delay, 0ms);
+    }
+    .timeline-step.is-revealed .timeline-dot { opacity: 1; transform: scale(1); }
+
+    /* ════════════════════════════════════════════════════════════
+       Pissenlit - graines qui dérivent doucement dans le vent
+       ════════════════════════════════════════════════════════════ */
+    @keyframes dandelion-drift {
+        0%   { transform: translate3d(0, 0, 0) rotate(0deg); }
+        25%  { transform: translate3d(14px, -10px, 0) rotate(6deg); }
+        50%  { transform: translate3d(26px, 4px, 0) rotate(-3deg); }
+        75%  { transform: translate3d(12px, 12px, 0) rotate(4deg); }
+        100% { transform: translate3d(0, 0, 0) rotate(0deg); }
+    }
+    .dandelion-seed {
+        animation: dandelion-drift 12s ease-in-out infinite;
+        will-change: transform;
+    }
+
+    /* Graines emportées par le vent : transform pilotée au scroll (seed-wind.js). */
+    .dandelion-seed-wind {
+        transform-origin: center;
+    }
+
+    @keyframes dandelion-sway {
+        0%, 100% { transform: rotate(0deg); }
+        30%      { transform: rotate(1.6deg); }
+        65%      { transform: rotate(-1.2deg); }
+    }
+    .dandelion-stems {
+        transform-origin: bottom center;
+        animation: dandelion-sway 7s ease-in-out infinite;
+        will-change: transform;
+    }
+
+    /* ════════════════════════════════════════════════════════════
        Préférence « moins d'animation »
        ════════════════════════════════════════════════════════════ */
     @media (prefers-reduced-motion: reduce) {
@@ -248,7 +311,15 @@
         .bird-up-r, .bird-up-l, .bird-hover,
         .bird-flap-r0, .bird-flap-rm5, .bird-flap-rm10, .bird-flap-rp8,
         .bird, .bird-fly,
+        .dandelion-seed, .dandelion-stems,
         .scroll-hint { animation: none; }
+
+        [data-reveal],
+        .timeline-line, .timeline-step .timeline-dot {
+            opacity: 1;
+            transform: none;
+            transition: none;
+        }
 
         .accordion-item > .accordion-content { transition: none; }
 
