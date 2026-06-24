@@ -74,7 +74,7 @@
 
     <article class="bg-cream-50">
         <header class="to-cream-50 relative overflow-hidden bg-linear-to-b from-teal-100 via-teal-50/70 pt-32 pb-8 sm:pt-36">
-            <div class="mx-auto max-w-4xl px-4 sm:px-6 lg:px-10">
+            <div class="mx-auto max-w-5xl px-4 sm:px-6 lg:px-10">
                 <x-breadcrumb :items="[
                     ['label' => 'Accueil', 'url' => route('home')],
                     ['label' => 'Vidéos', 'url' => route('videos.index')],
@@ -118,7 +118,7 @@
         </header>
 
         @if ($video->intro)
-            <div class="mx-auto max-w-3xl px-4 pt-8 sm:px-6 lg:px-10">
+            <div class="mx-auto max-w-5xl px-4 pt-8 sm:px-6 lg:px-10">
                 <div class="prose prose-ink max-w-none text-lg leading-relaxed">
                     {!! $video->intro !!}
                 </div>
@@ -138,7 +138,7 @@
         </div>
 
         @if (! empty($chapters))
-            <section class="mx-auto max-w-3xl px-4 pt-12 sm:px-6 lg:px-10" aria-labelledby="chapters-heading">
+            <section class="mx-auto max-w-5xl px-4 pt-12 sm:px-6 lg:px-10" aria-labelledby="chapters-heading">
                 <h2 id="chapters-heading" class="text-ink font-serif text-2xl font-medium">
                     Chapitres
                 </h2>
@@ -163,7 +163,7 @@
         @endif
 
         @if (! empty($video->key_takeaways))
-            <section class="mx-auto max-w-3xl px-4 pt-12 sm:px-6 lg:px-10" aria-labelledby="takeaways-heading">
+            <section class="mx-auto max-w-5xl px-4 pt-12 sm:px-6 lg:px-10" aria-labelledby="takeaways-heading">
                 <h2 id="takeaways-heading" class="text-ink font-serif text-2xl font-medium">
                     À retenir
                 </h2>
@@ -188,25 +188,41 @@
         @endif
 
         @if ($video->transcript)
-            <section class="mx-auto max-w-3xl px-4 pt-12 sm:px-6 lg:px-10" aria-labelledby="transcript-heading">
-                <details class="group ring-ink/5 overflow-hidden rounded-2xl bg-white ring-1 [&_summary::-webkit-details-marker]:hidden">
-                    <summary class="flex cursor-pointer items-center justify-between gap-4 px-5 py-4 sm:px-6">
-                        <h2 id="transcript-heading" class="text-ink font-serif text-2xl font-medium">
-                            Transcription
-                        </h2>
-                        <svg class="text-ink-muted size-5 shrink-0 transition group-open:rotate-180" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="m6 9 6 6 6-6"/>
-                        </svg>
-                    </summary>
-                    <div class="prose prose-ink border-ink/10 max-w-none border-t p-5 sm:px-6">
+            <section class="mx-auto max-w-5xl px-4 pt-12 sm:px-6 lg:px-10" aria-labelledby="transcript-heading">
+                <h2 id="transcript-heading" class="text-ink font-serif text-2xl font-medium">
+                    Transcription
+                </h2>
+
+                {{-- Aperçu repliable sans JS : la transcription complète reste
+                     toujours dans le DOM (indexée par Google) ; la case à cocher
+                     ne fait que révéler la partie masquée pour le visiteur. --}}
+                <div class="ring-ink/5 relative mt-4 overflow-hidden rounded-2xl bg-white ring-1">
+                    <input type="checkbox" id="transcript-toggle" class="peer sr-only">
+
+                    <div class="prose prose-ink max-h-[22rem] max-w-none overflow-hidden p-5 transition-[max-height] duration-500 peer-checked:max-h-none sm:px-6">
                         {!! $video->transcript !!}
                     </div>
-                </details>
+
+                    {{-- Dégradé de fondu sur l'aperçu, masqué une fois déplié.
+                         Frère direct de la case à cocher pour que peer-checked
+                         s'applique. --}}
+                    <div class="from-white pointer-events-none absolute inset-x-0 bottom-14 h-24 bg-gradient-to-t to-transparent peer-checked:hidden"></div>
+
+                    <div class="border-ink/10 border-t p-4 text-center peer-checked:hidden">
+                        <label for="transcript-toggle"
+                               class="inline-flex cursor-pointer items-center gap-2 text-sm font-medium text-teal-700 transition hover:text-teal-800">
+                            Lire la transcription complète
+                            <svg class="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="m6 9 6 6 6-6"/>
+                            </svg>
+                        </label>
+                    </div>
+                </div>
             </section>
         @endif
 
         @if ($relatedPost)
-            <section class="mx-auto max-w-3xl px-4 pt-12 sm:px-6 lg:px-10" aria-labelledby="related-post-heading">
+            <section class="mx-auto max-w-5xl px-4 pt-12 sm:px-6 lg:px-10" aria-labelledby="related-post-heading">
                 <h2 id="related-post-heading" class="text-ink font-serif text-2xl font-medium">
                     À lire aussi
                 </h2>
