@@ -3,39 +3,9 @@
     $filters ??= [];
     $categories ??= collect();
     $popularTags ??= collect();
-    $sidebarId ??= 'sidebar-'.\Illuminate\Support\Str::random(6);
-    $searchId = $sidebarId.'-q';
-    $activeQ = $filters['q'] ?? null;
     $activeCategory = $filters['category'] ?? null;
     $activeTag = $filters['tag'] ?? null;
 @endphp
-
-<form method="GET" action="{{ route('blog.index') }}" role="search">
-    <label for="{{ $searchId }}" class="text-ink-muted block text-xs font-medium tracking-wider uppercase">Rechercher</label>
-    <div class="relative mt-2">
-        <span class="text-ink-muted pointer-events-none absolute inset-y-0 left-4 flex items-center">
-            <svg class="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-                <circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/>
-            </svg>
-        </span>
-        <input type="search" id="{{ $searchId }}" name="q" value="{{ $activeQ }}" placeholder="Anxiété, phobie..."
-               class="text-ink ring-ink/10 placeholder:text-ink-muted w-full rounded-2xl border-0 bg-white py-3 pr-10 pl-11 text-sm ring-1 focus:ring-2 focus:ring-teal-500 focus:outline-hidden">
-        @if ($activeQ)
-            <a href="{{ BlogFilters::url('blog.index', $filters, ['q' => null]) }}"
-               class="text-ink-muted hover:text-ink absolute inset-y-0 right-3 flex items-center transition"
-               aria-label="Effacer la recherche">
-                <svg class="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12"/></svg>
-            </a>
-        @endif
-        @foreach (['category', 'tag', 'sort'] as $field)
-            @if (! empty($filters[$field]))
-                <input type="hidden" name="{{ $field }}" value="{{ $filters[$field] }}">
-            @endif
-        @endforeach
-        <button type="submit" class="sr-only">Rechercher</button>
-    </div>
-    <p class="text-ink-muted mt-2 text-xs">Appuyez sur Entrée pour rechercher</p>
-</form>
 
 <div>
     <h2 class="text-ink-muted text-xs font-medium tracking-wider uppercase">Catégories</h2>
