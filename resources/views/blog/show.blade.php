@@ -221,6 +221,23 @@
         $totalCount = $rootCount + $post->comments->sum(fn ($c) => $c->replies->count());
     @endphp
 
+    @if ($relatedVideo)
+        <section class="bg-white py-12 sm:py-16">
+            <div class="site-container max-w-3xl">
+                <p class="text-xs font-medium tracking-wider text-teal-700 uppercase">À regarder</p>
+                <h2 class="text-ink mt-2 font-serif text-2xl font-medium tracking-tight sm:text-3xl">
+                    La vidéo sur ce sujet
+                </h2>
+                <a href="{{ route('videos.show', $relatedVideo->slug) }}" class="mt-6 block">
+                    <x-youtube-embed :video="$relatedVideo" class="pointer-events-none" />
+                    <p class="text-ink-soft mt-4 inline-flex items-center gap-2 text-sm font-medium transition group-hover:text-teal-700">
+                        <span class="border-b border-teal-700/30">Voir la vidéo et son résumé</span> →
+                    </p>
+                </a>
+            </div>
+        </section>
+    @endif
+
     @if ($pillar)
         <section class="bg-cream-50 py-12 sm:py-16">
             <div class="site-container">
