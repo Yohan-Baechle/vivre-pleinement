@@ -5,6 +5,7 @@ namespace App\Filament\Admin\Resources\Appointments\Tables;
 use App\Enums\AppointmentStatus;
 use App\Mail\AppointmentCancelled;
 use App\Mail\AppointmentConfirmation;
+use App\Mail\AppointmentNoShow;
 use App\Mail\AppointmentRescheduled;
 use App\Models\Appointment;
 use App\Models\AppointmentService;
@@ -145,6 +146,22 @@ class AppointmentsTable
                             Mail::to($record->customer_email)->send(new AppointmentCancelled($record));
 
                             Notification::make()->success()->title('Rendez-vous annulé')->send();
+                        }),
+
+                    Action::make('noShow')
+                        ->label('Marquer absent')
+                        ->icon('heroicon-o-user-minus')
+                        ->color('danger')
+                        ->visible(fn (Appointment $record) => $record->status === AppointmentStatus::Confirmed
+                            && $record->ends_at->isPast())
+                        ->requiresConfirmation()
+                        ->modalDescription('Le client sera marqué comme absent et recevra un email l\'invitant à reprendre rendez-vous.')
+                        ->action(function (Appointment $record) {
+                            $record->update(['status' => AppointmentStatus::NoShow]);
+
+                            Mail::to($record->customer_email)->send(new AppointmentNoShow($record));
+
+                            Notification::make()->success()->title('Client marqué absent')->send();
                         }),
 
                     EditAction::make(),

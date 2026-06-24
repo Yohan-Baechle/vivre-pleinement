@@ -4,7 +4,7 @@
 @if ($forAdmin)
 Le rendez-vous suivant a été annulé par le client.
 
-**Client :** {{ $appointment->customer_full_name }}
+**Client :** {{ $appointment->customer_full_name }}\
 **Email :** [{{ $appointment->customer_email }}](mailto:{{ $appointment->customer_email }})
 @else
 Bonjour {{ $appointment->customer_first_name }},
@@ -12,8 +12,8 @@ Bonjour {{ $appointment->customer_first_name }},
 Votre rendez-vous a bien été annulé. Voici les détails de ce qui était prévu :
 @endif
 
-**Prestation :** {{ $appointment->service->name }}
-**Date :** {{ $appointment->starts_at->locale('fr')->isoFormat('dddd D MMMM YYYY') }} à {{ $appointment->starts_at->format('H\hi') }}
+**Prestation :** {{ $appointment->service->name }}\
+**Date :** {{ $appointment->starts_at->locale('fr')->isoFormat('dddd D MMMM YYYY') }} à {{ $appointment->starts_at->format('H\hi') }}\
 **Référence :** {{ $appointment->reference }}
 
 @unless ($forAdmin)
