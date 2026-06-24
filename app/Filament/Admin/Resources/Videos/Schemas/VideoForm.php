@@ -4,6 +4,7 @@ namespace App\Filament\Admin\Resources\Videos\Schemas;
 
 use App\Enums\VideoStatus;
 use App\Models\Category;
+use App\Models\Video;
 use Filament\Actions\Action;
 use Filament\Forms\Components\Checkbox;
 use Filament\Forms\Components\CheckboxList;
@@ -92,18 +93,22 @@ class VideoForm
 
                     Tab::make('SEO & Contenu éditorial')
                         ->icon(Heroicon::OutlinedSparkles)
-                        ->badge(fn ($record) => $record?->hasEditorialContent() ? '✓' : null)
-                        ->badgeColor('success')
+                        ->badge(fn ($record) => match (true) {
+                            $record === null => null,
+                            $record->isEnriched() && $record->hasTranscript() => 'Complet',
+                            $record->isEnriched() || $record->hasTranscript() => 'Partiel',
+                            default => 'À faire',
+                        })
+                        ->badgeColor(fn ($record) => match (true) {
+                            $record === null => 'gray',
+                            $record->isEnriched() && $record->hasTranscript() => 'success',
+                            $record->isEnriched() || $record->hasTranscript() => 'warning',
+                            default => 'danger',
+                        })
                         ->schema([
                             Placeholder::make('seo_help')
                                 ->hiddenLabel()
-                                ->content(new HtmlString(
-                                    '<div class="bg-primary-50 text-primary-900 ring-primary-200 rounded-lg p-4 text-sm ring-1">'
-                                    .'<p class="font-medium">Pourquoi remplir cette section ?</p>'
-                                    .'<p class="mt-2">Ajouter du contenu éditorial unique (résumé, points clés, transcription) transforme cette page en contenu indexable par Google. Sans ça, la page ne ranke pas car la description YouTube existe déjà ailleurs.</p>'
-                                    .'<p class="text-primary-700 mt-2 text-xs">Concentrez vos efforts sur les vidéos piliers : 2-3 vidéos bien rédigées valent mieux que 20 pages vides.</p>'
-                                    .'</div>'
-                                ))
+                                ->content(fn ($record) => new HtmlString(self::editorialChecklist($record)))
                                 ->columnSpanFull(),
 
                             TextInput::make('seo_description')
@@ -269,6 +274,38 @@ class VideoForm
                         ->columns(2),
                 ]),
         ]);
+    }
+
+    /**
+     * Liste de complétude éditoriale : montre d'un coup d'œil ce qui est fait
+     * et ce qui reste, pour guider la rédaction directement dans l'admin.
+     */
+    private static function editorialChecklist(?Video $record): string
+    {
+        $row = function (bool $done, string $label): string {
+            $icon = $done
+                ? '<span class="text-success-600">✓</span>'
+                : '<span class="text-danger-500">○</span>';
+            $class = $done ? 'text-gray-600' : 'font-medium text-gray-900';
+
+            return '<li class="flex items-center gap-2 '.$class.'">'.$icon.' '.$label.'</li>';
+        };
+
+        $items = $record
+            ? implode('', [
+                $row(filled($record->intro), 'Introduction (texte au-dessus de la vidéo)'),
+                $row(filled($record->summary), 'Résumé court'),
+                $row(filled($record->seo_description), 'Meta description SEO'),
+                $row(! empty($record->key_takeaways), 'Points clés à retenir'),
+                $row(filled($record->transcript), 'Transcription'),
+            ])
+            : '';
+
+        return '<div class="bg-primary-50 text-primary-900 ring-primary-200 rounded-lg p-4 text-sm ring-1">'
+            .'<p class="font-medium">Complétude éditoriale</p>'
+            .'<p class="mt-1 text-xs text-primary-700">Plus la page est riche en contenu unique, mieux elle se positionne sur Google.</p>'
+            .'<ul class="mt-3 space-y-1.5">'.$items.'</ul>'
+            .'</div>';
     }
 
     /**
