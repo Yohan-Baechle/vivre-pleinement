@@ -12,7 +12,7 @@ use Illuminate\Support\Facades\Route;
 
 Route::view('/', 'home.index')->name('home');
 
-Route::view('/faq', 'faq.index')->name('faq');
+Route::view('/a-propos', 'about.index')->name('about');
 
 Route::get('/contact', [ContactController::class, 'show'])->name('contact');
 Route::post('/contact', [ContactController::class, 'send'])->name('contact.send');

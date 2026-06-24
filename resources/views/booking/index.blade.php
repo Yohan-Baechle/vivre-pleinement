@@ -33,8 +33,23 @@
             ],
             'offers' => $offers,
         ];
+
+        $bookingFaq = \App\Support\BookingFaq::all();
+        $faqLd = [
+            '@context' => 'https://schema.org',
+            '@type' => 'FAQPage',
+            '@id' => route('booking.index').'#faq',
+            'url' => route('booking.index'),
+            'inLanguage' => 'fr-FR',
+            'mainEntity' => collect($bookingFaq)->map(fn ($item) => [
+                '@type' => 'Question',
+                'name' => $item['q'],
+                'acceptedAnswer' => ['@type' => 'Answer', 'text' => $item['a']],
+            ])->all(),
+        ];
     @endphp
     <script type="application/ld+json">{!! json_encode($bookingLd, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!}</script>
+    <script type="application/ld+json">{!! json_encode($faqLd, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!}</script>
 @endpush
 
 @section('body')
@@ -310,6 +325,20 @@
         </div>
     @endif
     </main>
+
+    <x-section
+        eyebrow="Avant de réserver"
+        title="Questions fréquentes."
+        bg="bg-white"
+    >
+        <div class="mx-auto max-w-3xl space-y-4">
+            @foreach (\App\Support\BookingFaq::all() as $item)
+                <x-accordion-item :question="$item['q']" :open="$loop->first">
+                    {{ $item['a'] }}
+                </x-accordion-item>
+            @endforeach
+        </div>
+    </x-section>
 
     @include('home.sections.footer')
 @endsection

@@ -11,10 +11,9 @@
             ['Le blog', route('blog.index')],
             ['Les vidéos', route('videos.index')],
             ['Vidéo offerte', $home.'#capture'],
-            ['FAQ', route('faq')],
         ],
         'À propos' => [
-            ['Qui suis-je', $home.'#a-propos'],
+            ['Qui suis-je', route('about')],
             ['Contact', route('contact')],
             ['Prendre RDV', route('booking.index')],
         ],

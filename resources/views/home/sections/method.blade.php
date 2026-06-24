@@ -8,7 +8,7 @@
         [
             'num' => '02',
             'title' => 'Plan d\'accompagnement personnalisé',
-            'desc' => 'Ensemble, on définit vos objectifs et on construit un chemin sur mesure : nombre de séances, fréquence, outils prioritaires.',
+            'desc' => 'Ensemble, nous définissons vos objectifs et nous construisons un chemin sur mesure : nombre de séances, fréquence, outils prioritaires.',
         ],
         [
             'num' => '03',
@@ -47,7 +47,6 @@
     <div class="mt-12 text-center">
         <a href="{{ route('booking.index') }}" class="group inline-flex items-center gap-2 rounded-full bg-teal-700 px-7 py-3.5 text-sm font-medium text-white shadow-lg shadow-teal-700/20 transition hover:bg-teal-800 sm:text-base">
             Prendre rendez-vous
-            <span class="transition group-hover:translate-x-0.5" aria-hidden="true">→</span>
         </a>
     </div>
 </x-section>

@@ -61,9 +61,9 @@ it('maps the old WooCommerce product categories to the book page', function () {
 });
 
 it('preserves the URL fragment when redirecting to an internal anchor', function () {
-    Redirect::create(['from_path' => '/a-propos', 'to_path' => '/#a-propos', 'status_code' => 301]);
+    Redirect::create(['from_path' => '/ancienne-page', 'to_path' => '/#a-propos', 'status_code' => 301]);
 
-    $this->get('/a-propos')
+    $this->get('/ancienne-page')
         ->assertStatus(301)
         ->assertRedirect(url('/#a-propos'));
 });

@@ -22,20 +22,23 @@
                 Qui suis-je
             </p>
             <h2 class="text-ink mt-5 font-serif text-3xl font-medium tracking-tight sm:text-4xl lg:text-5xl">
-                Pourquoi suis-je habilitée à vous accompagner&nbsp;?
+                Pourquoi suis-je habilitée à vous accompagner dans la guérison de vos troubles anxieux&nbsp;?
             </h2>
             <div class="text-ink-soft mt-6 space-y-4 text-base leading-relaxed">
                 <p>
                     Ayant eu de nombreux troubles anxieux, je me suis réellement prise en main à partir du moment où ils devenaient trop handicapants. Et comment y suis-je parvenue&nbsp;? Grâce à la découverte de l'<strong class="text-ink font-medium">ACT</strong> (thérapie d'acceptation et d'engagement), laquelle a marqué un véritable tournant dans mon parcours.
                 </p>
                 <p>
-                    Aujourd'hui, étant devenue praticienne ACT, c'est avec beaucoup de sens et de conviction que je souhaite transmettre cette approche à mon tour, puisque celle-ci a littéralement changé mes troubles anxieux.
+                    Aujourd'hui, étant devenue praticienne ACT, c'est avec beaucoup de sens et de conviction que je souhaite transmettre cette approche à mon tour puisque celle-ci a littéralement changé mes troubles anxieux.
                 </p>
                 <p>
-                    L'ACT est une approche thérapeutique dont l'efficacité est <strong class="text-ink font-medium">validée scientifiquement</strong>. Elle fait partie des TCC de 3<sup>e</sup> vague, qui enrichissent les thérapies cognitives et comportementales classiques. L'objectif&nbsp;? Réduire l'impact des mécanismes et apprentissages qui entretiennent la souffrance psychologique.
+                    L'ACT est une approche thérapeutique dont l'efficacité est <strong class="text-ink font-medium">validée scientifiquement</strong>. Elle fait partie des TCC de 3<sup>e</sup> vague, qui enrichissent les thérapies cognitives et comportementales classiques.
                 </p>
                 <p>
-                    N'ayant que trop connu les troubles anxieux, je ne peux que comprendre ce que vous ressentez, puisque j'ai été à votre place.
+                    L'objectif&nbsp;? Réduire l'impact des mécanismes et apprentissages qui entretiennent la souffrance psychologique.
+                </p>
+                <p>
+                    En outre, n'ayant que trop connu les troubles anxieux, je ne peux que comprendre ce que vous ressentez, puisque j'ai été à votre place. Comme on dit toujours&nbsp;: il n'y a que quand nous vivons la même situation que l'autre que nous pouvons comprendre ce qu'il ressent.
                 </p>
             </div>
 
@@ -46,7 +49,7 @@
                 </div>
                 <div>
                     <dt class="text-ink-muted text-xs font-medium tracking-wider uppercase">Méthode</dt>
-                    <dd class="mt-1 font-serif text-2xl font-medium text-teal-700">Validée</dd>
+                    <dd class="mt-1 font-serif text-2xl leading-tight font-medium text-teal-700">Validée<br>scientifiquement</dd>
                 </div>
                 <div>
                     <dt class="text-ink-muted text-xs font-medium tracking-wider uppercase">Format</dt>
@@ -54,9 +57,8 @@
                 </div>
             </dl>
 
-            <a href="{{ route('contact') }}" class="group mt-8 inline-flex items-center gap-2 text-sm font-medium text-teal-700 transition hover:text-teal-800">
-                <span class="border-b border-teal-700/30 transition group-hover:border-teal-700">Qui suis-je&nbsp;?</span>
-                <span class="transition group-hover:translate-x-0.5" aria-hidden="true">→</span>
+            <a href="{{ route('about') }}" class="group mt-8 inline-flex items-center gap-2 text-sm font-medium text-teal-700 transition hover:text-teal-800">
+                <span class="border-b border-teal-700/30 transition group-hover:border-teal-700">En savoir plus sur moi&nbsp;?</span>
             </a>
         </div>
     </div>
