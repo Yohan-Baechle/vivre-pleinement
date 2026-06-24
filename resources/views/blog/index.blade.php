@@ -91,10 +91,10 @@
                     Le blog
                 </p>
                 <h1 class="text-ink mt-5 font-serif text-4xl font-medium tracking-tight sm:text-5xl lg:text-6xl">
-                    Comprendre l'anxiété<br>pour mieux la traverser.
+                    Le blog
                 </h1>
                 <p class="text-ink-soft mt-5 max-w-2xl text-base sm:text-lg">
-                    Articles fouillés, outils concrets, témoignages : tout pour apaiser les troubles anxieux, les phobies, les TOC et le burnout.
+                    Des articles pour comprendre l'anxiété et avancer à votre rythme.
                 </p>
             </div>
         </div>

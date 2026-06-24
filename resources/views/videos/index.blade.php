@@ -64,7 +64,7 @@
                     Apprendre en vidéo.
                 </h1>
                 <p class="text-ink-soft mt-5 max-w-2xl text-base sm:text-lg">
-                    Conseils, exercices et témoignages pour comprendre et apaiser l'anxiété, les phobies, les TOC et le burnout.
+                    Conseils, exercices et témoignages pour comprendre et apaiser les troubles anxieux.
                 </p>
             </div>
         </div>

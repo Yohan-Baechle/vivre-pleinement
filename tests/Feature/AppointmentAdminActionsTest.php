@@ -3,6 +3,7 @@
 use App\Enums\AppointmentStatus;
 use App\Filament\Admin\Resources\Appointments\Pages\ListAppointments;
 use App\Mail\AppointmentCancelled;
+use App\Mail\AppointmentNoShow;
 use App\Mail\AppointmentRescheduled;
 use App\Models\Appointment;
 use App\Models\AppointmentService;
@@ -59,6 +60,27 @@ it('moves an appointment and notifies the client when an admin reschedules', fun
 
     expect($appointment->fresh()->starts_at->equalTo($newStart))->toBeTrue();
     Mail::assertQueued(AppointmentRescheduled::class, 1);
+});
+
+it('marks a past confirmed appointment as no-show and emails the client', function () {
+    $past = CarbonImmutable::now()->subDay()->setTime(10, 0);
+    $appointment = adminAppointment($past);
+
+    // Les RDV passés sont masqués par le filtre « À venir » actif par défaut.
+    Livewire::test(ListAppointments::class)
+        ->removeTableFilter('upcoming')
+        ->callAction(TestAction::make('noShow')->table($appointment))
+        ->assertHasNoActionErrors();
+
+    expect($appointment->fresh()->status)->toBe(AppointmentStatus::NoShow);
+    Mail::assertQueued(AppointmentNoShow::class, 1);
+});
+
+it('hides the no-show action for a future appointment', function () {
+    $appointment = adminAppointment(CarbonImmutable::now()->addDays(2)->setTime(10, 0));
+
+    Livewire::test(ListAppointments::class)
+        ->assertActionHidden(TestAction::make('noShow')->table($appointment));
 });
 
 it('refuses to reschedule onto an occupied slot', function () {

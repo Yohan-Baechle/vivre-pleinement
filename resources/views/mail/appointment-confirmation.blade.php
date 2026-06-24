@@ -9,21 +9,22 @@ Votre demande de rendez-vous a bien été reçue. Elle est **en attente de confi
 Votre rendez-vous est **confirmé**. Voici le récapitulatif :
 @endif
 
-**Prestation :** {{ $appointment->service->name }}
-**Format :** {{ $appointment->channel->getLabel() }}
-**Date :** {{ $appointment->starts_at->locale('fr')->isoFormat('dddd D MMMM YYYY') }}
-**Heure :** {{ $appointment->starts_at->format('H:i') }} - {{ $appointment->ends_at->format('H:i') }}
+**Prestation :** {{ $appointment->service->name }}\
+**Format :** {{ $appointment->channel->getLabel() }}\
+**Date :** {{ $appointment->starts_at->locale('fr')->isoFormat('dddd D MMMM YYYY') }}\
+**Heure :** {{ $appointment->starts_at->format('H:i') }} - {{ $appointment->ends_at->format('H:i') }}\
 @if ($appointment->channel === \App\Enums\AppointmentChannel::Phone)
-**Modalité :** Je vous appellerai au numéro indiqué à l'heure du rendez-vous.
+**Modalité :** Je vous appellerai au numéro indiqué à l'heure du rendez-vous.\
 @elseif ($appointment->meeting_url)
-**Lien visio :** [{{ $appointment->meeting_url }}]({{ $appointment->meeting_url }})
+**Lien visio :** [{{ $appointment->meeting_url }}]({{ $appointment->meeting_url }})\
 @else
-**Modalité :** En visioconférence (le lien vous sera transmis avant le rendez-vous).
+**Modalité :** En visioconférence (le lien vous sera transmis avant le rendez-vous).\
 @endif
-**Référence :** {{ $appointment->reference }}
-
 @if (! $appointment->service->isFree())
+**Référence :** {{ $appointment->reference }}\
 **Tarif :** {{ number_format($appointment->price_cents / 100, 2, ',', ' ') }} €
+@else
+**Référence :** {{ $appointment->reference }}
 @endif
 
 @if ($appointment->token)

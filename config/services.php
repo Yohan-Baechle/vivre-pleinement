@@ -39,4 +39,10 @@ return [
         'api_key' => env('YOUTUBE_API_KEY'),
         'channel_id' => env('YOUTUBE_CHANNEL_ID'),
     ],
+
+    'brevo' => [
+        'key' => env('BREVO_API_KEY'),
+        'video_list_id' => (int) env('BREVO_VIDEO_LIST_ID', 6),
+        'doi_template_id' => (int) env('BREVO_DOI_TEMPLATE_ID', 6),
+    ],
 ];

@@ -51,7 +51,6 @@
                     <div class="mt-8 flex flex-wrap items-center justify-center gap-3 sm:gap-4 lg:justify-start">
                         <a href="{{ route('book.show') }}" class="group hover:bg-cream-50 inline-flex items-center gap-2 rounded-full bg-white px-7 py-3.5 text-sm font-medium text-teal-800 shadow-lg transition sm:text-base">
                             Découvrir le livre · 37&nbsp;€
-                            <span class="transition group-hover:translate-x-0.5" aria-hidden="true">→</span>
                         </a>
                         <span class="inline-flex items-center gap-1.5 text-xs text-teal-100 sm:text-sm">
                             <svg class="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 12 2 2 4-4"/><path d="M21 12c0 4.97-4.03 9-9 9s-9-4.03-9-9 4.03-9 9-9 9 4.03 9 9z"/></svg>

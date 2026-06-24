@@ -12,24 +12,6 @@
         'TikTok' => 'M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64 2.93 2.93 0 0 1 .88.13V9.4a6.84 6.84 0 0 0-5.86 11.95 6.85 6.85 0 0 0 11.13-5.37V8.6a8.16 8.16 0 0 0 4.77 1.52v-3.4a4.85 4.85 0 0 1-.81-.03z',
     ];
 
-    $contactFaq = [
-        [
-            'q' => "Que se passe-t-il après l'envoi de mon message ?",
-            'a' => "Votre message m'arrive directement. Je le lis personnellement et je vous réponds sous 48h ouvrées, à l'adresse email que vous avez indiquée. Pensez à vérifier vos courriers indésirables au cas où.",
-        ],
-        [
-            'q' => "Quel est le délai de réponse ?",
-            'a' => "Je réponds à tous les messages sous 48h ouvrées (du lundi au vendredi). Pour une demande urgente, n'hésitez pas à l'indiquer dans votre message.",
-        ],
-        [
-            'q' => "Comment prendre rendez-vous plutôt que d'écrire ?",
-            'a' => "Si vous souhaitez directement réserver votre rendez-vous découverte gratuit, vous pouvez le faire en quelques clics depuis la page de réservation. Le formulaire de contact, lui, est parfait pour une question avant de vous lancer.",
-        ],
-        [
-            'q' => "Vous avez déjà la réponse à ma question ?",
-            'a' => "Pensez à consulter la FAQ générale et les articles du blog avant. Beaucoup de questions sur les troubles anxieux, l'accompagnement ou les tarifs y trouvent déjà une réponse.",
-        ],
-    ];
 @endphp
 
 @section('title', 'Contact · Laura Baechlé - Vivre Pleinement')
@@ -172,7 +154,7 @@
                 <aside class="space-y-6 lg:col-span-5">
                     <div class="text-cream-100 rounded-4xl bg-linear-to-br from-teal-700 to-teal-800 p-6 sm:p-8">
                         <h2 class="font-serif text-2xl font-medium text-white">Autres moyens</h2>
-                        <p class="text-cream-100/80 mt-2 text-sm">Préférez le téléphone ou l'email ? C'est aussi possible.</p>
+                        <p class="text-cream-100/80 mt-2 text-sm">Vous pouvez aussi me joindre directement&nbsp;:</p>
 
                         <ul class="mt-6 space-y-4">
                             <li>
@@ -246,20 +228,6 @@
             </div>
         </div>
     </main>
-
-    <x-section
-        eyebrow="Avant de m'écrire"
-        title="Quelques questions fréquentes."
-        bg="bg-white"
-    >
-        <div class="mx-auto max-w-3xl space-y-4">
-            @foreach ($contactFaq as $item)
-                <x-accordion-item :question="$item['q']" :open="$loop->first">
-                    {{ $item['a'] }}
-                </x-accordion-item>
-            @endforeach
-        </div>
-    </x-section>
 
     @include('home.sections.footer')
 @endsection

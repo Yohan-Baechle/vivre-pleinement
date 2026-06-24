@@ -1,6 +1,8 @@
 <?php
 
 use App\Enums\AppointmentStatus;
+use App\Enums\PaymentStatus;
+use App\Mail\AppointmentCheckoutExpired;
 use App\Mail\AppointmentFollowUp;
 use App\Mail\AppointmentReminder;
 use App\Models\Appointment;
@@ -95,4 +97,33 @@ it('does not remind appointments outside the window', function () {
     $this->artisan('appointments:send-reminders');
 
     Mail::assertNotQueued(AppointmentReminder::class);
+});
+
+it('cancels a stale unpaid checkout and emails the client', function () {
+    Mail::fake();
+    $appointment = appointmentAt(CarbonImmutable::now()->addDays(3), [
+        'status' => AppointmentStatus::Pending,
+        'payment_status' => PaymentStatus::Unpaid,
+        'created_at' => CarbonImmutable::now()->subMinutes(31),
+    ]);
+
+    $this->artisan('appointments:send-reminders');
+
+    expect($appointment->fresh()->status)->toBe(AppointmentStatus::Cancelled)
+        ->and($appointment->fresh()->cancelled_at)->not->toBeNull();
+    Mail::assertQueued(AppointmentCheckoutExpired::class);
+});
+
+it('leaves a recent unpaid checkout alone', function () {
+    Mail::fake();
+    $appointment = appointmentAt(CarbonImmutable::now()->addDays(3), [
+        'status' => AppointmentStatus::Pending,
+        'payment_status' => PaymentStatus::Unpaid,
+        'created_at' => CarbonImmutable::now()->subMinutes(10),
+    ]);
+
+    $this->artisan('appointments:send-reminders');
+
+    expect($appointment->fresh()->status)->toBe(AppointmentStatus::Pending);
+    Mail::assertNotQueued(AppointmentCheckoutExpired::class);
 });
