@@ -139,6 +139,20 @@ class Video extends Model
     }
 
     /**
+     * La vidéo a-t-elle son contenu éditorial principal (intro + résumé) ?
+     * Sert d'indicateur « page indexable » dans l'admin.
+     */
+    public function isEnriched(): bool
+    {
+        return filled($this->intro) && filled($this->summary);
+    }
+
+    public function hasTranscript(): bool
+    {
+        return filled($this->transcript);
+    }
+
+    /**
      * Chapitres formatés pour schema.org Clip[].
      *
      * @return list<array{name: string, startOffset: int, endOffset: int|null, url: string}>
