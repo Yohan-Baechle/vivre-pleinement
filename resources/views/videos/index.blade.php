@@ -2,34 +2,40 @@
 
 @php
     $page = (int) request('page', 1);
-    $hasFilters = ! empty($activeCategory);
-    $metaTitle = $hasFilters
+    $hasCategory = ! empty($activeCategory);
+    $hasSearch = ! empty($activeSearch);
+    $metaTitle = $hasCategory
         ? 'Vidéos · catégorie '.optional($categories->firstWhere('slug', $activeCategory))->name.' · Vivre Pleinement'
         : 'Toutes les vidéos · Vivre Pleinement';
 
-    if ($page > 1 && ! $hasFilters) {
+    if ($page > 1 && ! $hasCategory) {
         $metaTitle = 'Toutes les vidéos (page '.$page.') · Vivre Pleinement';
     }
 
     $metaDesc = "Toutes les vidéos de Laura Baechlé pour comprendre et apaiser les troubles anxieux : conseils, exercices, témoignages.";
+
+    // Pages indexables : la liste complète et les pages de catégorie (vos
+    // landing pages SEO). Les résultats de recherche et les pages 2+ sont en
+    // noindex pour éviter le contenu dupliqué et le gaspillage de budget crawl.
+    $isIndexable = ! $hasSearch && $page === 1;
 @endphp
 
 @section('title', $metaTitle)
 @section('description', $metaDesc)
-@section('canonical', route('videos.index').($page > 1 ? '?page='.$page : ''))
+@section('canonical', route('videos.index', $hasCategory ? ['category' => $activeCategory] : []))
 
 @push('head')
-    @if ($hasFilters || $page > 1)
+    @unless ($isIndexable)
         <meta name="robots" content="noindex, follow">
-    @endif
+    @endunless
 
-    @if (! $hasFilters && $page === 1)
+    @if ($isIndexable && ! $hasCategory)
         @php
             $itemListLd = [
                 '@context' => 'https://schema.org',
                 '@type' => 'ItemList',
                 'name' => 'Vidéos Vivre Pleinement',
-                'itemListElement' => collect($videos->items())->map(fn ($v, $i) => [
+                'itemListElement' => $topVideos->map(fn ($v, $i) => [
                     '@type' => 'ListItem',
                     'position' => $i + 1,
                     'url' => route('videos.show', $v),
@@ -72,55 +78,7 @@
 
     <main id="main" class="bg-cream-50 py-12 sm:py-16 lg:py-20">
         <div class="site-container">
-            @if ($categories->isNotEmpty())
-                <nav class="mb-10 flex flex-wrap items-center gap-2" aria-label="Filtres par catégorie">
-                    <a href="{{ route('videos.index') }}"
-                       @class([
-                           'inline-flex items-center rounded-full px-4 py-2 text-sm font-medium transition',
-                           'bg-teal-700 text-white shadow shadow-teal-700/20' => ! $activeCategory,
-                           'bg-white text-ink-soft ring-1 ring-ink/5 hover:text-teal-700' => $activeCategory,
-                       ])>
-                        Toutes ({{ $videos->total() }})
-                    </a>
-                    @foreach ($categories as $category)
-                        <a href="{{ route('videos.index', ['category' => $category->slug]) }}"
-                           @class([
-                               'inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-medium transition',
-                               'bg-teal-700 text-white shadow shadow-teal-700/20' => $activeCategory === $category->slug,
-                               'bg-white text-ink-soft ring-1 ring-ink/5 hover:text-teal-700' => $activeCategory !== $category->slug,
-                           ])>
-                            {{ $category->name }}
-                            <span @class([
-                                'rounded-full px-1.5 text-xs',
-                                'bg-white/20' => $activeCategory === $category->slug,
-                                'bg-cream-200 text-ink-muted' => $activeCategory !== $category->slug,
-                            ])>{{ $category->videos_count }}</span>
-                        </a>
-                    @endforeach
-                </nav>
-            @endif
-
-            @if ($videos->isNotEmpty())
-                <h2 class="sr-only">Liste des vidéos</h2>
-                <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-                    @foreach ($videos as $video)
-                        <x-video-card :video="$video" />
-                    @endforeach
-                </div>
-
-                <div class="mt-12">
-                    {{ $videos->links() }}
-                </div>
-            @else
-                <div class="border-ink/15 rounded-3xl border border-dashed bg-white/60 p-12 text-center">
-                    <svg class="text-ink-muted mx-auto size-10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-                        <rect x="2" y="6" width="20" height="12" rx="2"/>
-                        <path stroke-linecap="round" stroke-linejoin="round" d="m10 9 5 3-5 3z"/>
-                    </svg>
-                    <p class="text-ink mt-4 font-serif text-xl">Aucune vidéo pour l'instant.</p>
-                    <p class="text-ink-soft mt-2 text-sm">Les vidéos arriveront bientôt - revenez nous voir !</p>
-                </div>
-            @endif
+            @livewire('video-search', ['category' => $activeCategory ?? ''])
         </div>
     </main>
 
