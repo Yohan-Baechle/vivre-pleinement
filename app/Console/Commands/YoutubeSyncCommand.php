@@ -8,14 +8,14 @@ use Illuminate\Console\Attributes\Signature;
 use Illuminate\Console\Command;
 use Throwable;
 
-#[Signature('youtube:sync {--max=50 : Nombre maximum de vidéos à synchroniser}')]
+#[Signature('youtube:sync {--max=500 : Nombre maximum d\'éléments de la playlist à parcourir (Shorts inclus, garde-fou)}')]
 #[Description('Synchronise les vidéos de la chaîne YouTube configurée vers la table videos.')]
 class YoutubeSyncCommand extends Command
 {
     public function handle(): int
     {
         try {
-            $result = YoutubeSync::fromConfig()->sync(maxResults: (int) $this->option('max'));
+            $result = YoutubeSync::fromConfig()->sync(maxResults: max(1, (int) $this->option('max')));
         } catch (Throwable $e) {
             $this->error('Échec de la synchronisation : '.$e->getMessage());
 

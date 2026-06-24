@@ -12,12 +12,12 @@ Bonjour {{ $appointment->customer_first_name }},
 C'est noté : votre rendez-vous a bien été déplacé. Voici votre nouveau créneau.
 @endif
 
-**Prestation :** {{ $appointment->service->name }}
-**Ancien créneau :** {{ $previousStart->locale('fr')->isoFormat('dddd D MMMM YYYY') }} à {{ $previousStart->format('H\hi') }}
-**Nouveau créneau :** {{ $appointment->starts_at->locale('fr')->isoFormat('dddd D MMMM YYYY') }}
-**Heure :** {{ $appointment->starts_at->format('H:i') }} - {{ $appointment->ends_at->format('H:i') }}
+**Prestation :** {{ $appointment->service->name }}\
+**Ancien créneau :** {{ $previousStart->locale('fr')->isoFormat('dddd D MMMM YYYY') }} à {{ $previousStart->format('H\hi') }}\
+**Nouveau créneau :** {{ $appointment->starts_at->locale('fr')->isoFormat('dddd D MMMM YYYY') }}\
+**Heure :** {{ $appointment->starts_at->format('H:i') }} - {{ $appointment->ends_at->format('H:i') }}\
 @if ($appointment->meeting_url)
-**Lien visio :** [{{ $appointment->meeting_url }}]({{ $appointment->meeting_url }})
+**Lien visio :** [{{ $appointment->meeting_url }}]({{ $appointment->meeting_url }})\
 @endif
 **Référence :** {{ $appointment->reference }}
 

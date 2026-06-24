@@ -1,10 +1,9 @@
 @php
     $links = [
-        ['label' => 'Qui suis-je',  'href' => route('home').'#a-propos', 'active' => false],
+        ['label' => 'À propos',     'href' => route('about'),            'active' => request()->routeIs('about')],
         ['label' => 'Mon livre',    'href' => route('book.show'),        'active' => request()->routeIs('book.*')],
         ['label' => 'Blog',         'href' => route('blog.index'),       'active' => request()->routeIs('blog.*')],
         ['label' => 'Vidéos',       'href' => route('videos.index'),     'active' => request()->routeIs('videos.*')],
-        ['label' => 'FAQ',          'href' => route('home').'#faq',      'active' => false],
         ['label' => 'Me contacter', 'href' => route('contact'),          'active' => request()->routeIs('contact*')],
     ];
 
@@ -17,7 +16,8 @@
     ]);
 @endphp
 
-<header data-navbar class="site-container fixed inset-x-0 top-0 z-50 pt-4 transition-transform duration-300 ease-out will-change-transform motion-reduce:transition-none sm:pt-6">
+<header data-navbar class="fixed inset-x-0 top-0 z-50 pt-4 transition-transform duration-300 ease-out will-change-transform motion-reduce:transition-none sm:pt-6">
+    <div class="site-container">
     <details name="mobile-nav" class="group rounded-3xl bg-white/70 shadow-xs ring-1 ring-white backdrop-blur-md sm:rounded-full md:open:rounded-full">
         <summary class="flex list-none items-center justify-between px-4 py-2.5 sm:px-5 sm:py-3 md:pointer-events-none [&::-webkit-details-marker]:hidden">
             <a href="{{ route('home') }}" class="flex items-center md:pointer-events-auto" aria-label="Accueil">
@@ -69,4 +69,5 @@
             @endforeach
         </ul>
     </details>
+    </div>
 </header>

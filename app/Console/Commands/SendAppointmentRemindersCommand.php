@@ -4,6 +4,7 @@ namespace App\Console\Commands;
 
 use App\Enums\AppointmentStatus;
 use App\Enums\PaymentStatus;
+use App\Mail\AppointmentCheckoutExpired;
 use App\Mail\AppointmentFollowUp;
 use App\Mail\AppointmentReminder;
 use App\Models\Appointment;
@@ -77,14 +78,27 @@ class SendAppointmentRemindersCommand extends Command
      */
     private function sweepStaleCheckouts(CarbonImmutable $now): int
     {
-        return Appointment::query()
+        $count = 0;
+
+        Appointment::query()
+            ->with('service')
             ->where('status', AppointmentStatus::Pending)
             ->where('payment_status', PaymentStatus::Unpaid)
             ->where('created_at', '<', $now->subMinutes(30))
-            ->update([
-                'status' => AppointmentStatus::Cancelled,
-                'cancelled_at' => $now,
-            ]);
+            ->get()
+            ->each(function (Appointment $appointment) use ($now, &$count) {
+                $appointment->forceFill([
+                    'status' => AppointmentStatus::Cancelled,
+                    'cancelled_at' => $now,
+                ])->save();
+
+                Mail::to($appointment->customer_email)
+                    ->send(new AppointmentCheckoutExpired($appointment));
+
+                $count++;
+            });
+
+        return $count;
     }
 
     private function sendFollowUps(CarbonImmutable $now): int

@@ -4,6 +4,7 @@ use App\Http\Controllers\BookController;
 use App\Http\Controllers\BookingController;
 use App\Http\Controllers\CommentController;
 use App\Http\Controllers\ContactController;
+use App\Http\Controllers\NewsletterController;
 use App\Http\Controllers\PostController;
 use App\Http\Controllers\SitemapController;
 use App\Http\Controllers\VideoController;
@@ -11,9 +12,14 @@ use Illuminate\Support\Facades\Route;
 
 Route::view('/', 'home.index')->name('home');
 
+Route::view('/a-propos', 'about.index')->name('about');
+
 Route::get('/contact', [ContactController::class, 'show'])->name('contact');
 Route::post('/contact', [ContactController::class, 'send'])->name('contact.send');
 Route::get('/contact/merci', [ContactController::class, 'thanks'])->name('contact.thanks');
+
+Route::post('/newsletter', [NewsletterController::class, 'store'])->name('newsletter.store');
+Route::view('/inscription-confirmee', 'newsletter.confirmed')->name('newsletter.confirmed');
 
 Route::prefix('reservation')->name('booking.')->controller(BookingController::class)->group(function () {
     Route::get('/', 'index')->name('index');

@@ -32,11 +32,15 @@ class YoutubeSync
     }
 
     /**
-     * Synchronise les vidéos de la chaîne configurée.
+     * Synchronise les vidéos longues de la chaîne configurée.
+     *
+     * Les Shorts (durée <= 60s) sont ignorés : ils ne sont jamais stockés. Le
+     * paramètre $maxResults borne le nombre d'éléments parcourus dans la playlist
+     * d'uploads (garde-fou), pas le nombre de vidéos conservées.
      *
      * @return array{created: int, updated: int, missing: int, total: int}
      */
-    public function sync(int $maxResults = 50): array
+    public function sync(int $maxResults = 500): array
     {
         $this->ensureConfigured();
 
@@ -49,7 +53,7 @@ class YoutubeSync
             return ['created' => 0, 'updated' => 0, 'missing' => $missing, 'total' => 0];
         }
 
-        $videosData = $this->fetchVideosDetails($videoIds);
+        $videosData = $this->rejectShorts($this->fetchVideosDetails($videoIds));
         $fetchedIds = collect($videosData)->pluck('id');
 
         $existingByYtId = Video::query()
@@ -224,6 +228,23 @@ class YoutubeSync
         } while ($pageToken);
 
         return $ids;
+    }
+
+    /**
+     * Écarte les Shorts (durée <= seuil) afin qu'ils ne soient jamais stockés.
+     * Une durée absente/non parsable est conservée par prudence (sera traitée
+     * comme vidéo longue plutôt que supprimée à tort).
+     *
+     * @param  list<array<string, mixed>>  $videosData
+     * @return list<array<string, mixed>>
+     */
+    private function rejectShorts(array $videosData): array
+    {
+        return array_values(array_filter($videosData, function (array $data): bool {
+            $duration = $this->parseIso8601Duration($data['contentDetails']['duration'] ?? null);
+
+            return $duration === null || $duration > Video::SHORT_DURATION_THRESHOLD;
+        }));
     }
 
     /**

@@ -21,22 +21,32 @@
 <x-section
     id="temoignages"
     eyebrow="Témoignages"
-    title="Elles en parlent mieux que moi."
+    title="Ils en parlent mieux que moi."
     lead="Quelques retours de personnes accompagnées ces dernières années."
     bg="bg-cream-50"
 >
-    <div class="grid grid-cols-1 gap-6 md:grid-cols-3">
-        @foreach ($testimonials as $t)
-            <figure class="ring-ink/5 flex flex-col rounded-3xl bg-white p-7 shadow-xs ring-1">
-                <svg class="size-8 text-teal-200" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-                    <path d="M9.5 4.5C6 4.5 3 7.5 3 11v9h6v-9H6c0-2 1.5-4 3.5-4v-2.5zm9 0c-3.5 0-6.5 3-6.5 6.5v9h6v-9h-3c0-2 1.5-4 3.5-4v-2.5z"/>
-                </svg>
-                <blockquote class="text-ink mt-4 flex-1 font-serif text-lg leading-snug italic">
+    @php
+        $offsets = ['lg:mt-0', 'lg:mt-12', 'lg:mt-4'];
+    @endphp
+    <div class="mx-auto grid max-w-5xl grid-cols-1 gap-6 md:grid-cols-3">
+        @foreach ($testimonials as $i => $t)
+            <figure
+                data-reveal
+                style="--reveal-delay: {{ $i * 140 }}ms"
+                class="relative flex flex-col rounded-3xl bg-white/70 p-7 ring-1 ring-ink/5 backdrop-blur-sm {{ $offsets[$i] ?? '' }}"
+            >
+                <span class="pointer-events-none absolute top-5 right-6 font-serif text-6xl leading-none text-teal-100 select-none" aria-hidden="true">”</span>
+                <blockquote class="text-ink relative flex-1 font-serif text-base leading-relaxed italic">
                     {{ $t['text'] }}
                 </blockquote>
-                <figcaption class="border-ink/10 mt-6 border-t pt-4">
-                    <p class="text-ink text-sm font-medium">{{ $t['author'] }}</p>
-                    <p class="text-ink-muted text-xs">{{ $t['context'] }}</p>
+                <figcaption class="mt-6 flex items-center gap-3 border-t border-ink/8 pt-5">
+                    <span class="flex size-10 shrink-0 items-center justify-center rounded-full bg-linear-to-br from-teal-100 to-teal-50 font-serif text-sm font-medium text-teal-700 ring-1 ring-teal-100" aria-hidden="true">
+                        {{ mb_substr($t['author'], 0, 1) }}
+                    </span>
+                    <span>
+                        <span class="text-ink block text-sm font-medium">{{ $t['author'] }}</span>
+                        <span class="text-ink-muted block text-xs">{{ $t['context'] }}</span>
+                    </span>
                 </figcaption>
             </figure>
         @endforeach

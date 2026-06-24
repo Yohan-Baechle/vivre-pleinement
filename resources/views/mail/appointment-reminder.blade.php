@@ -9,11 +9,13 @@ Votre rendez-vous a lieu **dans 1 heure environ**. Voici les détails pour vous 
 Je vous rappelle votre rendez-vous **prévu demain**. Voici le récapitulatif :
 @endif
 
-**Prestation :** {{ $appointment->service->name }}
-**Date :** {{ $appointment->starts_at->locale('fr')->isoFormat('dddd D MMMM YYYY') }}
-**Heure :** {{ $appointment->starts_at->format('H:i') }} - {{ $appointment->ends_at->format('H:i') }}
+**Prestation :** {{ $appointment->service->name }}\
+**Date :** {{ $appointment->starts_at->locale('fr')->isoFormat('dddd D MMMM YYYY') }}\
 @if ($appointment->meeting_url)
+**Heure :** {{ $appointment->starts_at->format('H:i') }} - {{ $appointment->ends_at->format('H:i') }}\
 **Lien visio :** [{{ $appointment->meeting_url }}]({{ $appointment->meeting_url }})
+@else
+**Heure :** {{ $appointment->starts_at->format('H:i') }} - {{ $appointment->ends_at->format('H:i') }}
 @endif
 
 @if ($appointment->meeting_url)
