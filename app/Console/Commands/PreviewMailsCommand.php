@@ -5,8 +5,10 @@ namespace App\Console\Commands;
 use App\Enums\AppointmentChannel;
 use App\Enums\AppointmentStatus;
 use App\Mail\AppointmentCancelled;
+use App\Mail\AppointmentCheckoutExpired;
 use App\Mail\AppointmentConfirmation;
 use App\Mail\AppointmentFollowUp;
+use App\Mail\AppointmentNoShow;
 use App\Mail\AppointmentNotification;
 use App\Mail\AppointmentReminder;
 use App\Mail\AppointmentRescheduled;
@@ -58,6 +60,8 @@ class PreviewMailsCommand extends Command
             'Annulation (client)' => new AppointmentCancelled($appointment),
             'Annulation (admin)' => new AppointmentCancelled($appointment, forAdmin: true),
             'Créneau indisponible' => new AppointmentSlotUnavailable($appointment),
+            'Checkout expiré (non payé)' => new AppointmentCheckoutExpired($appointment),
+            'Absent (no-show)' => new AppointmentNoShow($appointment),
             'Suivi' => new AppointmentFollowUp($appointment),
             'Message de contact' => new ContactMessage(
                 firstName: 'Camille',
