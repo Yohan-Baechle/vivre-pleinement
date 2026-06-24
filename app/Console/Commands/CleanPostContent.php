@@ -8,7 +8,7 @@ use Illuminate\Console\Attributes\Signature;
 use Illuminate\Console\Command;
 
 #[Signature('posts:clean-content {--dry-run : Affiche les articles à nettoyer sans les enregistrer}')]
-#[Description('Retire les <span> parasites du contenu des articles importés de WordPress.')]
+#[Description('Retire les <span> parasites et les paragraphes « Si vous aimez mon travail » du contenu des articles importés de WordPress.')]
 class CleanPostContent extends Command
 {
     public function handle(): int
@@ -50,6 +50,10 @@ class CleanPostContent extends Command
         do {
             $content = preg_replace('#<span>(.*?)</span>#is', '$1', $content, -1, $count);
         } while ($count > 0);
+
+        // Retire les paragraphes d'appel au don « Si vous aimez mon travail »
+        // (résidus WordPress/Tipeee), avec leurs éventuels sauts de ligne alentour.
+        $content = preg_replace('#\s*<p>[^<]*Si vous aimez mon travail.*?</p>#is', '', $content);
 
         return $content;
     }
