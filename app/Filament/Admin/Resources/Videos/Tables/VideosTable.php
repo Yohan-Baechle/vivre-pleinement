@@ -161,7 +161,8 @@ class VideosTable
                     ->preload(),
 
                 TrashedFilter::make(),
-            ], layout: FiltersLayout::AboveContent)
+            ], layout: FiltersLayout::Dropdown)
+            ->filtersTriggerAction(fn ($action) => $action->label('Filtres')->icon('heroicon-m-funnel'))
             ->recordActions([
                 Action::make('view_on_site')
                     ->label('Voir')
