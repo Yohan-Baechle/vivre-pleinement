@@ -3,6 +3,7 @@
 namespace App\Filament\Admin\Resources\Videos\Pages;
 
 use App\Filament\Admin\Resources\Videos\VideoResource;
+use App\Filament\Admin\Widgets\VideoStatsOverview;
 use App\Services\YoutubeSync;
 use Filament\Actions\Action;
 use Filament\Notifications\Notification;
@@ -12,6 +13,13 @@ use Throwable;
 class ListVideos extends ListRecords
 {
     protected static string $resource = VideoResource::class;
+
+    protected function getHeaderWidgets(): array
+    {
+        return [
+            VideoStatsOverview::class,
+        ];
+    }
 
     protected function getHeaderActions(): array
     {
