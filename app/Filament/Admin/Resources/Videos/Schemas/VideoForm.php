@@ -118,6 +118,16 @@ class VideoForm
                                 ->rows(3)
                                 ->columnSpanFull(),
 
+                            RichEditor::make('intro')
+                                ->label('Texte d\'introduction (au-dessus de la vidéo)')
+                                ->helperText('Paragraphe(s) affichés AVANT la vidéo. C\'est le texte le plus important pour Google : il pose le sujet avec les mots-clés que les gens recherchent.')
+                                ->toolbarButtons([
+                                    ['bold', 'italic'],
+                                    ['link'],
+                                    ['undo', 'redo'],
+                                ])
+                                ->columnSpanFull(),
+
                             Repeater::make('key_takeaways')
                                 ->label('Points clés à retenir')
                                 ->helperText('3 à 7 idées principales de la vidéo. Affichées en liste sous l\'embed. Excellent pour le SEO et la rétention.')
@@ -210,6 +220,14 @@ class VideoForm
                                 ->relationship('categories', 'name')
                                 ->options(fn () => Category::orderBy('name')->pluck('name', 'id'))
                                 ->columns(2)
+                                ->columnSpanFull(),
+
+                            Select::make('related_post_id')
+                                ->label('Article de blog associé')
+                                ->relationship('relatedPost', 'title')
+                                ->searchable()
+                                ->preload()
+                                ->helperText('Maillage interne : affiche un bloc « À lire aussi » sur la vidéo et un bloc vidéo sur l\'article. Détecté automatiquement depuis le lien dans la description YouTube.')
                                 ->columnSpanFull(),
 
                             Checkbox::make('is_missing')

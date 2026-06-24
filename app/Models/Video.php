@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Str;
@@ -21,10 +22,12 @@ use Illuminate\Support\Str;
     'description',
     'seo_description',
     'summary',
+    'intro',
     'key_takeaways',
     'transcript',
     'chapters',
     'thumbnail_url',
+    'related_post_id',
     'youtube_published_at',
     'duration_seconds',
     'view_count',
@@ -74,6 +77,17 @@ class Video extends Model
         return $this->belongsToMany(Category::class);
     }
 
+    /**
+     * Article de blog explicitement associé à cette vidéo (même sujet),
+     * détecté depuis le lien présent dans la description YouTube.
+     *
+     * @return BelongsTo<Post, $this>
+     */
+    public function relatedPost(): BelongsTo
+    {
+        return $this->belongsTo(Post::class, 'related_post_id');
+    }
+
     public function scopePublished(Builder $query): Builder
     {
         return $query
@@ -119,6 +133,7 @@ class Video extends Model
     public function hasEditorialContent(): bool
     {
         return filled($this->summary)
+            || filled($this->intro)
             || filled($this->transcript)
             || ! empty($this->key_takeaways);
     }
