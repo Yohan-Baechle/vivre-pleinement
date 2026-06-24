@@ -8,6 +8,7 @@
     $ogDescription = $video->metaDescription(200) ?? $metaDescription;
     $schemaDescription = $video->summary
         ?: $video->seo_description
+        ?: ($video->intro ? strip_tags($video->intro) : null)
         ?: $video->description;
     $chapters = $video->chaptersForSchema();
 @endphp
@@ -116,7 +117,15 @@
             </div>
         </header>
 
-        <div class="mx-auto -mt-2 max-w-5xl px-4 sm:px-6 lg:px-10">
+        @if ($video->intro)
+            <div class="mx-auto max-w-3xl px-4 pt-8 sm:px-6 lg:px-10">
+                <div class="prose prose-ink max-w-none text-lg leading-relaxed">
+                    {!! $video->intro !!}
+                </div>
+            </div>
+        @endif
+
+        <div class="mx-auto mt-8 max-w-5xl px-4 sm:px-6 lg:px-10">
             <x-youtube-embed :video="$video" priority />
 
             <div class="mt-4 flex justify-end">
@@ -193,6 +202,30 @@
                         {!! $video->transcript !!}
                     </div>
                 </details>
+            </section>
+        @endif
+
+        @if ($relatedPost)
+            <section class="mx-auto max-w-3xl px-4 pt-12 sm:px-6 lg:px-10" aria-labelledby="related-post-heading">
+                <h2 id="related-post-heading" class="text-ink font-serif text-2xl font-medium">
+                    À lire aussi
+                </h2>
+                <a href="{{ route('blog.show', $relatedPost->slug) }}"
+                   class="group ring-ink/5 mt-4 flex items-center gap-5 rounded-2xl bg-white p-5 ring-1 transition hover:ring-teal-200">
+                    @if ($cover = $relatedPost->featuredImageUrl('thumb'))
+                        <img src="{{ $cover }}" alt="" loading="lazy" width="96" height="96"
+                             class="size-20 flex-none rounded-xl object-cover sm:size-24">
+                    @endif
+                    <div class="min-w-0">
+                        <p class="text-xs font-medium tracking-wider text-teal-700 uppercase">Article</p>
+                        <p class="text-ink mt-1 font-serif text-lg leading-snug font-medium transition group-hover:text-teal-700">
+                            {{ $relatedPost->title }}
+                        </p>
+                        <p class="text-ink-soft mt-2 inline-flex items-center gap-1.5 text-sm">
+                            <span class="border-b border-teal-700/30">Lire l'article complet</span> →
+                        </p>
+                    </div>
+                </a>
             </section>
         @endif
 
