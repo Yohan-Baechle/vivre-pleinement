@@ -54,7 +54,7 @@ it('fetches, cleans and stores a transcript from the srt subtitles', function ()
         'transcript' => null,
     ]);
 
-    $srt = "1\n00:00:01,000 --> 00:00:04,000\nBonjour à tous.\n\n"
+    $srt = "1\n00:00:01,000 --> 00:00:04,000\nBonjour à tous.\n[Musique]\n\n"
         ."2\n00:00:04,000 --> 00:00:07,000\nAujourd'hui je vous parle d'anxiété.\n\n"
         ."3\n00:00:07,000 --> 00:00:09,000\nAujourd'hui je vous parle d'anxiété.\n";
 
@@ -74,7 +74,9 @@ it('fetches, cleans and stores a transcript from the srt subtitles', function ()
         ->and($video->transcript)->toContain('<p>')
         ->and($video->transcript)->toContain('Bonjour à tous')
         ->and($video->transcript)->toContain('anxiété')
-        // La répétition consécutive du sous-titre ASR est dédupliquée.
+        // L'annotation non verbale est retirée.
+        ->and($video->transcript)->not->toContain('Musique')
+        // La répétition consécutive est dédupliquée.
         ->and(substr_count($video->transcript, 'Aujourd'))->toBe(1);
 });
 
