@@ -8,9 +8,15 @@ use App\Http\Controllers\NewsletterController;
 use App\Http\Controllers\PostController;
 use App\Http\Controllers\SitemapController;
 use App\Http\Controllers\VideoController;
+use App\Http\Controllers\YoutubeOAuthController;
 use Illuminate\Support\Facades\Route;
 
 Route::view('/', 'home.index')->name('home');
+
+// Installation OAuth YouTube (sous-titres) — accessible uniquement si les
+// identifiants OAuth sont configurés ; sert une seule fois à l'autorisation.
+Route::get('/youtube/oauth/redirect', [YoutubeOAuthController::class, 'redirect'])->name('youtube.oauth.redirect');
+Route::get('/youtube/oauth/callback', [YoutubeOAuthController::class, 'callback'])->name('youtube.oauth.callback');
 
 Route::view('/a-propos', 'about.index')->name('about');
 

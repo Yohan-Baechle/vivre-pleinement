@@ -72,17 +72,19 @@ class FetchTranscripts extends Command
                 }
 
                 $srt = $captions->downloadTrack($trackId);
-                $html = $this->srtToHtml($srt);
+                $text = $this->srtToText($srt);
 
-                if ($html === '') {
+                if ($text === '') {
                     $this->warn("  ⚠ #{$video->id} : sous-titre vide après nettoyage.");
                     $skipped++;
 
                     continue;
                 }
 
-                $video->update(['transcript' => $html]);
-                $this->line("  ✓ #{$video->id} « {$video->title} » ({$this->wordCount($html)} mots)");
+                // Stocké en texte continu nettoyé ; la reponctuation IA
+                // (videos:repunctuate-transcripts) le mettra en paragraphes.
+                $video->update(['transcript' => '<p>'.e($text).'</p>']);
+                $this->line("  ✓ #{$video->id} « {$video->title} » ({$this->wordCount($text)} mots)");
                 $fetched++;
             } catch (Throwable $e) {
                 $this->warn("  ✗ #{$video->id} : ".$e->getMessage());
@@ -97,60 +99,51 @@ class FetchTranscripts extends Command
     }
 
     /**
-     * Convertit un SRT en HTML lisible : retire timecodes, numéros et balises,
-     * fusionne les lignes en phrases puis regroupe en paragraphes.
+     * Convertit un SRT en texte continu nettoyé, prêt à être reponctué.
+     *
+     * Les sous-titres (même « standard ») arrivent sans ponctuation fiable :
+     * on produit donc un texte propre d'un seul tenant — retrait des index,
+     * timecodes, balises, annotations [Musique]/[Applaudissements], doublons
+     * consécutifs et espaces superflus. La mise en paragraphes et la
+     * ponctuation sont restaurées ensuite par l'étape de reponctuation IA.
      */
-    private function srtToHtml(string $srt): string
+    private function srtToText(string $srt): string
     {
         $lines = preg_split('/\r\n|\r|\n/', $srt) ?: [];
-        $textParts = [];
+        $parts = [];
+        $previous = null;
 
         foreach ($lines as $line) {
             $line = trim($line);
 
-            // Ignorer numéros de bloc, timecodes et lignes vides.
+            // Index de bloc, timecodes et lignes vides.
             if ($line === '' || ctype_digit($line) || str_contains($line, '-->')) {
                 continue;
             }
 
-            // Retirer les balises éventuelles (<i>, <c>, etc.).
             $line = trim(strip_tags($line));
 
-            if ($line !== '') {
-                $textParts[] = $line;
+            // Annotations non verbales : [Musique], [Applaudissements], (rires)…
+            $line = trim((string) preg_replace('/[\[\(][^\]\)]*[\]\)]/u', '', $line));
+
+            if ($line === '' || $line === $previous) {
+                continue;
             }
+
+            $parts[] = $line;
+            $previous = $line;
         }
 
-        if ($textParts === []) {
-            return '';
-        }
+        $text = implode(' ', $parts);
+        // \s ne couvre pas tous les espaces unicode (insécables, etc.) des
+        // sous-titres : on normalise avec le flag /u et la classe \p{Z}.
+        $text = (string) preg_replace('/[\s\p{Z}]+/u', ' ', $text);
 
-        // Recoller en un texte continu, en dédupliquant les répétitions
-        // consécutives fréquentes dans les sous-titres ASR.
-        $previous = null;
-        $clean = [];
-        foreach ($textParts as $part) {
-            if ($part !== $previous) {
-                $clean[] = $part;
-                $previous = $part;
-            }
-        }
-
-        $fullText = implode(' ', $clean);
-        $fullText = preg_replace('/\s+/', ' ', $fullText) ?? $fullText;
-
-        // Découper en phrases puis regrouper en paragraphes de ~4 phrases.
-        $sentences = preg_split('/(?<=[.!?])\s+/', $fullText, -1, PREG_SPLIT_NO_EMPTY) ?: [$fullText];
-        $paragraphs = [];
-        foreach (array_chunk($sentences, 4) as $chunk) {
-            $paragraphs[] = '<p>'.e(trim(implode(' ', $chunk))).'</p>';
-        }
-
-        return implode("\n", $paragraphs);
+        return trim($text);
     }
 
-    private function wordCount(string $html): int
+    private function wordCount(string $text): int
     {
-        return Str::wordCount(strip_tags($html));
+        return Str::wordCount(strip_tags($text));
     }
 }
