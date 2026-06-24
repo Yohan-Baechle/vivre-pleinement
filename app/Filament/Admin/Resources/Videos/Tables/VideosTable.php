@@ -69,6 +69,27 @@ class VideosTable
                     ->sortable()
                     ->toggleable(),
 
+                TextColumn::make('editorial')
+                    ->label('Éditorial')
+                    ->badge()
+                    ->getStateUsing(fn (Video $record) => match (true) {
+                        $record->isEnriched() && $record->hasTranscript() => '✓ Complet',
+                        $record->isEnriched() => 'Sans transcription',
+                        $record->hasTranscript() => 'À enrichir',
+                        default => '⚠️ À traiter',
+                    })
+                    ->color(fn (Video $record) => match (true) {
+                        $record->isEnriched() && $record->hasTranscript() => 'success',
+                        $record->isEnriched() || $record->hasTranscript() => 'warning',
+                        default => 'danger',
+                    })
+                    ->tooltip(fn (Video $record) => sprintf(
+                        'Intro : %s · Résumé : %s · Transcription : %s',
+                        filled($record->intro) ? 'oui' : 'non',
+                        filled($record->summary) ? 'oui' : 'non',
+                        $record->hasTranscript() ? 'oui' : 'non',
+                    )),
+
                 TextColumn::make('categories.name')
                     ->label('Catégories')
                     ->badge()
@@ -109,6 +130,21 @@ class VideosTable
                 Filter::make('shorts')
                     ->label('Shorts uniquement')
                     ->query(fn (Builder $query) => $query->where('duration_seconds', '<=', Video::SHORT_DURATION_THRESHOLD))
+                    ->toggle(),
+
+                Filter::make('to_enrich')
+                    ->label('À enrichir (sans intro/résumé)')
+                    ->query(fn (Builder $query) => $query->where(
+                        fn (Builder $q) => $q->whereNull('intro')->orWhere('intro', '')
+                            ->orWhereNull('summary')->orWhere('summary', ''),
+                    ))
+                    ->toggle(),
+
+                Filter::make('no_transcript')
+                    ->label('Sans transcription')
+                    ->query(fn (Builder $query) => $query->where(
+                        fn (Builder $q) => $q->whereNull('transcript')->orWhere('transcript', ''),
+                    ))
                     ->toggle(),
 
                 SelectFilter::make('categories')
