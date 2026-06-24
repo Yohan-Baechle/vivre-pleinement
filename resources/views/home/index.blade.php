@@ -62,24 +62,18 @@
             @include('home.partials.cloud-landscape')
 
             <div class="relative z-[55] mx-auto flex min-h-0 w-full max-w-3xl flex-1 flex-col items-center justify-center px-4 pt-24 pb-10 text-center sm:px-6 sm:pt-28 lg:pt-32">
-                <p class="inline-flex items-center gap-2 rounded-full bg-white/80 px-4 py-1.5 text-xs font-medium text-teal-700 ring-1 ring-teal-200 backdrop-blur-sm">
-                    <svg class="size-3.5" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2 4 12l8 10 8-10z"/></svg>
-                    Accompagnement anxiété
-                </p>
-
-                <h1 class="text-hero text-ink mt-7 font-serif font-medium tracking-tight text-balance sm:mt-8">
+                <h1 class="text-hero text-ink font-serif font-medium tracking-tight text-balance">
                     Se libérer des<br>
                     <span class="font-normal text-teal-700 italic">troubles anxieux.</span>
                 </h1>
 
                 <p class="text-lead text-ink-soft mx-auto mt-7 max-w-xl text-balance">
-                    Tous les outils pour les personnes anxieuses, pour avancer pas à pas, à votre rythme, vers un quotidien plus serein.
+                    Tous les outils pour les personnes anxieuses. Vous n'êtes pas seul·e&nbsp;: avancez pas à pas, à votre rythme, vers un quotidien plus serein.
                 </p>
 
                 <div class="mt-8 flex flex-wrap items-center justify-center gap-3 sm:gap-4">
                     <a href="#capture" class="group inline-flex items-center gap-2 rounded-full bg-teal-700 px-7 py-3.5 text-sm font-medium text-white shadow-lg shadow-teal-700/20 transition hover:bg-teal-800 sm:text-base">
-                        Recevoir la vidéo
-                        <span class="transition group-hover:translate-x-0.5">→</span>
+                        Recevoir la vidéo offerte
                     </a>
                     <a href="#a-propos" class="text-ink-soft inline-flex items-center gap-2 text-sm font-medium transition hover:text-teal-700 sm:text-base">
                         Qui suis-je ?
@@ -116,10 +110,10 @@
                 <div class="lg:col-span-2">
                     <div class="inline-flex items-center gap-2 rounded-full bg-teal-50 px-3 py-1 text-xs font-medium text-teal-700">
                         <span class="size-1.5 rounded-full bg-teal-500"></span>
-                        Vidéo gratuite
+                        Vidéo offerte
                     </div>
-                    <h2 class="text-ink mt-3 font-serif text-3xl leading-tight">Téléchargez votre<br>vidéo gratuite</h2>
-                    <p class="text-ink-soft mt-2 text-sm">7 pièges de l'anxiété dans lesquels je suis tombée et qui m'ont maintenue dans cet état&nbsp;: ne faites pas les mêmes erreurs que moi pour guérir plus rapidement&nbsp;!</p>
+                    <h2 class="text-ink mt-3 font-serif text-3xl leading-tight">Téléchargez votre<br>vidéo offerte</h2>
+                    <p class="text-ink-soft mt-2 text-sm">7 pièges de l'anxiété dans lesquels je suis tombée et qui m'ont maintenus dans cet état — ne faites pas les mêmes erreurs que moi pour guérir plus rapidement&nbsp;!</p>
                 </div>
                 @if (session('newsletter_status') === 'pending')
                     @include('home.partials.newsletter-success')
@@ -142,7 +136,6 @@
                         <p data-newsletter-error role="alert" aria-live="polite" class="text-xs text-rose-700" @unless ($errors->has('email')) hidden @endunless>@error('email'){{ $message }}@enderror</p>
                         <button type="submit" class="group inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-teal-700 px-5 py-3.5 text-sm font-semibold text-white shadow-lg shadow-teal-700/20 transition hover:bg-teal-800 disabled:opacity-60">
                             Recevoir la vidéo
-                            <span class="transition group-hover:translate-x-0.5">→</span>
                         </button>
                         <p class="text-ink-muted text-center text-xs">Aucun spam · Désinscription en un clic</p>
                     </form>

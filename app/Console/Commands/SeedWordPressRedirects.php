@@ -32,7 +32,6 @@ class SeedWordPressRedirects extends Command
 
         $pageMap = [
             '/prendre-rendez-vous' => '/reservation',
-            '/a-propos' => '/#a-propos',
             '/plan-du-site' => '/blog',
             '/credits' => '/mentions-legales',
             '/credits-2' => '/mentions-legales',

@@ -21,7 +21,7 @@
 <x-section
     id="temoignages"
     eyebrow="Témoignages"
-    title="Elles en parlent mieux que moi."
+    title="Ils en parlent mieux que moi."
     lead="Quelques retours de personnes accompagnées ces dernières années."
     bg="bg-cream-50"
 >

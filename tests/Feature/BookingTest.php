@@ -59,6 +59,16 @@ it('shows the booking index with active services', function () {
         ->assertSee('data-booking-cta', false);
 });
 
+it('shows the booking FAQ on the index page', function () {
+    bookableService();
+
+    $this->get(route('booking.index'))
+        ->assertOk()
+        ->assertSee('Questions fréquentes')
+        ->assertSee('Comment cela va-t-il se passer pour prendre rendez-vous ?')
+        ->assertSee('FAQPage', false);
+});
+
 it('shows the service booking page', function () {
     $service = bookableService();
 

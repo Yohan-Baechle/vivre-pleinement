@@ -1,10 +1,9 @@
 @php
     $links = [
-        ['label' => 'Qui suis-je',  'href' => route('home').'#a-propos', 'active' => false],
+        ['label' => 'À propos',     'href' => route('about'),            'active' => request()->routeIs('about')],
         ['label' => 'Mon livre',    'href' => route('book.show'),        'active' => request()->routeIs('book.*')],
         ['label' => 'Blog',         'href' => route('blog.index'),       'active' => request()->routeIs('blog.*')],
         ['label' => 'Vidéos',       'href' => route('videos.index'),     'active' => request()->routeIs('videos.*')],
-        ['label' => 'FAQ',          'href' => route('faq'),              'active' => request()->routeIs('faq')],
         ['label' => 'Me contacter', 'href' => route('contact'),          'active' => request()->routeIs('contact*')],
     ];
 
