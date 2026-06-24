@@ -102,6 +102,57 @@ it('marks videos no longer returned by the api as missing', function () {
         ->and(Video::query()->where('youtube_id', 'gone')->firstOrFail()->is_missing)->toBeTrue();
 });
 
+it('ignores shorts and only stores long videos', function () {
+    fakeYoutubeApi([
+        [
+            'id' => 'long1',
+            'snippet' => ['title' => 'Vidéo longue', 'publishedAt' => '2025-01-15T10:00:00Z', 'thumbnails' => []],
+            'contentDetails' => ['duration' => 'PT5M'],
+            'statistics' => ['viewCount' => '10', 'likeCount' => '1'],
+        ],
+        [
+            'id' => 'short1',
+            'snippet' => ['title' => 'Un short', 'publishedAt' => '2025-02-15T10:00:00Z', 'thumbnails' => []],
+            'contentDetails' => ['duration' => 'PT45S'],
+            'statistics' => ['viewCount' => '99', 'likeCount' => '9'],
+        ],
+        [
+            'id' => 'exactly60',
+            'snippet' => ['title' => 'Pile 60s', 'publishedAt' => '2025-03-15T10:00:00Z', 'thumbnails' => []],
+            'contentDetails' => ['duration' => 'PT60S'],
+            'statistics' => ['viewCount' => '5', 'likeCount' => '0'],
+        ],
+    ]);
+
+    $result = (new YoutubeSync('test-key', 'UC_channel'))->sync();
+
+    expect($result)->toMatchArray(['created' => 1, 'total' => 1]);
+    expect(Video::query()->pluck('youtube_id')->all())->toBe(['long1']);
+});
+
+it('removes a short that was previously stored by marking it missing', function () {
+    Video::factory()->create(['youtube_id' => 'short1', 'is_missing' => false, 'duration_seconds' => 30]);
+
+    fakeYoutubeApi([
+        [
+            'id' => 'long1',
+            'snippet' => ['title' => 'Vidéo longue', 'publishedAt' => '2025-01-15T10:00:00Z', 'thumbnails' => []],
+            'contentDetails' => ['duration' => 'PT5M'],
+            'statistics' => ['viewCount' => '10', 'likeCount' => '1'],
+        ],
+        [
+            'id' => 'short1',
+            'snippet' => ['title' => 'Un short', 'publishedAt' => '2025-02-15T10:00:00Z', 'thumbnails' => []],
+            'contentDetails' => ['duration' => 'PT45S'],
+            'statistics' => ['viewCount' => '99', 'likeCount' => '9'],
+        ],
+    ]);
+
+    (new YoutubeSync('test-key', 'UC_channel'))->sync();
+
+    expect(Video::query()->where('youtube_id', 'short1')->firstOrFail()->is_missing)->toBeTrue();
+});
+
 it('throws when the api is not configured', function () {
     (new YoutubeSync(null, null))->sync();
 })->throws(RuntimeException::class);
