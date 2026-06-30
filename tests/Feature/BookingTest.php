@@ -59,6 +59,26 @@ it('shows the booking index with active services', function () {
         ->assertSee('data-booking-cta', false);
 });
 
+it('previews the next available slots in the hero', function () {
+    bookableService(['name' => 'Accompagnement ACT']);
+
+    $this->get(route('booking.index'))
+        ->assertOk()
+        ->assertSee('Prochaines disponibilit', false)
+        ->assertSee("Voir tout l'agenda", false);
+});
+
+it('lists the next available slots across days', function () {
+    $service = bookableService();
+
+    $slots = app(AppointmentSlotService::class)->nextAvailableSlots($service, 3);
+
+    expect($slots)->toHaveCount(3);
+    // Les créneaux sont triés chronologiquement.
+    expect($slots[0]['start']->lessThanOrEqualTo($slots[1]['start']))->toBeTrue();
+    expect($slots[1]['start']->lessThanOrEqualTo($slots[2]['start']))->toBeTrue();
+});
+
 it('shows the booking FAQ on the index page', function () {
     bookableService();
 

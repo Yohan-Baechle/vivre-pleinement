@@ -2,11 +2,11 @@
     <div class="grid grid-cols-1 items-center gap-12 lg:grid-cols-5 lg:gap-16">
         <div class="lg:col-span-2">
             <div class="relative mx-auto w-full max-w-sm">
-                <div class="rounded-5xl via-cream-100 to-rose-soft/40 absolute inset-0 -z-10 bg-linear-to-br from-teal-100/60 blur-2xl"></div>
-                <div class="bg-cream-100 relative aspect-square overflow-hidden rounded-4xl shadow-2xl ring-8 ring-white">
+                <div class="via-cream-100 to-rose-soft/40 absolute inset-0 -z-10 rounded-full bg-linear-to-br from-teal-100/60 blur-2xl"></div>
+                <div class="bg-cream-100 relative aspect-square overflow-hidden rounded-full shadow-2xl ring-8 ring-white">
                     <img
-                        src="{{ asset('images/laura-portrait-800.webp') }}"
-                        srcset="{{ asset('images/laura-portrait-400.webp') }} 400w, {{ asset('images/laura-portrait-800.webp') }} 800w, {{ asset('images/laura-portrait-1200.webp') }} 1200w"
+                        src="{{ asset('images/laura-livre-800.webp') }}"
+                        srcset="{{ asset('images/laura-livre-400.webp') }} 400w, {{ asset('images/laura-livre-800.webp') }} 800w, {{ asset('images/laura-livre-1200.webp') }} 1200w"
                         sizes="(min-width: 1024px) 384px, 100vw"
                         alt="Laura Baechlé, auteure du livre"
                         width="800"

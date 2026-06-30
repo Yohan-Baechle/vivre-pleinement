@@ -7,6 +7,7 @@ use App\Enums\PaymentStatus;
 use App\Mail\AppointmentCancelled;
 use App\Models\Appointment;
 use App\Models\AppointmentService;
+use App\Services\AppointmentSlotService;
 use App\Services\BookingPaymentService;
 use App\Support\IcsCalendar;
 use App\Support\Settings;
@@ -18,13 +19,17 @@ use Illuminate\View\View;
 
 class BookingController extends Controller
 {
-    public function index(): View
+    public function index(AppointmentSlotService $slots): View
     {
         $services = AppointmentService::query()->active()->orderBy('sort_order')->get();
+        $primaryService = $services->first();
 
         return view('booking.index', [
             'services' => $services,
-            'primaryService' => $services->first(),
+            'primaryService' => $primaryService,
+            'upcomingSlots' => $primaryService
+                ? $slots->nextAvailableSlots($primaryService, 3)
+                : collect(),
         ]);
     }
 

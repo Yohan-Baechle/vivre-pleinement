@@ -40,8 +40,8 @@
             {{-- Portrait centré en ouverture --}}
             <div class="mx-auto w-full max-w-xs sm:max-w-sm">
                 <div class="relative">
-                    <div class="rounded-5xl via-cream-100 to-rose-soft/40 absolute inset-0 -z-10 bg-linear-to-br from-teal-100/60 blur-2xl"></div>
-                    <div class="bg-cream-100 relative aspect-square overflow-hidden rounded-4xl shadow-2xl ring-8 ring-white">
+                    <div class="via-cream-100 to-rose-soft/40 absolute inset-0 -z-10 rounded-full bg-linear-to-br from-teal-100/60 blur-2xl"></div>
+                    <div class="bg-cream-100 relative aspect-square overflow-hidden rounded-full shadow-2xl ring-8 ring-white">
                         <img
                             src="{{ asset('images/laura-about-800.webp') }}"
                             srcset="{{ asset('images/laura-about-400.webp') }} 400w, {{ asset('images/laura-about-800.webp') }} 800w, {{ asset('images/laura-about-1200.webp') }} 1200w"
