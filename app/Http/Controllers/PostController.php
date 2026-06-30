@@ -7,7 +7,6 @@ use App\Models\Category;
 use App\Models\Post;
 use App\Models\Tag;
 use App\Support\InternalLinking;
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -19,6 +18,12 @@ class PostController extends Controller
 {
     private const PER_PAGE = 9;
 
+    /**
+     * Page blog. Le listing interactif (recherche, tri, pagination, chips) est
+     * géré par le composant Livewire PostSearch ; le contrôleur ne fournit que
+     * les métadonnées SEO, la sidebar (catégories/tags en liens indexables) et
+     * l'aperçu pour le JSON-LD de la page canonique.
+     */
     public function index(Request $request): View
     {
         $validated = $request->validate([
@@ -29,26 +34,22 @@ class PostController extends Controller
         ]);
 
         $hasFilters = collect(['q', 'category', 'tag'])->some(fn ($k) => ! empty($validated[$k] ?? null));
-        $featured = $this->featuredPost($request, $validated, $hasFilters);
 
-        $query = Post::query()
-            ->published()
-            ->with(['categories', 'tags', 'media'])
-            ->when($featured, fn ($q) => $q->where('id', '!=', $featured->id));
-
-        $this->applyFilters($query, $validated);
-
-        $posts = $query
-            ->orderBy('published_at', ($validated['sort'] ?? 'recent') === 'oldest' ? 'asc' : 'desc')
-            ->paginate(self::PER_PAGE)
-            ->withQueryString();
+        // Aperçu (featured + premiers articles) uniquement pour le JSON-LD de la
+        // page canonique non filtrée. Le listing affiché vient de Livewire.
+        $previewPosts = collect();
+        if (! $hasFilters && ($validated['sort'] ?? 'recent') === 'recent') {
+            $previewPosts = Post::query()
+                ->published()
+                ->orderByDesc('published_at')
+                ->limit(self::PER_PAGE + 1)
+                ->get(['id', 'slug', 'title']);
+        }
 
         return view('blog.index', [
-            'posts' => $posts,
-            'featured' => $featured,
             'categories' => $this->sidebarCategories(),
             'popularTags' => $this->popularTags(),
-            'allTags' => Tag::query()->get(),
+            'previewPosts' => $previewPosts,
             'filters' => $validated,
             'hasFilters' => $hasFilters,
         ]);
@@ -72,6 +73,7 @@ class PostController extends Controller
             'post' => $post,
             'similar' => InternalLinking::similar($post),
             'pillar' => InternalLinking::pillar($post),
+            'relatedVideo' => $post->bestRelatedVideo(),
         ]);
     }
 
@@ -133,26 +135,6 @@ class PostController extends Controller
     }
 
     /**
-     * Le dernier article publié, mis en avant uniquement sur la première page non filtrée et triée par défaut.
-     *
-     * @param  array<string, mixed>  $filters
-     */
-    private function featuredPost(Request $request, array $filters, bool $hasFilters): ?Post
-    {
-        $isFirstPage = ! $request->filled('page') || (int) $request->get('page') === 1;
-
-        if ($hasFilters || ! $isFirstPage || ($filters['sort'] ?? 'recent') !== 'recent') {
-            return null;
-        }
-
-        return Post::query()
-            ->published()
-            ->with(['categories', 'tags', 'media'])
-            ->orderByDesc('published_at')
-            ->first();
-    }
-
-    /**
      * @return Collection<int, Category>
      */
     private function sidebarCategories(): Collection
@@ -174,28 +156,5 @@ class PostController extends Controller
             ->limit(20)
             ->get()
             ->filter(fn ($t) => $t->posts_count > 0);
-    }
-
-    /**
-     * @param  array<string, mixed>  $filters
-     */
-    private function applyFilters(Builder $query, array $filters): void
-    {
-        if ($search = $filters['q'] ?? null) {
-            $query->where(function (Builder $q) use ($search) {
-                $like = '%'.str_replace(['%', '_'], ['\%', '\_'], $search).'%';
-                $q->where('title', 'like', $like)
-                    ->orWhere('excerpt', 'like', $like)
-                    ->orWhere('content', 'like', $like);
-            });
-        }
-
-        if ($category = $filters['category'] ?? null) {
-            $query->whereHas('categories', fn (Builder $q) => $q->where('slug', $category));
-        }
-
-        if ($tag = $filters['tag'] ?? null) {
-            $query->whereHas('tags', fn (Builder $q) => $q->where('slug', $tag));
-        }
     }
 }
