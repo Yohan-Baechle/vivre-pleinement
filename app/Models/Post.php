@@ -6,6 +6,7 @@ use App\Enums\PostStatus;
 use App\Models\Concerns\HasOptimizedMedia;
 use App\Observers\PostObserver;
 use App\Support\Settings;
+use App\Support\VideoArticleMatcher;
 use Database\Factories\PostFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
@@ -87,6 +88,26 @@ class Post extends Model implements HasMedia
     public function comments(): HasMany
     {
         return $this->hasMany(Comment::class);
+    }
+
+    /**
+     * Vidéos explicitement associées à cet article (même sujet).
+     *
+     * @return HasMany<Video, $this>
+     */
+    public function videos(): HasMany
+    {
+        return $this->hasMany(Video::class, 'related_post_id');
+    }
+
+    /**
+     * Meilleure vidéo à présenter sur l'article : la vidéo explicitement
+     * associée en priorité, sinon la vidéo de la même catégorie dont le titre
+     * est le plus proche thématiquement. Null si rien d'assez pertinent.
+     */
+    public function bestRelatedVideo(): ?Video
+    {
+        return VideoArticleMatcher::videoForPost($this);
     }
 
     public function scopePublished(Builder $query): Builder

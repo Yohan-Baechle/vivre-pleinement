@@ -88,6 +88,26 @@ class AppointmentSlotService
     }
 
     /**
+     * Renvoie les prochains créneaux réservables, tous jours confondus, à partir
+     * d'aujourd'hui et jusqu'à la limite de réservation anticipée du service.
+     *
+     * @return Collection<int, array{start: CarbonImmutable, end: CarbonImmutable, label: string}>
+     */
+    public function nextAvailableSlots(AppointmentService $service, int $limit = 3): Collection
+    {
+        $found = collect();
+        $date = CarbonImmutable::now()->startOfDay();
+        $lastDay = $date->addDays($service->max_advance_days);
+
+        while ($date->lessThanOrEqualTo($lastDay) && $found->count() < $limit) {
+            $found = $found->concat($this->slotsForDate($service, $date));
+            $date = $date->addDay();
+        }
+
+        return $found->take($limit)->values();
+    }
+
+    /**
      * Vérifie côté serveur qu'un début de créneau précis est réellement réservable.
      */
     public function isSlotBookable(AppointmentService $service, CarbonImmutable $start): bool
