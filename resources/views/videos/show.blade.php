@@ -22,8 +22,6 @@
 @section('og_image', $video->thumbnail())
 
 @push('head')
-    <meta name="twitter:card" content="player">
-
     @php
         $videoLd = [
             '@context' => 'https://schema.org',
@@ -40,9 +38,14 @@
                 'interactionType' => ['@type' => 'WatchAction'],
                 'userInteractionCount' => $video->view_count,
             ] : null,
-            'publisher' => [
+            'author' => [
                 '@type' => 'Person',
                 'name' => 'Laura Baechlé',
+                'url' => url('/'),
+            ],
+            'publisher' => [
+                '@type' => 'Organization',
+                'name' => 'Vivre Pleinement',
                 'url' => url('/'),
             ],
             'inLanguage' => 'fr-FR',

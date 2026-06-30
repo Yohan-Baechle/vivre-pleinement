@@ -36,3 +36,22 @@ it('lists only long videos on the index, never shorts', function () {
         ->assertSee('longue')
         ->assertDontSee('courte');
 });
+
+it('exposes correct SEO metadata on the video page', function () {
+    Video::factory()->create([
+        'slug' => 'video-seo',
+        'duration_seconds' => 600,
+        'view_count' => 1234,
+    ]);
+
+    $html = $this->get('/videos/video-seo')->assertOk()->getContent();
+
+    // VideoObject : publisher = Organization, author = Person (et non plus publisher Person).
+    expect($html)
+        ->toContain('"publisher":{"@type":"Organization","name":"Vivre Pleinement"')
+        ->toContain('"author":{"@type":"Person","name":"Laura Baechlé"');
+
+    // Une seule balise twitter:card (player cassée supprimée), et meta robots aux aperçus larges.
+    expect(substr_count($html, 'name="twitter:card"'))->toBe(1);
+    expect($html)->toContain('max-video-preview:-1');
+});
