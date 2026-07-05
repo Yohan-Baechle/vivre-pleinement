@@ -10,7 +10,7 @@ use App\Models\AppointmentService;
 use App\Services\AppointmentSlotService;
 use App\Services\BookingPaymentService;
 use App\Support\IcsCalendar;
-use App\Support\Settings;
+use App\Support\SiteContact;
 use Carbon\CarbonImmutable;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Response;
@@ -99,7 +99,7 @@ class BookingController extends Controller
         ]);
 
         Mail::to($appointment->customer_email)->send(new AppointmentCancelled($appointment));
-        Mail::to(Settings::get('notify_email', config('mail.contact_to', 'contact@vivre-pleinement.fr')))
+        Mail::to(SiteContact::notifyEmail())
             ->send(new AppointmentCancelled($appointment, forAdmin: true));
 
         return redirect()->route('booking.manage', $appointment->token);

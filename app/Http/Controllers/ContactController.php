@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\ContactFormRequest;
 use App\Mail\ContactMessage;
+use App\Support\SiteContact;
 use App\Support\SubmissionThrottle;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Mail;
@@ -30,7 +31,7 @@ class ContactController extends Controller
 
         $data = $request->validated();
 
-        Mail::to(config('mail.contact_to', 'contact@vivre-pleinement.fr'))->send(
+        Mail::to(SiteContact::notifyEmail())->send(
             new ContactMessage(
                 firstName: $data['first_name'],
                 lastName: $data['last_name'] ?? null,

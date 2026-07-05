@@ -12,6 +12,7 @@ use App\Models\Appointment;
 use App\Models\AppointmentService;
 use App\Services\AppointmentSlotService;
 use App\Support\Settings;
+use App\Support\SiteContact;
 use Carbon\CarbonImmutable;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Facades\Mail;
@@ -215,7 +216,7 @@ class BookingCalendar extends Component
         }
 
         Mail::to($appointment->customer_email)->send(new AppointmentConfirmation($appointment));
-        Mail::to(Settings::get('notify_email', config('mail.contact_to', 'contact@vivre-pleinement.fr')))
+        Mail::to(SiteContact::notifyEmail())
             ->send(new AppointmentNotification($appointment));
 
         return redirect()->route('booking.confirmation', $appointment->reference);
@@ -252,7 +253,7 @@ class BookingCalendar extends Component
         $appointment = $appointment->fresh('service');
 
         Mail::to($appointment->customer_email)->send(new AppointmentRescheduled($appointment, $previousStart));
-        Mail::to(Settings::get('notify_email', config('mail.contact_to', 'contact@vivre-pleinement.fr')))
+        Mail::to(SiteContact::notifyEmail())
             ->send(new AppointmentRescheduled($appointment, $previousStart, forAdmin: true));
 
         return redirect()->route('booking.manage', $appointment->token);

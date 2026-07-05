@@ -7,7 +7,7 @@ use App\Mail\CourseAccessGranted;
 use App\Mail\CoursePurchaseNotification;
 use App\Models\Enrollment;
 use App\Models\Student;
-use App\Support\Settings;
+use App\Support\SiteContact;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use Laravel\Cashier\Cashier;
@@ -150,7 +150,7 @@ class CoursePaymentService
         $fresh->setRelation('course', $enrollment->course);
 
         Mail::to($enrollment->student->email)->send(new CourseAccessGranted($fresh));
-        Mail::to(Settings::get('notify_email', config('mail.contact_to', 'contact@vivre-pleinement.fr')))
+        Mail::to(SiteContact::notifyEmail())
             ->send(new CoursePurchaseNotification($fresh));
     }
 

@@ -8,7 +8,7 @@ use App\Mail\AppointmentConfirmation;
 use App\Mail\AppointmentNotification;
 use App\Mail\AppointmentSlotUnavailable;
 use App\Models\Appointment;
-use App\Support\Settings;
+use App\Support\SiteContact;
 use Carbon\CarbonImmutable;
 use Illuminate\Support\Facades\Mail;
 use Laravel\Cashier\Cashier;
@@ -71,7 +71,7 @@ class BookingPaymentService
         ]);
 
         Mail::to($appointment->customer_email)->send(new AppointmentConfirmation($appointment->fresh('service')));
-        Mail::to(Settings::get('notify_email', config('mail.contact_to', 'contact@vivre-pleinement.fr')))
+        Mail::to(SiteContact::notifyEmail())
             ->send(new AppointmentNotification($appointment->fresh('service')));
     }
 
