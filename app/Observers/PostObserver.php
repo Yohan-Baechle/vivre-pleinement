@@ -4,6 +4,7 @@ namespace App\Observers;
 
 use App\Models\Post;
 use App\Support\InternalLinking;
+use App\Support\VideoArticleMatcher;
 use Illuminate\Support\Facades\Cache;
 
 class PostObserver
@@ -34,5 +35,6 @@ class PostObserver
         Cache::forget('blog.rss.posts');
 
         InternalLinking::flushCluster($post);
+        VideoArticleMatcher::flush();
     }
 }
