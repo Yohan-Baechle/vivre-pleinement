@@ -146,3 +146,21 @@ it('confirms a specific slot is bookable', function () {
     expect(app(AppointmentSlotService::class)->isSlotBookable($service, $start))->toBeTrue()
         ->and(app(AppointmentSlotService::class)->isSlotBookable($service, $day->setTime(13, 0)))->toBeFalse();
 });
+
+it('computes a full month of availability in three queries', function () {
+    $day = nextWeekday(3);
+    $service = serviceWithAvailability($day->dayOfWeek);
+
+    $this->expectsDatabaseQueryCount(3);
+
+    app(AppointmentSlotService::class)->availableDaysForMonth($service, $day->year, $day->month);
+});
+
+it('finds the next available slots in three queries', function () {
+    $day = nextWeekday(3);
+    $service = serviceWithAvailability($day->dayOfWeek);
+
+    $this->expectsDatabaseQueryCount(3);
+
+    app(AppointmentSlotService::class)->nextAvailableSlots($service);
+});
