@@ -2,19 +2,15 @@
 
 namespace App\Http\Controllers;
 
-use App\Enums\AppointmentStatus;
 use App\Enums\PaymentStatus;
-use App\Mail\AppointmentCancelled;
 use App\Models\Appointment;
 use App\Models\AppointmentService;
+use App\Services\AppointmentLifecycleService;
 use App\Services\AppointmentSlotService;
 use App\Services\BookingPaymentService;
 use App\Support\IcsCalendar;
-use App\Support\SiteContact;
-use Carbon\CarbonImmutable;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Response;
-use Illuminate\Support\Facades\Mail;
 use Illuminate\View\View;
 
 class BookingController extends Controller
@@ -89,18 +85,11 @@ class BookingController extends Controller
         return view('booking.manage', ['appointment' => $appointment]);
     }
 
-    public function cancel(Appointment $appointment): RedirectResponse
+    public function cancel(Appointment $appointment, AppointmentLifecycleService $lifecycle): RedirectResponse
     {
         abort_unless($appointment->isManageable(), 403, 'Ce rendez-vous ne peut plus être annulé.');
 
-        $appointment->update([
-            'status' => AppointmentStatus::Cancelled,
-            'cancelled_at' => CarbonImmutable::now(),
-        ]);
-
-        Mail::to($appointment->customer_email)->send(new AppointmentCancelled($appointment));
-        Mail::to(SiteContact::notifyEmail())
-            ->send(new AppointmentCancelled($appointment, forAdmin: true));
+        $lifecycle->cancel($appointment);
 
         return redirect()->route('booking.manage', $appointment->token);
     }
