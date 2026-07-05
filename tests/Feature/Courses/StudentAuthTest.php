@@ -68,7 +68,6 @@ it('verrouille la connexion après cinq tentatives échouées', function () {
         ])->assertSessionHasErrors('email');
     }
 
-    // Même le bon mot de passe est refusé tant que le verrou est actif.
     $this->post(route('student.login.store'), [
         'email' => 'pierre@example.com',
         'password' => 'password',
@@ -87,7 +86,6 @@ it('ne verrouille pas un élève après une connexion réussie entre deux échec
         ]);
     }
 
-    // La connexion réussie purge le compteur de tentatives.
     $this->post(route('student.login.store'), [
         'email' => 'pierre@example.com',
         'password' => 'password',

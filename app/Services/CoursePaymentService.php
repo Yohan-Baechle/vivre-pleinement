@@ -117,29 +117,75 @@ class CoursePaymentService
 
     /**
      * Active l'inscription après paiement réussi, puis notifie l'élève et l'admin.
-     * Idempotent : un webhook dupliqué pour une inscription déjà active ne fait rien.
+     * Idempotent : un webhook dupliqué pour une inscription déjà active ne fait
+     * rien ; un paiement concurrent (intent différent) est remboursé d'office.
+     * Le montant et la devise enregistrés viennent du payload Stripe : c'est ce
+     * qui a réellement été payé, pas le prix courant du cours. Le cours est
+     * chargé withTrashed : un cours supprimé entre le paiement et le webhook ne
+     * doit pas faire échouer le job, l'élève ayant déjà payé.
      */
-    public function fulfill(Enrollment $enrollment, ?string $paymentIntentId = null): void
-    {
+    public function fulfill(
+        Enrollment $enrollment,
+        ?string $paymentIntentId = null,
+        ?int $amountReceivedCents = null,
+        ?string $currency = null,
+    ): void {
         if ($enrollment->status === EnrollmentStatus::Active) {
+            $this->refundDuplicatePayment($enrollment, $paymentIntentId);
+
             return;
         }
 
-        $enrollment->loadMissing(['course', 'student']);
+        $enrollment->loadMissing(['student', 'course' => fn ($query) => $query->withTrashed()]);
 
         $enrollment->update([
             'status' => EnrollmentStatus::Active,
-            'amount_paid_cents' => $enrollment->course->price_cents,
-            'currency' => $enrollment->course->currency,
+            'amount_paid_cents' => $amountReceivedCents ?? $enrollment->course->price_cents,
+            'currency' => $currency !== null ? strtoupper($currency) : $enrollment->course->currency,
             'stripe_payment_intent_id' => $paymentIntentId,
             'purchased_at' => now(),
         ]);
 
-        $fresh = $enrollment->fresh(['course', 'student']);
+        $fresh = $enrollment->fresh(['student']);
+        $fresh->setRelation('course', $enrollment->course);
 
         Mail::to($enrollment->student->email)->send(new CourseAccessGranted($fresh));
         Mail::to(Settings::get('notify_email', config('mail.contact_to', 'contact@vivre-pleinement.fr')))
             ->send(new CoursePurchaseNotification($fresh));
+    }
+
+    /**
+     * Un paiement réussi arrive pour une inscription déjà active via un intent
+     * différent : l'élève a payé deux fois (deux onglets avant la réutilisation
+     * d'intent, ou course entre webhooks). On rembourse le second débit.
+     */
+    private function refundDuplicatePayment(Enrollment $enrollment, ?string $paymentIntentId): void
+    {
+        if ($paymentIntentId === null || $paymentIntentId === $enrollment->stripe_payment_intent_id) {
+            return;
+        }
+
+        try {
+            $this->refundPaymentIntent($paymentIntentId);
+
+            Log::warning('Second paiement détecté pour une inscription déjà active : remboursé automatiquement.', [
+                'enrollment_id' => $enrollment->id,
+                'kept_payment_intent_id' => $enrollment->stripe_payment_intent_id,
+                'refunded_payment_intent_id' => $paymentIntentId,
+            ]);
+        } catch (Throwable $exception) {
+            report($exception);
+
+            Log::error('Second paiement détecté mais remboursement automatique impossible : à traiter dans le dashboard Stripe.', [
+                'enrollment_id' => $enrollment->id,
+                'payment_intent_id' => $paymentIntentId,
+            ]);
+        }
+    }
+
+    public function refundPaymentIntent(string $paymentIntentId): void
+    {
+        Cashier::stripe()->refunds->create(['payment_intent' => $paymentIntentId]);
     }
 
     /**
