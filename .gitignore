@@ -6,6 +6,7 @@
 .env.testing
 .phpactor.json
 .phpunit.result.cache
+/.claude
 /.codex
 /.cursor/
 /.idea
@@ -32,6 +33,7 @@ Thumbs.db
 
 # Archives locales (backups, exports binaires)
 /database/storage-archive.tar.gz
+/storage/backups
 /database/*.tar.gz
 /database/*.zip
 
