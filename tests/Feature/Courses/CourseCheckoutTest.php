@@ -15,7 +15,7 @@ beforeEach(function () {
     $intent = PaymentIntent::constructFrom(['id' => 'pi_test', 'client_secret' => 'pi_secret_test']);
 
     $this->mock(CoursePaymentService::class)
-        ->shouldReceive('createPaymentIntent')
+        ->shouldReceive('getOrCreatePaymentIntent')
         ->andReturn($intent);
 });
 

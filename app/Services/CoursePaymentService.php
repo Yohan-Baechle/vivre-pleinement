@@ -6,29 +6,49 @@ use App\Enums\EnrollmentStatus;
 use App\Mail\CourseAccessGranted;
 use App\Mail\CoursePurchaseNotification;
 use App\Models\Enrollment;
+use App\Models\Student;
 use App\Support\Settings;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use Laravel\Cashier\Cashier;
 use Stripe\PaymentIntent;
+use Throwable;
 
 class CoursePaymentService
 {
     /**
-     * Crée un PaymentIntent Stripe pour l'achat d'une formation. Le client_secret
-     * retourné alimente le Payment Element affiché sur le site. L'inscription est
-     * activée plus tard par le webhook payment_intent.succeeded.
+     * Statuts Stripe pour lesquels un PaymentIntent existant peut resservir au
+     * Payment Element au lieu d'en créer un nouveau (risque de double débit sinon).
+     *
+     * @var list<string>
      */
-    public function createPaymentIntent(Enrollment $enrollment): PaymentIntent
+    private const REUSABLE_INTENT_STATUSES = [
+        'requires_payment_method',
+        'requires_confirmation',
+        'requires_action',
+        'processing',
+    ];
+
+    /**
+     * Retourne le PaymentIntent de l'inscription : réutilise celui déjà créé
+     * (rafraîchissement, second onglet) tant qu'il n'est pas finalisé, sinon en
+     * crée un nouveau. Le client_secret retourné alimente le Payment Element.
+     * L'inscription est activée plus tard par le webhook payment_intent.succeeded.
+     */
+    public function getOrCreatePaymentIntent(Enrollment $enrollment): PaymentIntent
     {
         $enrollment->loadMissing(['course', 'student']);
 
-        $customer = $enrollment->student->createOrGetStripeCustomer();
+        $existing = $this->reusableIntentFor($enrollment);
 
-        return Cashier::stripe()->paymentIntents->create([
+        if ($existing !== null) {
+            return $existing;
+        }
+
+        $intent = $this->createIntent([
             'amount' => $enrollment->course->price_cents,
-            'currency' => config('cashier.currency', 'eur'),
-            'customer' => $customer->id,
+            'currency' => strtolower($enrollment->course->currency ?? config('cashier.currency', 'eur')),
+            'customer' => $this->resolveStripeCustomerId($enrollment->student),
             'description' => 'Formation : '.$enrollment->course->title,
             'receipt_email' => $enrollment->student->email,
             'metadata' => [
@@ -38,6 +58,61 @@ class CoursePaymentService
             ],
             'automatic_payment_methods' => ['enabled' => true],
         ]);
+
+        $enrollment->update(['stripe_payment_intent_id' => $intent->id]);
+
+        return $intent;
+    }
+
+    /**
+     * Récupère le PaymentIntent déjà rattaché à l'inscription s'il est encore
+     * utilisable, en réalignant son montant si le prix de la formation a changé
+     * entre-temps.
+     */
+    private function reusableIntentFor(Enrollment $enrollment): ?PaymentIntent
+    {
+        if ($enrollment->stripe_payment_intent_id === null) {
+            return null;
+        }
+
+        $intent = $this->retrieveIntent($enrollment->stripe_payment_intent_id);
+
+        if ($intent === null || ! in_array($intent->status, self::REUSABLE_INTENT_STATUSES, true)) {
+            return null;
+        }
+
+        if ($intent->amount !== $enrollment->course->price_cents && str_starts_with($intent->status, 'requires_')) {
+            return $this->updateIntentAmount($intent->id, $enrollment->course->price_cents);
+        }
+
+        return $intent;
+    }
+
+    public function retrieveIntent(string $paymentIntentId): ?PaymentIntent
+    {
+        try {
+            return Cashier::stripe()->paymentIntents->retrieve($paymentIntentId);
+        } catch (Throwable) {
+            return null;
+        }
+    }
+
+    /**
+     * @param  array<string, mixed>  $params
+     */
+    public function createIntent(array $params): PaymentIntent
+    {
+        return Cashier::stripe()->paymentIntents->create($params);
+    }
+
+    public function updateIntentAmount(string $paymentIntentId, int $amountCents): PaymentIntent
+    {
+        return Cashier::stripe()->paymentIntents->update($paymentIntentId, ['amount' => $amountCents]);
+    }
+
+    public function resolveStripeCustomerId(Student $student): string
+    {
+        return $student->createOrGetStripeCustomer()->id;
     }
 
     /**

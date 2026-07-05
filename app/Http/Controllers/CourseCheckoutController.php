@@ -49,7 +49,7 @@ class CourseCheckoutController extends Controller
             ->where('course_id', $course->id)
             ->firstOrFail();
 
-        $intent = $payments->createPaymentIntent($enrollment);
+        $intent = $payments->getOrCreatePaymentIntent($enrollment);
 
         return view('courses.pay', [
             'course' => $course,
