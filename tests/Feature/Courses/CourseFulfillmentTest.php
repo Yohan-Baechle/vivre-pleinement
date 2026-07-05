@@ -6,6 +6,7 @@ use App\Mail\CoursePurchaseNotification;
 use App\Models\Course;
 use App\Models\Enrollment;
 use App\Models\Student;
+use App\Services\CoursePaymentService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Mail;
 use Laravel\Cashier\Events\WebhookReceived;
@@ -57,6 +58,51 @@ it('est idempotent : un webhook dupliqué ne renvoie pas un second email', funct
     courseWebhook($enrollment->id);
     courseWebhook($enrollment->id);
 
+    Mail::assertQueued(CourseAccessGranted::class, 1);
+});
+
+it('enregistre le montant et la devise réellement payés transmis par Stripe', function () {
+    Mail::fake();
+    $enrollment = pendingEnrollment();
+
+    event(new WebhookReceived([
+        'type' => 'payment_intent.succeeded',
+        'data' => ['object' => [
+            'id' => 'pi_payload',
+            'amount_received' => 12900,
+            'currency' => 'eur',
+            'metadata' => ['enrollment_id' => $enrollment->id],
+        ]],
+    ]));
+
+    $fresh = $enrollment->fresh();
+    expect($fresh->amount_paid_cents)->toBe(12900)
+        ->and($fresh->currency)->toBe('EUR');
+});
+
+it('active l\'inscription même si le cours a été supprimé entre le paiement et le webhook', function () {
+    Mail::fake();
+    $enrollment = pendingEnrollment();
+    $enrollment->course->delete();
+
+    courseWebhook($enrollment->id);
+
+    expect($enrollment->fresh()->status)->toBe(EnrollmentStatus::Active);
+    Mail::assertQueued(CourseAccessGranted::class);
+});
+
+it('rembourse automatiquement un second paiement arrivé sur une inscription déjà active', function () {
+    Mail::fake();
+    $enrollment = pendingEnrollment();
+    courseWebhook($enrollment->id, 'pi_premier');
+
+    $this->partialMock(CoursePaymentService::class, function ($mock) {
+        $mock->shouldReceive('refundPaymentIntent')->once()->with('pi_second');
+    });
+
+    courseWebhook($enrollment->id, 'pi_second');
+
+    expect($enrollment->fresh()->stripe_payment_intent_id)->toBe('pi_premier');
     Mail::assertQueued(CourseAccessGranted::class, 1);
 });
 

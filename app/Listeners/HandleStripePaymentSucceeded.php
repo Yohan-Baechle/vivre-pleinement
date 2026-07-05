@@ -37,7 +37,7 @@ class HandleStripePaymentSucceeded implements ShouldQueue
         }
 
         if (isset($metadata['enrollment_id'])) {
-            $this->fulfillEnrollment($metadata['enrollment_id'], $paymentIntentId);
+            $this->fulfillEnrollment($metadata['enrollment_id'], $paymentIntentId, $intent);
         }
     }
 
@@ -50,12 +50,20 @@ class HandleStripePaymentSucceeded implements ShouldQueue
         }
     }
 
-    private function fulfillEnrollment(mixed $enrollmentId, ?string $paymentIntentId): void
+    /**
+     * @param  array<string, mixed>  $intent
+     */
+    private function fulfillEnrollment(mixed $enrollmentId, ?string $paymentIntentId, array $intent): void
     {
         $enrollment = Enrollment::query()->find($enrollmentId);
 
         if ($enrollment !== null) {
-            $this->coursePayments->fulfill($enrollment, $paymentIntentId);
+            $this->coursePayments->fulfill(
+                $enrollment,
+                $paymentIntentId,
+                is_int($intent['amount_received'] ?? null) ? $intent['amount_received'] : null,
+                is_string($intent['currency'] ?? null) ? $intent['currency'] : null,
+            );
         }
     }
 }
