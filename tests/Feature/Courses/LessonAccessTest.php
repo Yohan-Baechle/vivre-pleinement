@@ -53,6 +53,26 @@ it('donne accès aux leçons à un élève inscrit', function () {
         ->assertSee($lesson->title);
 });
 
+it('redirige un élève dont l\'inscription a été remboursée vers la page de vente', function () {
+    [$course, $lesson] = courseWithLesson();
+    $student = Student::factory()->create();
+    Enrollment::factory()->refunded()->create(['student_id' => $student->id, 'course_id' => $course->id]);
+
+    $this->actingAs($student, 'student')
+        ->get(route('student.lesson', [$course, $lesson]))
+        ->assertRedirect(route('courses.show', $course));
+});
+
+it('redirige un élève dont l\'inscription est en attente de paiement vers la page de vente', function () {
+    [$course, $lesson] = courseWithLesson();
+    $student = Student::factory()->create();
+    Enrollment::factory()->pending()->create(['student_id' => $student->id, 'course_id' => $course->id]);
+
+    $this->actingAs($student, 'student')
+        ->get(route('student.lesson', [$course, $lesson]))
+        ->assertRedirect(route('courses.show', $course));
+});
+
 it('empêche un élève d\'accéder au contenu d\'une formation non achetée', function () {
     [$course, $lesson] = courseWithLesson();
     $otherCourse = Course::factory()->create();

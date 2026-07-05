@@ -7,6 +7,7 @@ use App\Mail\CourseAccessGranted;
 use App\Mail\CoursePurchaseNotification;
 use App\Models\Enrollment;
 use App\Support\Settings;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use Laravel\Cashier\Cashier;
 use Stripe\PaymentIntent;
@@ -64,5 +65,24 @@ class CoursePaymentService
         Mail::to($enrollment->student->email)->send(new CourseAccessGranted($fresh));
         Mail::to(Settings::get('notify_email', config('mail.contact_to', 'contact@vivre-pleinement.fr')))
             ->send(new CoursePurchaseNotification($fresh));
+    }
+
+    /**
+     * Révoque l'accès après un remboursement (webhook charge.refunded ou action
+     * admin). Idempotent : une inscription déjà remboursée ou en attente ne bouge pas.
+     */
+    public function refund(Enrollment $enrollment): void
+    {
+        if ($enrollment->status !== EnrollmentStatus::Active) {
+            return;
+        }
+
+        $enrollment->update(['status' => EnrollmentStatus::Refunded]);
+
+        Log::info('Inscription remboursée, accès révoqué.', [
+            'enrollment_id' => $enrollment->id,
+            'course_id' => $enrollment->course_id,
+            'student_id' => $enrollment->student_id,
+        ]);
     }
 }

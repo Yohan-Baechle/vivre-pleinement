@@ -4,6 +4,10 @@ namespace App\Filament\Admin\Resources\Enrollments\Tables;
 
 use App\Enums\EnrollmentStatus;
 use App\Models\Course;
+use App\Models\Enrollment;
+use App\Services\CoursePaymentService;
+use Filament\Actions\Action;
+use Filament\Notifications\Notification;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
@@ -49,6 +53,21 @@ class EnrollmentsTable
                 SelectFilter::make('course_id')
                     ->label('Formation')
                     ->options(fn () => Course::orderBy('title')->pluck('title', 'id')),
+            ])
+            ->recordActions([
+                Action::make('markRefunded')
+                    ->label('Marquer remboursé')
+                    ->icon('heroicon-o-arrow-uturn-left')
+                    ->color('danger')
+                    ->visible(fn (Enrollment $record) => $record->status === EnrollmentStatus::Active)
+                    ->requiresConfirmation()
+                    ->modalHeading('Marquer comme remboursé')
+                    ->modalDescription("L'élève perd immédiatement l'accès à la formation. Le remboursement lui-même doit être émis depuis le dashboard Stripe (il déclenche aussi cette révocation automatiquement via le webhook charge.refunded).")
+                    ->action(function (Enrollment $record) {
+                        app(CoursePaymentService::class)->refund($record);
+
+                        Notification::make()->success()->title('Accès révoqué')->send();
+                    }),
             ]);
     }
 }

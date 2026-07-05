@@ -38,4 +38,11 @@ class EnrollmentFactory extends Factory
             'purchased_at' => null,
         ]);
     }
+
+    public function refunded(): static
+    {
+        return $this->state(fn () => [
+            'status' => EnrollmentStatus::Refunded,
+        ]);
+    }
 }
