@@ -2,7 +2,6 @@
 
 namespace App\Filament\Admin\Resources\Products\Tables;
 
-use Filament\Actions\Action;
 use Filament\Actions\ActionGroup;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteAction;
@@ -56,13 +55,6 @@ class ProductsTable
             ->recordActions([
                 ActionGroup::make([
                     EditAction::make(),
-                    Action::make('view_on_site')
-                        ->label('Voir sur le site')
-                        ->icon('heroicon-o-arrow-top-right-on-square')
-                        ->color('gray')
-                        ->url(fn ($record) => url('/produits/'.$record->slug))
-                        ->openUrlInNewTab()
-                        ->visible(fn ($record) => $record->is_active),
                     DeleteAction::make(),
                 ]),
             ])
