@@ -5,8 +5,10 @@ namespace App\Models;
 use App\Enums\CourseStatus;
 use App\Models\Concerns\HasOptimizedMedia;
 use App\Models\Concerns\HasPriceInCents;
+use App\Observers\CourseObserver;
 use Database\Factories\CourseFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
+use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -16,6 +18,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
 
+#[ObservedBy([CourseObserver::class])]
 #[Fillable([
     'title',
     'slug',
