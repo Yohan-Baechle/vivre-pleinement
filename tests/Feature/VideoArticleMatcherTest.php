@@ -77,3 +77,26 @@ it('returns null when the post or video has no category', function () {
     expect(VideoArticleMatcher::videoForPost($post))->toBeNull()
         ->and(VideoArticleMatcher::postForVideo($video))->toBeNull();
 });
+
+it('caches the match and refreshes it when a new video is saved', function () {
+    $c = Category::factory()->create();
+    $post = categorizedPost($c, ['title' => 'Le burn-out et comment le surmonter']);
+
+    expect(VideoArticleMatcher::videoForPost($post))->toBeNull();
+
+    $video = categorizedVideo($c, ['title' => 'Sortir du burn-out']);
+
+    expect(VideoArticleMatcher::videoForPost($post)?->id)->toBe($video->id);
+});
+
+it('serves the cached match without recomputing', function () {
+    $c = Category::factory()->create();
+    $post = categorizedPost($c, ['title' => 'Le burn-out et comment le surmonter']);
+    $video = categorizedVideo($c, ['title' => 'Sortir du burn-out']);
+
+    expect(VideoArticleMatcher::videoForPost($post)?->id)->toBe($video->id);
+
+    $this->expectsDatabaseQueryCount(1);
+
+    VideoArticleMatcher::videoForPost($post);
+});

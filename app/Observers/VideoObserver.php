@@ -3,6 +3,7 @@
 namespace App\Observers;
 
 use App\Models\Video;
+use App\Support\VideoArticleMatcher;
 use Illuminate\Support\Facades\Cache;
 
 class VideoObserver
@@ -31,5 +32,7 @@ class VideoObserver
     {
         Cache::forget('sitemap.urls');
         Cache::forget('sitemap.videos');
+
+        VideoArticleMatcher::flush();
     }
 }
