@@ -44,6 +44,58 @@ it('connecte un élève existant', function () {
     expect(auth('student')->check())->toBeTrue();
 });
 
+it('refuse une connexion avec un mauvais mot de passe', function () {
+    Student::factory()->create(['email' => 'pierre@example.com']);
+
+    $this->from(route('student.login'))
+        ->post(route('student.login.store'), [
+            'email' => 'pierre@example.com',
+            'password' => 'mauvais-mot-de-passe',
+        ])
+        ->assertRedirect(route('student.login'))
+        ->assertSessionHasErrors('email');
+
+    expect(auth('student')->check())->toBeFalse();
+});
+
+it('verrouille la connexion après cinq tentatives échouées', function () {
+    $student = Student::factory()->create(['email' => 'pierre@example.com']);
+
+    foreach (range(1, 5) as $attempt) {
+        $this->post(route('student.login.store'), [
+            'email' => 'pierre@example.com',
+            'password' => 'mauvais-mot-de-passe',
+        ])->assertSessionHasErrors('email');
+    }
+
+    // Même le bon mot de passe est refusé tant que le verrou est actif.
+    $this->post(route('student.login.store'), [
+        'email' => 'pierre@example.com',
+        'password' => 'password',
+    ])->assertSessionHasErrors('email');
+
+    expect(auth('student')->check())->toBeFalse();
+});
+
+it('ne verrouille pas un élève après une connexion réussie entre deux échecs', function () {
+    Student::factory()->create(['email' => 'pierre@example.com']);
+
+    foreach (range(1, 4) as $attempt) {
+        $this->post(route('student.login.store'), [
+            'email' => 'pierre@example.com',
+            'password' => 'mauvais-mot-de-passe',
+        ]);
+    }
+
+    // La connexion réussie purge le compteur de tentatives.
+    $this->post(route('student.login.store'), [
+        'email' => 'pierre@example.com',
+        'password' => 'password',
+    ])->assertRedirect(route('student.dashboard'));
+
+    expect(auth('student')->check())->toBeTrue();
+});
+
 it('déconnecte un élève', function () {
     $student = Student::factory()->create();
 
