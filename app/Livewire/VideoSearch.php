@@ -90,7 +90,7 @@ class VideoSearch extends Component
                 fn (Builder $cq) => $cq->where('slug', $this->category),
             ))
             ->when($term !== '', function (Builder $q) use ($term): void {
-                $like = '%'.$term.'%';
+                $like = '%'.str_replace(['%', '_'], ['\%', '\_'], $term).'%';
 
                 $q->where(function (Builder $sub) use ($like): void {
                     $sub->where('title', 'like', $like)

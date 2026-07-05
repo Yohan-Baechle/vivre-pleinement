@@ -86,3 +86,13 @@ it('noindexes search result pages but indexes the listing and categories', funct
     $this->get('/videos?category=phobies')->assertDontSee('noindex', false);
     $this->get('/videos?q=phobie')->assertSee('noindex', false);
 });
+
+it('treats like wildcards as literal characters in the search term', function () {
+    Video::factory()->create(['title' => 'La peur de conduire', 'duration_seconds' => 600]);
+    Video::factory()->create(['title' => 'Vidéo 100% détente', 'duration_seconds' => 600]);
+
+    Livewire::test(VideoSearch::class)
+        ->set('search', '%')
+        ->assertViewHas('videos', fn ($videos) => $videos->total() === 1)
+        ->assertSee('100% détente', false);
+});
