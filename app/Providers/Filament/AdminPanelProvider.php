@@ -2,6 +2,7 @@
 
 namespace App\Providers\Filament;
 
+use App\Filament\Admin\Widgets\CourseSalesStats;
 use App\Filament\Admin\Widgets\LatestPosts;
 use App\Filament\Admin\Widgets\StatsOverview;
 use App\Filament\Admin\Widgets\UpcomingAppointments;
@@ -42,6 +43,7 @@ class AdminPanelProvider extends PanelProvider
             ->navigationGroups([
                 'Rendez-vous',
                 'Contenu',
+                'Formations',
                 'Taxonomies',
                 'Boutique',
                 'SEO',
@@ -55,6 +57,7 @@ class AdminPanelProvider extends PanelProvider
             ->discoverWidgets(in: app_path('Filament/Admin/Widgets'), for: 'App\Filament\Admin\Widgets')
             ->widgets([
                 StatsOverview::class,
+                CourseSalesStats::class,
                 UpcomingAppointments::class,
                 LatestPosts::class,
             ])
