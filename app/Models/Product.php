@@ -43,9 +43,14 @@ class Product extends Model implements HasMedia
         ];
     }
 
+    /**
+     * La collection download (fichier vendu) vit sur le disque privé : sur le
+     * disque public, l'URL /storage/{media_id}/… serait devinable et le
+     * fichier téléchargeable sans achat.
+     */
     public function registerMediaCollections(): void
     {
         $this->addMediaCollection('cover')->singleFile();
-        $this->addMediaCollection('download')->singleFile();
+        $this->addMediaCollection('download')->singleFile()->useDisk('local');
     }
 }
