@@ -7,10 +7,8 @@ use App\Models\Category;
 use App\Models\Post;
 use App\Models\Tag;
 use App\Support\InternalLinking;
-use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
-use Illuminate\Support\Collection as SupportCollection;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\View\View;
 
@@ -47,8 +45,6 @@ class PostController extends Controller
         }
 
         return view('blog.index', [
-            'categories' => $this->sidebarCategories(),
-            'popularTags' => $this->popularTags(),
             'previewPosts' => $previewPosts,
             'filters' => $validated,
             'hasFilters' => $hasFilters,
@@ -132,29 +128,5 @@ class PostController extends Controller
             ->view('blog.rss', ['posts' => $posts])
             ->header('Content-Type', 'application/rss+xml; charset=UTF-8')
             ->header('Cache-Control', 'public, max-age=1800');
-    }
-
-    /**
-     * @return Collection<int, Category>
-     */
-    private function sidebarCategories(): Collection
-    {
-        return Category::query()
-            ->withCount(['posts' => fn ($q) => $q->published()])
-            ->orderBy('name')
-            ->get();
-    }
-
-    /**
-     * @return SupportCollection<int, Tag>
-     */
-    private function popularTags(): SupportCollection
-    {
-        return Tag::query()
-            ->withCount(['posts' => fn ($q) => $q->published()])
-            ->orderByDesc('posts_count')
-            ->limit(20)
-            ->get()
-            ->filter(fn ($t) => $t->posts_count > 0);
     }
 }
