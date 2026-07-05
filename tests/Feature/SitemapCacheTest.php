@@ -1,6 +1,7 @@
 <?php
 
 use App\Models\Category;
+use App\Models\Course;
 use App\Models\Tag;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Cache;
@@ -19,6 +20,14 @@ it('flushes the sitemap cache when a tag changes', function () {
     Cache::put('sitemap.urls', ['cached'], now()->addHour());
 
     Tag::factory()->create();
+
+    expect(Cache::has('sitemap.urls'))->toBeFalse();
+});
+
+it('flushes the sitemap cache when a course changes', function () {
+    Cache::put('sitemap.urls', ['cached'], now()->addHour());
+
+    Course::factory()->create();
 
     expect(Cache::has('sitemap.urls'))->toBeFalse();
 });

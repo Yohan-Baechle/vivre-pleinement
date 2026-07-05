@@ -65,7 +65,7 @@ class SitemapController extends Controller
             Video::query()
                 ->published()
                 ->orderByDesc('updated_at')
-                ->get()
+                ->get(['slug', 'updated_at'])
                 ->each(function ($video) use ($items) {
                     $items->push([
                         'loc' => route('videos.show', $video),
