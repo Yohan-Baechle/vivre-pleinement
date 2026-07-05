@@ -89,7 +89,7 @@ class PostsTable
                         ->label('Voir sur le site')
                         ->icon('heroicon-o-arrow-top-right-on-square')
                         ->color('gray')
-                        ->url(fn ($record) => url('/'.$record->slug))
+                        ->url(fn ($record) => route('blog.show', $record))
                         ->openUrlInNewTab()
                         ->visible(fn ($record) => $record->status === PostStatus::Published),
                     DeleteAction::make(),

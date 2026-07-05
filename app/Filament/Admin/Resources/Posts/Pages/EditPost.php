@@ -22,7 +22,7 @@ class EditPost extends EditRecord
                 ->label('Voir sur le site')
                 ->icon('heroicon-o-arrow-top-right-on-square')
                 ->color('gray')
-                ->url(fn () => url('/'.$this->record->slug))
+                ->url(fn () => route('blog.show', $this->record))
                 ->openUrlInNewTab()
                 ->visible(fn () => $this->record->status === PostStatus::Published),
             DeleteAction::make(),
