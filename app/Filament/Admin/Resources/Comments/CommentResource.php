@@ -16,6 +16,7 @@ use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Illuminate\Support\Facades\Cache;
 use UnitEnum;
 
 class CommentResource extends Resource
@@ -36,7 +37,11 @@ class CommentResource extends Resource
 
     public static function getNavigationBadge(): ?string
     {
-        $pending = static::getModel()::where('status', CommentStatus::Pending)->count();
+        $pending = Cache::remember(
+            'filament.badge.comments.pending',
+            now()->addMinute(),
+            fn () => static::getModel()::where('status', CommentStatus::Pending)->count(),
+        );
 
         return $pending > 0 ? (string) $pending : null;
     }

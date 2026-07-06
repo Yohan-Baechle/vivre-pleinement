@@ -52,6 +52,14 @@ class Video extends Model
     /** Seuil au-dessus duquel une vidéo n'est plus considérée comme un Short YouTube. */
     public const SHORT_DURATION_THRESHOLD = 60;
 
+    /**
+     * @var array<string, mixed>
+     */
+    protected $attributes = [
+        'status' => 'published',
+        'is_missing' => false,
+    ];
+
     protected function casts(): array
     {
         return [

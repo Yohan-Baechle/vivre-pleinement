@@ -2,6 +2,10 @@
 
 @section('title', $service->name.' · Prendre rendez-vous - Vivre Pleinement')
 
+@php
+    use Illuminate\Support\Number;
+@endphp
+
 @push('head')
     <meta name="description" content="Réservez « {{ $service->name }} » avec Laura Baechlé : choisissez votre créneau en ligne, en visioconférence.">
     <link rel="canonical" href="{{ route('booking.show', $service->slug) }}">
@@ -22,7 +26,7 @@
             <div class="mt-6 max-w-3xl">
                 <p class="inline-flex items-center gap-2 rounded-full bg-white/80 px-4 py-1.5 text-xs font-medium text-teal-700 ring-1 ring-teal-200">
                     <svg class="size-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
-                    {{ $service->duration_minutes }} min · {{ $service->isFree() ? 'Gratuit' : number_format($service->price, 2, ',', ' ').' €' }}
+                    {{ $service->duration_minutes }} min · {{ $service->isFree() ? 'Gratuit' : Number::currency($service->price, in: 'EUR', locale: 'fr') }}
                 </p>
                 <h1 class="text-ink mt-5 font-serif text-4xl font-medium tracking-tight sm:text-5xl">
                     {{ $service->name }}

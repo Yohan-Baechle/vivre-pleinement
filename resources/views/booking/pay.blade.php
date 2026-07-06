@@ -2,6 +2,8 @@
 
 @php
     use Carbon\CarbonImmutable;
+    use Illuminate\Support\Number;
+
     $start = CarbonImmutable::parse($appointment->starts_at);
 @endphp
 
@@ -28,14 +30,14 @@
                 <p class="text-xs font-medium tracking-wider text-teal-700 uppercase">Votre rendez-vous</p>
                 <div class="mt-3 flex items-baseline justify-between gap-4">
                     <p class="text-ink font-serif text-xl font-medium">{{ $appointment->service->name }}</p>
-                    <p class="text-ink font-serif text-xl font-medium">{{ number_format($appointment->price_cents / 100, 2, ',', ' ') }} €</p>
+                    <p class="text-ink font-serif text-xl font-medium">{{ Number::currency($appointment->price_cents / 100, in: 'EUR', locale: 'fr') }}</p>
                 </div>
                 <p class="text-ink-soft mt-1 text-sm">
                     {{ $start->locale('fr')->isoFormat('dddd D MMMM YYYY à H\hi') }} · {{ $appointment->service->duration_minutes }} min · en visioconférence
                 </p>
             </div>
 
-            @php $amountLabel = number_format($appointment->price_cents / 100, 2, ',', ' ').' €'; @endphp
+            @php $amountLabel = Number::currency($appointment->price_cents / 100, in: 'EUR', locale: 'fr'); @endphp
 
             {{-- Paiement --}}
             <form id="payment-form"

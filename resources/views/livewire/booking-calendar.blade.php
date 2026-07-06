@@ -1,5 +1,6 @@
 @php
     use Carbon\CarbonImmutable;
+    use Illuminate\Support\Number;
 
     $service = $this->service;
     $weekDays = ['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim'];
@@ -16,10 +17,10 @@
 
 <div class="mx-auto max-w-2xl space-y-6">
     <p class="sr-only" aria-live="polite">
-        @if ($selectedSlot)
-            Créneau sélectionné : {{ CarbonImmutable::parse($selectedSlot)->locale('fr')->isoFormat('dddd D MMMM') }} à {{ CarbonImmutable::parse($selectedSlot)->format('H\hi') }}.
-        @elseif ($selectedDate)
-            {{ count($this->slots) }} créneaux disponibles le {{ CarbonImmutable::parse($selectedDate)->locale('fr')->isoFormat('dddd D MMMM') }}.
+        @if ($this->selectedSlotStart)
+            Créneau sélectionné : {{ $this->selectedSlotStart->locale('fr')->isoFormat('dddd D MMMM') }} à {{ $this->selectedSlotStart->format('H\hi') }}.
+        @elseif ($this->selectedDateStart)
+            {{ count($this->slots) }} créneaux disponibles le {{ $this->selectedDateStart->locale('fr')->isoFormat('dddd D MMMM') }}.
         @else
             {{ $monthNames[$month] }} {{ $year }} : {{ $available->count() }} jours disponibles.
         @endif
@@ -76,7 +77,7 @@
                     $fullLabel = $dateObj->locale('fr')->isoFormat('dddd D MMMM YYYY');
                 @endphp
                 @if ($isAvailable)
-                    <button type="button" wire:click="selectDate('{{ $date }}')"
+                    <button type="button" wire:key="day-{{ $date }}" wire:click="selectDate('{{ $date }}')"
                             wire:loading.attr="disabled" wire:target="selectDate,previousMonth,nextMonth"
                             @class([
                                 'aspect-square rounded-xl text-sm font-medium transition focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-teal-500',
@@ -88,7 +89,7 @@
                         {{ $day }}
                     </button>
                 @else
-                    <div @class([
+                    <div wire:key="day-{{ $date }}" @class([
                             'flex aspect-square items-center justify-center rounded-xl text-sm text-ink-muted line-through decoration-ink-muted/30',
                             'ring-1 ring-teal-100' => $isToday,
                         ])
@@ -111,13 +112,13 @@
             <div class="border-ink/5 mt-8 border-t pt-6"
                  x-data x-init="$el.scrollIntoView({ behavior: 'smooth', block: 'nearest' })">
                 <p class="text-ink-muted text-xs font-medium tracking-wider uppercase">
-                    Créneaux le {{ CarbonImmutable::parse($selectedDate)->locale('fr')->isoFormat('dddd D MMMM') }}
+                    Créneaux le {{ $this->selectedDateStart?->locale('fr')->isoFormat('dddd D MMMM') }}
                     <span class="text-ink-muted/70 ml-1 tracking-normal normal-case">· {{ $service->duration_minutes }} min chacun</span>
                 </p>
                 @if (count($this->slots) > 0)
                     <div class="mt-4 grid grid-cols-3 gap-2 sm:grid-cols-4 md:grid-cols-5" role="group" aria-label="Créneaux horaires disponibles">
                         @foreach ($this->slots as $slot)
-                            <button type="button" wire:click="selectSlot('{{ $slot['value'] }}')"
+                            <button type="button" wire:key="slot-{{ $slot['value'] }}" wire:click="selectSlot('{{ $slot['value'] }}')"
                                     @class([
                                         'rounded-xl px-2 py-2.5 text-sm font-medium transition focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-teal-500',
                                         'bg-teal-700 text-white shadow' => $selectedSlot === $slot['value'],
@@ -137,8 +138,8 @@
     </section>
 
     {{-- Étape 2 - Récap + coordonnées --}}
-    @if ($selectedSlot)
-        @php $slotStart = CarbonImmutable::parse($selectedSlot); @endphp
+    @if ($this->selectedSlotStart)
+        @php $slotStart = $this->selectedSlotStart; @endphp
         <section id="booking-form" class="ring-ink/5 rounded-4xl bg-white p-6 shadow-xs ring-1 sm:p-8"
                  x-data x-init="$el.scrollIntoView({ behavior: 'smooth', block: 'nearest' })"
                  aria-label="Récapitulatif et coordonnées">
@@ -161,7 +162,7 @@
                     <div class="flex items-center gap-2">
                         <svg class="size-4 shrink-0 text-teal-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M9.5 9a2.5 2.5 0 0 1 5 0c0 1.5-2.5 2-2.5 3.5M12 17h.01"/></svg>
                         <dt class="sr-only">Tarif</dt>
-                        <dd>{{ $service->isFree() ? 'Gratuit · Sans engagement' : number_format($service->price, 2, ',', ' ').' €' }}</dd>
+                        <dd>{{ $service->isFree() ? 'Gratuit · Sans engagement' : Number::currency($service->price, in: 'EUR', locale: 'fr') }}</dd>
                     </div>
                 </dl>
                 <button type="button" wire:click="$set('selectedSlot', null)"

@@ -4,9 +4,9 @@ use App\Enums\CommentStatus;
 use App\Models\Comment;
 use App\Models\Post;
 use App\Support\Settings;
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
 
-uses(RefreshDatabase::class);
+uses(LazilyRefreshDatabase::class);
 
 it('displays root comments on the article page', function () {
     $post = Post::factory()->create(['status' => 'published']);

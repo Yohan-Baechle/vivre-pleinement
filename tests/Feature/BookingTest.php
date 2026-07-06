@@ -11,11 +11,11 @@ use App\Models\Availability;
 use App\Services\AppointmentSlotService;
 use App\Support\Settings;
 use Carbon\CarbonImmutable;
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
 use Illuminate\Support\Facades\Mail;
 use Livewire\Livewire;
 
-uses(RefreshDatabase::class);
+uses(LazilyRefreshDatabase::class);
 
 function bookableService(array $attributes = []): AppointmentService
 {
@@ -28,13 +28,7 @@ function bookableService(array $attributes = []): AppointmentService
 
     // Disponibilité tous les jours, large fenêtre, pour garantir un créneau futur.
     foreach (range(0, 6) as $dow) {
-        Availability::create([
-            'appointment_service_id' => null,
-            'day_of_week' => $dow,
-            'start_time' => '08:00',
-            'end_time' => '20:00',
-            'is_active' => true,
-        ]);
+        Availability::factory()->dayOfWeek($dow)->create();
     }
 
     return $service;
@@ -101,13 +95,7 @@ it('jumps to the first month that has availability', function () {
     // Service disponible uniquement le dimanche : on garantit qu'au moins
     // un mois affiché contient des dispos plutôt qu'une grille vide.
     $service = AppointmentService::factory()->create(['duration_minutes' => 30, 'min_notice_hours' => 12]);
-    Availability::create([
-        'appointment_service_id' => null,
-        'day_of_week' => 0,
-        'start_time' => '09:00',
-        'end_time' => '12:00',
-        'is_active' => true,
-    ]);
+    Availability::factory()->create(['day_of_week' => 0, 'start_time' => '09:00', 'end_time' => '12:00']);
 
     $component = Livewire::test(BookingCalendar::class, ['service' => $service]);
 
@@ -203,6 +191,21 @@ it('requires consent', function () {
         ->set('consent', false)
         ->call('book')
         ->assertHasErrors(['consent']);
+
+    expect(Appointment::query()->count())->toBe(0);
+});
+
+it('rejects a non-date selectedSlot as a validation error instead of a 500', function () {
+    Mail::fake();
+    $service = bookableService();
+
+    Livewire::test(BookingCalendar::class, ['service' => $service])
+        ->set('selectedSlot', 'not-a-real-date')
+        ->set('firstName', 'Camille')
+        ->set('email', 'camille@gmail.com')
+        ->set('consent', true)
+        ->call('book')
+        ->assertHasErrors(['selectedSlot' => 'date']);
 
     expect(Appointment::query()->count())->toBe(0);
 });

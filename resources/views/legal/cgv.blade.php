@@ -125,14 +125,35 @@
         peuvent être reproduits, diffusés ou commercialisés sans autorisation écrite.
     </p>
 
-    <h2>12. Données personnelles</h2>
+    <h2>12. Formations en ligne</h2>
+    <p>
+        Le Prestataire propose des formations en ligne accessibles depuis un espace personnel après
+        achat. Chaque formation fait l'objet d'un <strong>paiement unique</strong> donnant un accès
+        illimité dans le temps au contenu (vidéos, textes et ressources associées), pour un usage
+        strictement personnel.
+    </p>
+    <p>
+        L'accès est ouvert dès la confirmation du paiement, traité de manière sécurisée par notre
+        prestataire Stripe. Les contenus restent la propriété intellectuelle du Prestataire et ne
+        peuvent être téléchargés, partagés, reproduits ou revendus.
+    </p>
+    <p>
+        <strong>Droit de rétractation.</strong> Conformément à l'article L.221-28 du Code de la
+        consommation, le Client reconnaît expressément, en cochant la case prévue à cet effet lors de
+        l'achat, que la fourniture du contenu numérique commence immédiatement après son achat et
+        <strong>renonce de ce fait à son droit de rétractation de 14 jours</strong>. À défaut d'avoir
+        donné cet accord exprès et renoncé à son droit, le Client dispose d'un délai de rétractation de
+        14 jours à compter de l'achat.
+    </p>
+
+    <h2>13. Données personnelles</h2>
     <p>
         Les données personnelles collectées dans le cadre de la prestation sont traitées
         conformément au RGPD et à notre
         <a href="{{ route('legal.privacy') }}">politique de confidentialité</a>.
     </p>
 
-    <h2>13. Médiation de la consommation</h2>
+    <h2>14. Médiation de la consommation</h2>
     <p>
         Conformément aux articles L.611-1 et suivants du Code de la consommation, en cas de litige
         n'ayant pas pu être résolu à l'amiable, le Client consommateur peut recourir gratuitement au
@@ -149,14 +170,14 @@
         <a href="https://ec.europa.eu/consumers/odr" target="_blank" rel="noopener">ec.europa.eu/consumers/odr</a>.
     </p>
 
-    <h2>14. Loi applicable et juridiction</h2>
+    <h2>15. Loi applicable et juridiction</h2>
     <p>
         Les présentes CGV sont soumises au droit français. En cas de litige et après échec de toute
         tentative de résolution amiable, les tribunaux français seront seuls compétents, conformément
         aux règles de droit commun en vigueur.
     </p>
 
-    <h2>15. Modifications des CGV</h2>
+    <h2>16. Modifications des CGV</h2>
     <p>
         Le Prestataire se réserve le droit de modifier les présentes CGV à tout moment. Les CGV
         applicables sont celles en vigueur à la date de la conclusion du contrat.

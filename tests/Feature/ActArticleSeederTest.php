@@ -4,9 +4,9 @@ use App\Enums\PostStatus;
 use App\Models\Category;
 use App\Models\Post;
 use Database\Seeders\ActArticleSeeder;
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
 
-uses(RefreshDatabase::class);
+uses(LazilyRefreshDatabase::class);
 
 beforeEach(function () {
     // Le seeder rattache l'article à cette catégorie : on s'assure qu'elle existe

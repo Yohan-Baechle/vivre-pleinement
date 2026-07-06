@@ -5,11 +5,13 @@ namespace App\Livewire;
 use App\Models\Category;
 use App\Models\Post;
 use App\Models\Tag;
+use App\Support\LikeSearch;
 use Illuminate\Contracts\View\View;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Collection;
 use Livewire\Attributes\Computed;
 use Livewire\Attributes\Url;
+use Livewire\Attributes\Validate;
 use Livewire\Component;
 use Livewire\WithPagination;
 
@@ -20,16 +22,36 @@ class PostSearch extends Component
     private const PER_PAGE = 9;
 
     #[Url(as: 'q')]
+    #[Validate('string|max:100')]
     public string $search = '';
 
     #[Url]
+    #[Validate('string|max:100')]
     public string $category = '';
 
     #[Url]
+    #[Validate('string|max:100')]
     public string $tag = '';
 
     #[Url]
+    #[Validate('in:recent,oldest')]
     public string $sort = 'recent';
+
+    /**
+     * Tronque défensivement les valeurs venues de l'URL : #[Validate] ne
+     * s'applique qu'aux mises à jour ultérieures via wire:model, pas à
+     * l'hydratation initiale depuis la query string.
+     */
+    public function mount(): void
+    {
+        $this->search = mb_substr($this->search, 0, 100);
+        $this->category = mb_substr($this->category, 0, 100);
+        $this->tag = mb_substr($this->tag, 0, 100);
+
+        if (! in_array($this->sort, ['recent', 'oldest'], true)) {
+            $this->sort = 'recent';
+        }
+    }
 
     public function updatedSearch(): void
     {
@@ -111,7 +133,7 @@ class PostSearch extends Component
             ->with(['categories', 'tags', 'media'])
             ->when($featured, fn (Builder $q) => $q->where('id', '!=', $featured->id))
             ->when(trim($this->search) !== '', function (Builder $q): void {
-                $like = '%'.str_replace(['%', '_'], ['\%', '\_'], trim($this->search)).'%';
+                $like = LikeSearch::wrap(trim($this->search));
 
                 $q->where(function (Builder $sub) use ($like): void {
                     $sub->where('title', 'like', $like)
@@ -128,7 +150,9 @@ class PostSearch extends Component
                 fn (Builder $tq) => $tq->where('slug', $this->tag),
             ))
             ->orderBy('published_at', $this->sort === 'oldest' ? 'asc' : 'desc')
-            ->paginate(self::PER_PAGE);
+            ->paginate(self::PER_PAGE, [
+                'id', 'slug', 'title', 'excerpt', 'published_at', 'reading_time_minutes',
+            ]);
 
         return view('livewire.post-search', [
             'posts' => $posts,

@@ -8,6 +8,7 @@
             ['Témoignages', $home.'#temoignages'],
         ],
         'Ressources' => [
+            ['Les formations', route('courses.index')],
             ['Le blog', route('blog.index')],
             ['Les vidéos', route('videos.index')],
             ['Vidéo offerte', $home.'#capture'],

@@ -6,6 +6,7 @@ use App\Models\Post;
 use App\Models\Video;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Str;
 
 /**
@@ -17,6 +18,10 @@ use Illuminate\Support\Str;
  *
  * Principe directeur : mieux vaut ne rien proposer qu'un contenu non
  * pertinent. Un score minimal est donc exigé (SCORE_THRESHOLD).
+ *
+ * Le résultat est mis en cache par contenu (ID scalaire uniquement, 0 pour
+ * « aucune correspondance »), invalidé par les observers Post et Video : le
+ * scoring parcourait sinon tous les contenus de la catégorie à chaque page.
  */
 class VideoArticleMatcher
 {
@@ -25,6 +30,10 @@ class VideoArticleMatcher
      * titres comme thématiquement proches.
      */
     private const SCORE_THRESHOLD = 1;
+
+    private const CACHE_TTL_MINUTES = 1440;
+
+    private const NO_MATCH = 0;
 
     /**
      * Mots vides et termes éditoriaux trop génériques pour porter du sens
@@ -64,10 +73,63 @@ class VideoArticleMatcher
      */
     public static function videoForPost(Post $post): ?Video
     {
-        $explicit = $post->videos()->published()->orderByDesc('view_count')->first();
+        $videoId = Cache::remember(
+            "videos.match.post.{$post->id}",
+            now()->addMinutes(self::CACHE_TTL_MINUTES),
+            fn () => self::computeVideoIdForPost($post) ?? self::NO_MATCH,
+        );
+
+        if ($videoId === self::NO_MATCH) {
+            return null;
+        }
+
+        return Video::query()->published()->find($videoId);
+    }
+
+    /**
+     * Meilleur article pour une vidéo : le lien explicite d'abord, sinon
+     * l'article de la même catégorie dont le titre recouvre le plus celui de
+     * la vidéo. Retourne null si aucune correspondance n'est assez pertinente.
+     */
+    public static function postForVideo(Video $video): ?Post
+    {
+        $postId = Cache::remember(
+            "blog.match.video.{$video->id}",
+            now()->addMinutes(self::CACHE_TTL_MINUTES),
+            fn () => self::computePostIdForVideo($video) ?? self::NO_MATCH,
+        );
+
+        if ($postId === self::NO_MATCH) {
+            return null;
+        }
+
+        return Post::query()->with(['categories', 'media'])->find($postId);
+    }
+
+    /**
+     * Vide tout le cache d'appariement. Un contenu créé ou modifié peut changer
+     * le meilleur match de n'importe quel contenu voisin, et ses catégories
+     * sont synchronisées après l'événement saved : un flush ciblé par catégorie
+     * raterait des clés. Les écritures étant rares (admin), le flush large est
+     * le compromis sûr.
+     */
+    public static function flush(): void
+    {
+        foreach (Post::query()->pluck('id') as $id) {
+            Cache::forget("videos.match.post.{$id}");
+        }
+
+        foreach (Video::query()->pluck('id') as $id) {
+            Cache::forget("blog.match.video.{$id}");
+        }
+    }
+
+    private static function computeVideoIdForPost(Post $post): ?int
+    {
+        $explicit = $post->videos()->published()->orderByDesc('view_count')->first(['videos.id']);
 
         if ($explicit) {
-            return $explicit;
+            return $explicit->id;
         }
 
         $categoryIds = $post->categories->pluck('id');
@@ -79,20 +141,15 @@ class VideoArticleMatcher
         $candidates = Video::query()
             ->published()
             ->whereHas('categories', fn (Builder $q) => $q->whereIn('categories.id', $categoryIds))
-            ->get();
+            ->get(['id', 'title']);
 
-        return self::bestMatch($post->title, $candidates, fn (Video $v) => $v->title);
+        return self::bestMatch($post->title, $candidates, fn (Video $v) => $v->title)?->id;
     }
 
-    /**
-     * Meilleur article pour une vidéo : le lien explicite d'abord, sinon
-     * l'article de la même catégorie dont le titre recouvre le plus celui de
-     * la vidéo. Retourne null si aucune correspondance n'est assez pertinente.
-     */
-    public static function postForVideo(Video $video): ?Post
+    private static function computePostIdForVideo(Video $video): ?int
     {
         if ($video->related_post_id && $video->relatedPost && $video->relatedPost->published_at) {
-            return $video->relatedPost;
+            return $video->related_post_id;
         }
 
         $categoryIds = $video->categories->pluck('id');
@@ -104,9 +161,9 @@ class VideoArticleMatcher
         $candidates = Post::query()
             ->published()
             ->whereHas('categories', fn (Builder $q) => $q->whereIn('categories.id', $categoryIds))
-            ->get();
+            ->get(['id', 'title']);
 
-        return self::bestMatch($video->title, $candidates, fn (Post $p) => $p->title);
+        return self::bestMatch($video->title, $candidates, fn (Post $p) => $p->title)?->id;
     }
 
     /**

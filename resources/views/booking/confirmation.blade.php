@@ -4,6 +4,7 @@
     use App\Enums\AppointmentStatus;
     use App\Enums\PaymentStatus;
     use Carbon\CarbonImmutable;
+    use Illuminate\Support\Number;
 
     $isPaidService = $appointment->price_cents > 0;
     $isConfirmed = $appointment->status === AppointmentStatus::Confirmed;
@@ -90,7 +91,7 @@
                     @if ($isPaidService)
                         <div class="flex justify-between gap-4">
                             <dt class="text-ink-muted">Montant</dt>
-                            <dd class="text-ink font-medium">{{ number_format($appointment->price_cents / 100, 2, ',', ' ') }} €</dd>
+                            <dd class="text-ink font-medium">{{ Number::currency($appointment->price_cents / 100, in: 'EUR', locale: 'fr') }}</dd>
                         </div>
                     @endif
                     @if ($appointment->meeting_url)

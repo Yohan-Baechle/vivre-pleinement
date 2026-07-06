@@ -2,7 +2,6 @@
 
 namespace App\Observers;
 
-use Illuminate\Support\Facades\Storage;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
 class MediaObserver

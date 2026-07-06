@@ -2,12 +2,12 @@
 
 namespace App\Http\Controllers;
 
-use App\Console\Commands\CleanCommentContent;
 use App\Enums\CommentStatus;
 use App\Http\Requests\CommentFormRequest;
 use App\Mail\NewCommentNotification;
 use App\Models\Comment;
 use App\Models\Post;
+use App\Support\CommentSanitizer;
 use App\Support\SiteContact;
 use App\Support\SubmissionThrottle;
 use Illuminate\Http\RedirectResponse;
@@ -37,7 +37,7 @@ class CommentController extends Controller
         $comment = $post->comments()->create([
             'author_name' => $data['author_name'],
             'author_email' => $data['author_email'],
-            'content' => CleanCommentContent::clean($data['content']),
+            'content' => CommentSanitizer::clean($data['content']),
             'status' => CommentStatus::Pending,
             'posted_at' => now(),
             'author_ip' => $request->ip(),

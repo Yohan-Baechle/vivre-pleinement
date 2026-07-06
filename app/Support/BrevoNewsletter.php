@@ -33,7 +33,7 @@ class BrevoNewsletter
             $response = Http::withHeaders([
                 'api-key' => $apiKey,
                 'accept' => 'application/json',
-            ])->post(self::ENDPOINT, [
+            ])->timeout(5)->post(self::ENDPOINT, [
                 'email' => $email,
                 'attributes' => ['PRENOM' => $firstName],
                 'includeListIds' => [config('services.brevo.video_list_id')],

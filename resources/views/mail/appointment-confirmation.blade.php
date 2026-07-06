@@ -22,7 +22,7 @@ Votre rendez-vous est **confirmé**. Voici le récapitulatif :
 @endif
 @if (! $appointment->service->isFree())
 **Référence :** {{ $appointment->reference }}\
-**Tarif :** {{ number_format($appointment->price_cents / 100, 2, ',', ' ') }} €
+**Tarif :** {{ \Illuminate\Support\Number::currency($appointment->price_cents / 100, in: 'EUR', locale: 'fr') }}
 @else
 **Référence :** {{ $appointment->reference }}
 @endif

@@ -17,8 +17,8 @@
                 @foreach ($post->categories as $cat)
                     <category>{{ $cat->name }}</category>
                 @endforeach
-                <description>{!! '<![CDATA['.$post->cleanExcerpt().']]>' !!}</description>
-                <content:encoded>{!! '<![CDATA['.($post->content ?? '').']]>' !!}</content:encoded>
+                <description>{!! '<![CDATA['.str_replace(']]>', ']]]]><![CDATA[>', $post->cleanExcerpt()).']]>' !!}</description>
+                <content:encoded>{!! '<![CDATA['.str_replace(']]>', ']]]]><![CDATA[>', $post->content ?? '').']]>' !!}</content:encoded>
             </item>
         @endforeach
     </channel>
