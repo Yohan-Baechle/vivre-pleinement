@@ -1,4 +1,4 @@
-<aside {{ $attributes }} role="note" aria-label="Information importante">
+<aside {{ $attributes }} role="note" aria-label="Information importante" data-nosnippet>
     <div class="ring-ink/5 rounded-2xl bg-white p-5 ring-1 sm:p-6">
         <p class="text-ink-muted text-sm leading-relaxed">
             Ce contenu s'appuie sur l'expérience personnelle de Laura Baechlé et sur sa pratique de

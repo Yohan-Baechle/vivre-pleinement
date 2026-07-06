@@ -125,6 +125,16 @@ class Post extends Model implements HasMedia
     }
 
     /**
+     * Articles éligibles aux sitemaps : publiés et sans directive noindex.
+     */
+    public function scopeIndexable(Builder $query): Builder
+    {
+        return $query->published()->where(function (Builder $query): void {
+            $query->whereNull('seo_robots')->orWhere('seo_robots', 'not like', '%noindex%');
+        });
+    }
+
+    /**
      * Les commentaires sont-ils ouverts sur cet article ?
      * Requiert l'interrupteur global ET celui de l'article.
      */

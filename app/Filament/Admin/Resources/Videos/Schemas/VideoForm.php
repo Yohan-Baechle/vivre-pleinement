@@ -117,6 +117,12 @@ class VideoForm
                                 ->maxLength(320)
                                 ->columnSpanFull(),
 
+                            TextInput::make('seo_robots')
+                                ->label('Robots')
+                                ->placeholder('index, follow')
+                                ->helperText('Vide = index, follow par défaut. Mettre « noindex, follow » pour exclure la page de Google.')
+                                ->columnSpanFull(),
+
                             Textarea::make('summary')
                                 ->label('Résumé d\'introduction')
                                 ->helperText('2-4 phrases affichées en intro sur la page publique. Contenu unique = signal SEO.')

@@ -17,11 +17,11 @@
 @section('canonical', route('blog.show', $post->slug))
 @section('description', $post->seo_description ?: $post->excerpt)
 
-@push('head')
-    @if ($post->seo_robots)
-        <meta name="robots" content="{{ $post->seo_robots }}">
-    @endif
+@if ($post->seo_robots)
+    @section('robots', $post->seo_robots)
+@endif
 
+@push('head')
     <meta property="og:type" content="article">
     <meta property="og:title" content="{{ $post->seo_title ?: $post->title }}">
     <meta property="og:description" content="{{ $post->seo_description ?: $post->excerpt }}">

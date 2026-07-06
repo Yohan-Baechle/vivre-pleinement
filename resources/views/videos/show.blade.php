@@ -15,6 +15,9 @@
 
 @section('title', $video->title.' · Vidéo Vivre Pleinement')
 @section('canonical', route('videos.show', $video->slug))
+@if ($video->seo_robots)
+    @section('robots', $video->seo_robots)
+@endif
 @section('description', $metaDescription)
 @section('og_type', 'video.other')
 @section('og_title', $video->title)

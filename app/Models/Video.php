@@ -21,6 +21,7 @@ use Illuminate\Support\Str;
     'slug',
     'description',
     'seo_description',
+    'seo_robots',
     'summary',
     'intro',
     'key_takeaways',
@@ -103,6 +104,16 @@ class Video extends Model
             ->where('is_missing', false)
             ->whereNotNull('published_at')
             ->where('duration_seconds', '>', self::SHORT_DURATION_THRESHOLD);
+    }
+
+    /**
+     * Vidéos éligibles aux sitemaps : publiées et sans directive noindex.
+     */
+    public function scopeIndexable(Builder $query): Builder
+    {
+        return $query->published()->where(function (Builder $query): void {
+            $query->whereNull('seo_robots')->orWhere('seo_robots', 'not like', '%noindex%');
+        });
     }
 
     public function isShort(): bool
