@@ -1,7 +1,9 @@
 <?php
 
+use App\Jobs\SubscribeToNewsletterJob;
 use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Queue;
 use Illuminate\Support\Facades\RateLimiter;
 
 beforeEach(function () {
@@ -37,6 +39,20 @@ it('subscribes a contact via the Brevo double opt-in endpoint', function () {
             && $request['includeListIds'] === [6]
             && $request['templateId'] === 6
             && str_contains($request['redirectionUrl'], '/inscription-confirmee');
+    });
+});
+
+it('dispatches the subscription onto the queue instead of calling Brevo synchronously', function () {
+    Queue::fake();
+
+    $this->post(route('newsletter.store'), validNewsletterPayload())
+        ->assertRedirect()
+        ->assertSessionHas('newsletter_status', 'pending');
+
+    Queue::assertPushed(SubscribeToNewsletterJob::class, function (SubscribeToNewsletterJob $job) {
+        return $job->email === 'camille@gmail.com'
+            && $job->firstName === 'Camille'
+            && str_contains($job->redirectionUrl, '/inscription-confirmee');
     });
 });
 

@@ -14,6 +14,7 @@ use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Illuminate\Support\Facades\Cache;
 use UnitEnum;
 
 class VideoResource extends Resource
@@ -36,7 +37,11 @@ class VideoResource extends Resource
 
     public static function getNavigationBadge(): ?string
     {
-        $missing = Video::query()->where('is_missing', true)->count();
+        $missing = Cache::remember(
+            'filament.badge.videos.missing',
+            now()->addMinute(),
+            fn () => Video::query()->where('is_missing', true)->count(),
+        );
 
         return $missing > 0 ? (string) $missing : null;
     }

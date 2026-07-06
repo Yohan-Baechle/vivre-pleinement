@@ -23,11 +23,12 @@ class AppointmentSlotService
     {
         $first = CarbonImmutable::create($year, $month, 1)->startOfDay();
         $last = $first->endOfMonth();
+        $context = $this->loadRangeContext($service, $first, $last);
 
         $days = [];
 
         for ($date = $first; $date->lessThanOrEqualTo($last); $date = $date->addDay()) {
-            if ($this->slotsForDate($service, $date)->isNotEmpty()) {
+            if ($this->slotsForDateInContext($service, $date, $context)->isNotEmpty()) {
                 $days[] = $date->format('Y-m-d');
             }
         }
@@ -43,21 +44,107 @@ class AppointmentSlotService
     public function slotsForDate(AppointmentService $service, CarbonImmutable $date): Collection
     {
         $date = $date->startOfDay();
+
+        return $this->slotsForDateInContext($service, $date, $this->loadRangeContext($service, $date, $date));
+    }
+
+    /**
+     * Renvoie les prochains créneaux réservables, tous jours confondus, à partir
+     * d'aujourd'hui et jusqu'à la limite de réservation anticipée du service.
+     *
+     * @return Collection<int, array{start: CarbonImmutable, end: CarbonImmutable, label: string}>
+     */
+    public function nextAvailableSlots(AppointmentService $service, int $limit = 3): Collection
+    {
+        $found = collect();
+        $date = CarbonImmutable::now()->startOfDay();
+        $lastDay = $date->addDays($service->max_advance_days);
+        $context = $this->loadRangeContext($service, $date, $lastDay);
+
+        while ($date->lessThanOrEqualTo($lastDay) && $found->count() < $limit) {
+            $found = $found->concat($this->slotsForDateInContext($service, $date, $context));
+            $date = $date->addDay();
+        }
+
+        return $found->take($limit)->values();
+    }
+
+    /**
+     * Charge en trois requêtes tout ce qu'il faut pour calculer les créneaux
+     * d'une plage de dates : disponibilités actives, fermetures exceptionnelles
+     * et rendez-vous bloquants, indexés par date. Évite les trois requêtes par
+     * jour qui faisaient exploser le coût d'un mois de calendrier.
+     *
+     * @return array{
+     *     availabilities: Collection<int, Availability>,
+     *     overridesByDate: Collection<string, Collection<int, DateOverride>>,
+     *     bookedByDate: Collection<string, Collection<int, Appointment>>
+     * }
+     */
+    private function loadRangeContext(AppointmentService $service, CarbonImmutable $from, CarbonImmutable $to): array
+    {
+        $availabilities = Availability::query()
+            ->where('is_active', true)
+            ->where(function ($query) use ($service) {
+                $query->whereNull('appointment_service_id')
+                    ->orWhere('appointment_service_id', $service->id);
+            })
+            ->get();
+
+        $overridesByDate = DateOverride::query()
+            ->whereBetween('date', [$from->toDateString(), $to->toDateString()])
+            ->get()
+            ->groupBy(fn (DateOverride $override) => CarbonImmutable::parse($override->date)->toDateString());
+
+        $bookedByDate = Appointment::query()
+            ->where('appointment_service_id', $service->id)
+            ->blocking()
+            ->whereBetween('starts_at', [$from->startOfDay(), $to->endOfDay()])
+            ->get(['starts_at', 'ends_at'])
+            ->groupBy(fn (Appointment $appointment) => CarbonImmutable::parse($appointment->starts_at)->toDateString());
+
+        return [
+            'availabilities' => $availabilities,
+            'overridesByDate' => $overridesByDate,
+            'bookedByDate' => $bookedByDate,
+        ];
+    }
+
+    /**
+     * Calcule les créneaux d'une date à partir d'un contexte préchargé, sans
+     * toucher à la base.
+     *
+     * @param  array{
+     *     availabilities: Collection<int, Availability>,
+     *     overridesByDate: Collection<string, Collection<int, DateOverride>>,
+     *     bookedByDate: Collection<string, Collection<int, Appointment>>
+     * }  $context
+     * @return Collection<int, array{start: CarbonImmutable, end: CarbonImmutable, label: string}>
+     */
+    private function slotsForDateInContext(AppointmentService $service, CarbonImmutable $date, array $context): Collection
+    {
+        $date = $date->startOfDay();
         $now = CarbonImmutable::now();
 
         if ($date->greaterThan($now->addDays($service->max_advance_days)->endOfDay())) {
             return collect();
         }
 
-        $overrides = $this->overridesForDate($date);
+        $overrides = $context['overridesByDate']->get($date->toDateString(), collect());
         if ($overrides->contains(fn (DateOverride $o) => $o->isFullDay())) {
             return collect();
         }
 
         $minBookable = $now->addHours($service->min_notice_hours);
-        $booked = $this->bookedRangesForDate($service, $date);
 
-        return $this->availabilitiesForDate($service, $date)
+        $booked = $context['bookedByDate']->get($date->toDateString(), collect())
+            ->map(fn (Appointment $appointment) => [
+                'start' => CarbonImmutable::parse($appointment->starts_at),
+                'end' => CarbonImmutable::parse($appointment->ends_at),
+            ]);
+
+        return $context['availabilities']
+            ->where('day_of_week', $date->dayOfWeek)
             ->flatMap(fn (Availability $availability) => $this->slotsFromAvailability($availability, $date, $service))
             ->reject(function (array $slot) use ($minBookable, $overrides, $booked) {
                 if ($slot['start']->lessThan($minBookable)) {
@@ -88,26 +175,6 @@ class AppointmentSlotService
     }
 
     /**
-     * Renvoie les prochains créneaux réservables, tous jours confondus, à partir
-     * d'aujourd'hui et jusqu'à la limite de réservation anticipée du service.
-     *
-     * @return Collection<int, array{start: CarbonImmutable, end: CarbonImmutable, label: string}>
-     */
-    public function nextAvailableSlots(AppointmentService $service, int $limit = 3): Collection
-    {
-        $found = collect();
-        $date = CarbonImmutable::now()->startOfDay();
-        $lastDay = $date->addDays($service->max_advance_days);
-
-        while ($date->lessThanOrEqualTo($lastDay) && $found->count() < $limit) {
-            $found = $found->concat($this->slotsForDate($service, $date));
-            $date = $date->addDay();
-        }
-
-        return $found->take($limit)->values();
-    }
-
-    /**
      * Vérifie côté serveur qu'un début de créneau précis est réellement réservable.
      */
     public function isSlotBookable(AppointmentService $service, CarbonImmutable $start): bool
@@ -122,9 +189,28 @@ class AppointmentSlotService
      */
     public function hasConflictingAppointment(Appointment $appointment): bool
     {
-        return $this->overlapQuery($appointment->appointment_service_id, $appointment->starts_at, $appointment->ends_at)
-            ->where('id', '!=', $appointment->id)
-            ->exists();
+        return $this->hasOverlap(
+            $appointment->appointment_service_id,
+            $appointment->starts_at,
+            $appointment->ends_at,
+            $appointment->id,
+        );
+    }
+
+    /**
+     * Indique si un autre rendez-vous bloquant chevauche la fenêtre donnée pour
+     * cette prestation. Utilisé par le formulaire admin pour empêcher la
+     * création/modification d'un rendez-vous en double-réservation.
+     */
+    public function hasOverlap(int $serviceId, CarbonInterface $start, CarbonInterface $end, ?int $excludingAppointmentId = null): bool
+    {
+        $query = $this->overlapQuery($serviceId, $start, $end);
+
+        if ($excludingAppointmentId !== null) {
+            $query->where('id', '!=', $excludingAppointmentId);
+        }
+
+        return $query->exists();
     }
 
     /**
@@ -189,47 +275,6 @@ class AppointmentSlotService
             ->blocking()
             ->where('starts_at', '<', $end)
             ->where('ends_at', '>', $start);
-    }
-
-    /**
-     * @return Collection<int, Availability>
-     */
-    private function availabilitiesForDate(AppointmentService $service, CarbonImmutable $date): Collection
-    {
-        return Availability::query()
-            ->where('is_active', true)
-            ->where('day_of_week', $date->dayOfWeek)
-            ->where(function ($query) use ($service) {
-                $query->whereNull('appointment_service_id')
-                    ->orWhere('appointment_service_id', $service->id);
-            })
-            ->get();
-    }
-
-    /**
-     * @return Collection<int, DateOverride>
-     */
-    private function overridesForDate(CarbonImmutable $date): Collection
-    {
-        return DateOverride::query()
-            ->whereDate('date', $date->toDateString())
-            ->get();
-    }
-
-    /**
-     * @return Collection<int, array{start: CarbonImmutable, end: CarbonImmutable}>
-     */
-    private function bookedRangesForDate(AppointmentService $service, CarbonImmutable $date): Collection
-    {
-        return Appointment::query()
-            ->where('appointment_service_id', $service->id)
-            ->blocking()
-            ->whereDate('starts_at', $date->toDateString())
-            ->get(['starts_at', 'ends_at'])
-            ->map(fn (Appointment $appointment) => [
-                'start' => CarbonImmutable::parse($appointment->starts_at),
-                'end' => CarbonImmutable::parse($appointment->ends_at),
-            ]);
     }
 
     /**

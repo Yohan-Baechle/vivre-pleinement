@@ -1,9 +1,9 @@
 <?php
 
 use App\Models\Video;
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
 
-uses(RefreshDatabase::class);
+uses(LazilyRefreshDatabase::class);
 
 it('reports a video as enriched only when intro and summary are both present', function () {
     expect(Video::factory()->make(['intro' => '<p>x</p>', 'summary' => 'y'])->isEnriched())->toBeTrue()

@@ -17,6 +17,8 @@ class StatsOverview extends StatsOverviewWidget
 
     protected ?string $heading = 'Vue d\'ensemble';
 
+    protected ?string $pollingInterval = null;
+
     protected function getStats(): array
     {
         $publishedPosts = Post::where('status', PostStatus::Published)->count();

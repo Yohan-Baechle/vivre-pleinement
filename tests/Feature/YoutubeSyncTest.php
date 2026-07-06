@@ -2,10 +2,10 @@
 
 use App\Models\Video;
 use App\Services\YoutubeSync;
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
 use Illuminate\Support\Facades\Http;
 
-uses(RefreshDatabase::class);
+uses(LazilyRefreshDatabase::class);
 
 function fakeYoutubeApi(array $videoItems): void
 {

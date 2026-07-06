@@ -81,31 +81,15 @@
                         </div>
 
                         <div class="grid grid-cols-1 gap-5 sm:grid-cols-2">
-                            <div>
-                                <label for="first_name" class="text-ink-muted block text-xs font-medium tracking-wider uppercase">Prénom *</label>
-                                <input type="text" id="first_name" name="first_name" value="{{ old('first_name') }}" required autocomplete="given-name"
-                                       class="{{ $fieldClasses }} @error('first_name') {{ $fieldError }} @enderror">
-                                @error('first_name')<p class="mt-1 text-xs text-rose-700">{{ $message }}</p>@enderror
-                            </div>
-                            <div>
-                                <label for="last_name" class="text-ink-muted block text-xs font-medium tracking-wider uppercase">Nom</label>
-                                <input type="text" id="last_name" name="last_name" value="{{ old('last_name') }}" autocomplete="family-name"
-                                       class="{{ $fieldClasses }} @error('last_name') {{ $fieldError }} @enderror">
-                            </div>
+                            <x-form-field name="first_name" label="Prénom *" :value="old('first_name')" required autocomplete="given-name" error-class="ring-rose-400 bg-rose-soft/20" />
+
+                            <x-form-field name="last_name" label="Nom" :value="old('last_name')" autocomplete="family-name" error-class="ring-rose-400 bg-rose-soft/20" :show-error-message="false" />
                         </div>
 
                         <div class="grid grid-cols-1 gap-5 sm:grid-cols-2">
-                            <div>
-                                <label for="email" class="text-ink-muted block text-xs font-medium tracking-wider uppercase">Email *</label>
-                                <input type="email" id="email" name="email" value="{{ old('email') }}" required autocomplete="email"
-                                       class="{{ $fieldClasses }} @error('email') {{ $fieldError }} @enderror">
-                                @error('email')<p class="mt-1 text-xs text-rose-700">{{ $message }}</p>@enderror
-                            </div>
-                            <div>
-                                <label for="phone" class="text-ink-muted block text-xs font-medium tracking-wider uppercase">Téléphone</label>
-                                <input type="tel" id="phone" name="phone" value="{{ old('phone') }}" autocomplete="tel" placeholder="Optionnel"
-                                       class="{{ $fieldClasses }}">
-                            </div>
+                            <x-form-field name="email" label="Email *" type="email" :value="old('email')" required autocomplete="email" error-class="ring-rose-400 bg-rose-soft/20" />
+
+                            <x-form-field name="phone" label="Téléphone" type="tel" :value="old('phone')" autocomplete="tel" placeholder="Optionnel" :show-error-ring="false" :show-error-message="false" />
                         </div>
 
                         <div>

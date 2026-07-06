@@ -4,10 +4,10 @@ use App\Livewire\PostSearch;
 use App\Models\Category;
 use App\Models\Post;
 use App\Models\Tag;
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
 use Livewire\Livewire;
 
-uses(RefreshDatabase::class);
+uses(LazilyRefreshDatabase::class);
 
 it('searches across title, excerpt and content', function () {
     Post::factory()->create(['title' => 'Vaincre l\'anxiété', 'excerpt' => 'x', 'content' => 'y']);
@@ -88,6 +88,18 @@ it('escapes wildcard characters in the search term', function () {
     Livewire::test(PostSearch::class)
         ->set('search', '%')
         ->assertViewHas('posts', fn ($p) => $p->total() === 0);
+});
+
+it('truncates an oversized search value coming from the url', function () {
+    $huge = str_repeat('a', 5000);
+
+    Livewire::test(PostSearch::class, ['search' => $huge])
+        ->assertSet('search', str_repeat('a', 100));
+});
+
+it('falls back to the default sort for an invalid value from the url', function () {
+    Livewire::test(PostSearch::class, ['sort' => 'javascript:alert(1)'])
+        ->assertSet('sort', 'recent');
 });
 
 it('noindexes the search query on the blog page but indexes the listing', function () {

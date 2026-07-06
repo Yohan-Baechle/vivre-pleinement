@@ -2,10 +2,11 @@
 
 use App\Models\Video;
 use App\Services\YoutubeCaptions;
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Sleep;
 
-uses(RefreshDatabase::class);
+uses(LazilyRefreshDatabase::class);
 
 beforeEach(function () {
     config()->set('services.youtube.oauth_client_id', 'cid');
@@ -99,4 +100,29 @@ it('fails when oauth is not configured', function () {
     config()->set('services.youtube.oauth_refresh_token', null);
 
     $this->artisan('youtube:fetch-transcripts')->assertFailed();
+});
+
+it('surfaces a RuntimeException with a clear message when the OAuth code exchange fails', function () {
+    Http::fake([
+        'oauth2.googleapis.com/token' => Http::response(['error' => 'invalid_grant'], 400),
+    ]);
+
+    $captions = YoutubeCaptions::fromConfig();
+
+    expect(fn () => $captions->exchangeAuthorizationCode('bad-code', 'https://example.test/callback'))
+        ->toThrow(RuntimeException::class, "Échec de l'échange du code OAuth");
+});
+
+it('surfaces a RuntimeException instead of an uncaught RequestException when captions listing keeps failing', function () {
+    Sleep::fake();
+
+    Http::fake([
+        'oauth2.googleapis.com/token' => Http::response(['access_token' => 'tok', 'expires_in' => 3600]),
+        '*/captions?*' => Http::response(['error' => 'server error'], 500),
+    ]);
+
+    $captions = YoutubeCaptions::fromConfig();
+
+    expect(fn () => $captions->listTracks('abc123'))
+        ->toThrow(RuntimeException::class, 'Échec du listing des sous-titres');
 });

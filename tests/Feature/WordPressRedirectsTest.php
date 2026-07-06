@@ -3,9 +3,10 @@
 use App\Models\Category;
 use App\Models\Post;
 use App\Models\Redirect;
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
+use Illuminate\Support\Facades\DB;
 
-uses(RefreshDatabase::class);
+uses(LazilyRefreshDatabase::class);
 
 it('generates a 301 redirect for every published post from its old WordPress URL', function () {
     Post::factory()->create(['slug' => 'burn-out', 'status' => 'published']);
@@ -66,6 +67,24 @@ it('preserves the URL fragment when redirecting to an internal anchor', function
     $this->get('/ancienne-page')
         ->assertStatus(301)
         ->assertRedirect(url('/#a-propos'));
+});
+
+it('tracks hit_count and last_hit_at in a single update query', function () {
+    $redirect = Redirect::create(['from_path' => '/burn-out', 'to_path' => '/blog/burn-out', 'status_code' => 301]);
+
+    DB::enableQueryLog();
+    $this->get('/burn-out');
+    $log = DB::getQueryLog();
+    DB::disableQueryLog();
+
+    $updateQueries = collect($log)->filter(fn ($q) => str_starts_with(strtolower($q['query']), 'update')
+        && (str_contains($q['query'], 'redirects')));
+
+    expect($updateQueries)->toHaveCount(1);
+
+    $fresh = $redirect->fresh();
+    expect($fresh->hit_count)->toBe(1)
+        ->and($fresh->last_hit_at)->not->toBeNull();
 });
 
 it('does not redirect an unknown URL', function () {

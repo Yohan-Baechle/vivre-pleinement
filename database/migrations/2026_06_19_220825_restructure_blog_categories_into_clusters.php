@@ -1,9 +1,7 @@
 <?php
 
-use App\Models\Category;
-use App\Models\Post;
-use App\Models\Tag;
 use Illuminate\Database\Migrations\Migration;
+use Illuminate\Support\Facades\DB;
 
 /**
  * Restructure les catégories du blog en 9 clusters thématiques cohérents.
@@ -112,36 +110,62 @@ return new class extends Migration
     public function up(): void
     {
         foreach (self::CLUSTERS as $slug => $cluster) {
-            $category = Category::query()->firstOrCreate(
-                ['slug' => $slug],
-                ['name' => $cluster['name']],
-            );
+            $category = DB::table('categories')->where('slug', $slug)->first();
 
-            if ($category->name !== $cluster['name']) {
-                $category->update(['name' => $cluster['name']]);
+            if ($category === null) {
+                $categoryId = DB::table('categories')->insertGetId([
+                    'name' => $cluster['name'],
+                    'slug' => $slug,
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ]);
+            } else {
+                $categoryId = $category->id;
+
+                if ($category->name !== $cluster['name']) {
+                    DB::table('categories')->where('id', $categoryId)->update([
+                        'name' => $cluster['name'],
+                        'updated_at' => now(),
+                    ]);
+                }
             }
 
-            $postIds = Post::query()
+            $postIds = DB::table('posts')
                 ->whereIn('slug', $cluster['posts'])
                 ->pluck('id', 'slug');
 
             foreach ($postIds as $postId) {
-                Post::query()->find($postId)?->categories()->sync([$category->id]);
+                DB::table('category_post')->where('post_id', $postId)->delete();
+                DB::table('category_post')->insert([
+                    'category_id' => $categoryId,
+                    'post_id' => $postId,
+                ]);
             }
 
             $pillarId = $postIds[$cluster['pillar']] ?? null;
             if ($pillarId) {
-                $category->update(['pillar_post_id' => $pillarId]);
+                DB::table('categories')->where('id', $categoryId)->update([
+                    'pillar_post_id' => $pillarId,
+                    'updated_at' => now(),
+                ]);
             }
         }
 
-        Category::query()
+        DB::table('categories')
             ->whereIn('slug', ['tous-les-articles', 'angoisse-et-anxiete', 'developpement-personnel', 'blessures-de-lame'])
-            ->whereDoesntHave('posts')
-            ->whereDoesntHave('videos')
+            ->whereNotExists(function ($query): void {
+                $query->select(DB::raw(1))
+                    ->from('category_post')
+                    ->whereColumn('category_post.category_id', 'categories.id');
+            })
+            ->whereNotExists(function ($query): void {
+                $query->select(DB::raw(1))
+                    ->from('category_video')
+                    ->whereColumn('category_video.category_id', 'categories.id');
+            })
             ->delete();
 
-        Tag::query()->whereIn('slug', self::OBSOLETE_CLUSTER_TAGS)->delete();
+        DB::table('tags')->whereIn('slug', self::OBSOLETE_CLUSTER_TAGS)->delete();
     }
 
     /**

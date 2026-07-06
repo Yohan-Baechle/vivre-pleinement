@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Category;
+use App\Models\Course;
 use App\Models\Post;
 use App\Models\Tag;
 use App\Models\Video;
@@ -19,6 +20,7 @@ class SitemapController extends Controller
                 ['loc' => route('book.show'), 'changefreq' => 'weekly', 'priority' => '0.95'],
                 ['loc' => route('booking.index'), 'changefreq' => 'weekly', 'priority' => '0.9'],
                 ['loc' => route('blog.index'), 'changefreq' => 'daily', 'priority' => '0.9'],
+                ['loc' => route('courses.index'), 'changefreq' => 'weekly', 'priority' => '0.9'],
                 ['loc' => route('about'), 'changefreq' => 'monthly', 'priority' => '0.7'],
                 ['loc' => route('contact'), 'changefreq' => 'monthly', 'priority' => '0.6'],
                 ['loc' => route('legal.mentions'), 'changefreq' => 'yearly', 'priority' => '0.2'],
@@ -63,7 +65,7 @@ class SitemapController extends Controller
             Video::query()
                 ->published()
                 ->orderByDesc('updated_at')
-                ->get()
+                ->get(['slug', 'updated_at'])
                 ->each(function ($video) use ($items) {
                     $items->push([
                         'loc' => route('videos.show', $video),
@@ -78,6 +80,19 @@ class SitemapController extends Controller
                 'changefreq' => 'weekly',
                 'priority' => '0.8',
             ]);
+
+            Course::query()
+                ->published()
+                ->orderByDesc('updated_at')
+                ->get(['slug', 'updated_at'])
+                ->each(function ($course) use ($items) {
+                    $items->push([
+                        'loc' => route('courses.show', $course),
+                        'lastmod' => $course->updated_at?->toAtomString(),
+                        'changefreq' => 'weekly',
+                        'priority' => '0.85',
+                    ]);
+                });
 
             return $items->all();
         });
@@ -96,7 +111,11 @@ class SitemapController extends Controller
             fn () => Video::query()
                 ->published()
                 ->orderByDesc('published_at')
-                ->get(),
+                ->get([
+                    'id', 'slug', 'title', 'youtube_id', 'thumbnail_url',
+                    'seo_description', 'summary', 'description',
+                    'duration_seconds', 'published_at', 'view_count',
+                ]),
         );
 
         return response()

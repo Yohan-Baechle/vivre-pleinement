@@ -19,6 +19,14 @@ class Redirect extends Model
     /** @use HasFactory<RedirectFactory> */
     use HasFactory;
 
+    /**
+     * @var array<string, mixed>
+     */
+    protected $attributes = [
+        'status_code' => 301,
+        'hit_count' => 0,
+    ];
+
     protected function casts(): array
     {
         return [

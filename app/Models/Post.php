@@ -51,6 +51,14 @@ class Post extends Model implements HasMedia
     }
     use SoftDeletes;
 
+    /**
+     * @var array<string, mixed>
+     */
+    protected $attributes = [
+        'status' => 'draft',
+        'comments_enabled' => true,
+    ];
+
     protected function casts(): array
     {
         return [
@@ -58,6 +66,7 @@ class Post extends Model implements HasMedia
             'comments_enabled' => 'boolean',
             'seo_schema_json' => 'array',
             'published_at' => 'datetime',
+            'reading_time_minutes' => 'integer',
         ];
     }
 
@@ -150,9 +159,25 @@ class Post extends Model implements HasMedia
         return 'meshed';
     }
 
+    /**
+     * Persisté dans reading_time_minutes (recalculé à chaque sauvegarde par
+     * PostObserver) pour éviter de charger la colonne content (longText) dans
+     * les listings juste pour ce calcul. Recalculé à la volée en repli si la
+     * colonne n'est pas encore renseignée (ligne pas encore sauvegardée depuis
+     * l'ajout de la colonne).
+     */
     public function readingTimeMinutes(): int
     {
-        $words = str_word_count(strip_tags((string) $this->content));
+        if ($this->reading_time_minutes !== null) {
+            return $this->reading_time_minutes;
+        }
+
+        return self::computeReadingTimeMinutes((string) $this->content);
+    }
+
+    public static function computeReadingTimeMinutes(string $content): int
+    {
+        $words = str_word_count(strip_tags($content));
 
         return max(1, (int) ceil($words / 230));
     }

@@ -3,12 +3,11 @@
 namespace App\Filament\Admin\Resources\Appointments\Tables;
 
 use App\Enums\AppointmentStatus;
-use App\Mail\AppointmentCancelled;
-use App\Mail\AppointmentConfirmation;
 use App\Mail\AppointmentNoShow;
 use App\Mail\AppointmentRescheduled;
 use App\Models\Appointment;
 use App\Models\AppointmentService;
+use App\Services\AppointmentLifecycleService;
 use App\Services\AppointmentSlotService;
 use Carbon\CarbonImmutable;
 use Filament\Actions\Action;
@@ -90,8 +89,7 @@ class AppointmentsTable
                         ->visible(fn (Appointment $record) => $record->status === AppointmentStatus::Pending)
                         ->requiresConfirmation()
                         ->action(function (Appointment $record) {
-                            $record->update(['status' => AppointmentStatus::Confirmed]);
-                            Mail::to($record->customer_email)->send(new AppointmentConfirmation($record));
+                            app(AppointmentLifecycleService::class)->confirm($record);
 
                             Notification::make()->success()->title('Rendez-vous confirmé')->send();
                         }),
@@ -138,12 +136,7 @@ class AppointmentsTable
                         ->visible(fn (Appointment $record) => $record->status->isCancellable())
                         ->requiresConfirmation()
                         ->action(function (Appointment $record) {
-                            $record->update([
-                                'status' => AppointmentStatus::Cancelled,
-                                'cancelled_at' => CarbonImmutable::now(),
-                            ]);
-
-                            Mail::to($record->customer_email)->send(new AppointmentCancelled($record));
+                            app(AppointmentLifecycleService::class)->cancel($record);
 
                             Notification::make()->success()->title('Rendez-vous annulé')->send();
                         }),
