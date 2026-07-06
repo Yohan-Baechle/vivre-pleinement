@@ -222,9 +222,9 @@
 
             <x-author-card class="mt-14" />
 
-            <x-content-cta :category="$category" class="mt-10" />
+            <x-health-disclaimer class="mt-6" />
 
-            <x-health-disclaimer class="mt-8" />
+            <x-content-cta :category="$category" class="mt-12" />
         </div>
     </article>
 
