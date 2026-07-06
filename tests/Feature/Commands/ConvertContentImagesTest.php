@@ -37,14 +37,17 @@ it('converts legacy images to capped-width webp and rewrites the content', funct
 
     expect(Storage::disk('public')->exists('blog-images/exemple.webp'))->toBeTrue();
 
-    [$width] = getimagesize(Storage::disk('public')->path('blog-images/exemple.webp'));
-    expect($width)->toBe(1600);
+    [$width, $height] = getimagesize(Storage::disk('public')->path('blog-images/exemple.webp'));
+    expect($width)->toBe(1200);
 
     $content = $post->refresh()->content;
     expect($content)->toContain('src="/storage/blog-images/exemple.webp"')
         ->and($content)->toContain('loading="lazy"')
         ->and($content)->not->toContain('fetchpriority')
-        ->and($content)->toContain('decoding="async"');
+        ->and($content)->toContain('decoding="async"')
+        ->and($content)->toContain('width="1200"')
+        ->and($content)->toContain('height="'.$height.'"')
+        ->and($content)->not->toContain('width="2880"');
 });
 
 it('keeps the original file on disk for legacy inbound traffic', function () {
