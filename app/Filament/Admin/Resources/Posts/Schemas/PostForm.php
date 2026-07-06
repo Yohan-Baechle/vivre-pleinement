@@ -6,6 +6,7 @@ use App\Enums\PostStatus;
 use App\Models\Category;
 use App\Models\Tag;
 use Filament\Forms\Components\DateTimePicker;
+use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\RichEditor;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\SpatieMediaLibraryFileUpload;
@@ -152,6 +153,25 @@ class PostForm
                                 ->label('Robots')
                                 ->placeholder('index, follow')
                                 ->helperText('Vide = index, follow par défaut.'),
+
+                            Repeater::make('faq')
+                                ->label('FAQ (questions fréquentes)')
+                                ->helperText('Affichées en accordéon sous l\'article et exposées à Google en FAQPage (rich results). 3 à 5 questions maximum, réponses courtes et auto-suffisantes.')
+                                ->schema([
+                                    TextInput::make('question')
+                                        ->label('Question')
+                                        ->required()
+                                        ->maxLength(255),
+                                    Textarea::make('answer')
+                                        ->label('Réponse')
+                                        ->required()
+                                        ->rows(3),
+                                ])
+                                ->itemLabel(fn (array $state): ?string => $state['question'] ?? null)
+                                ->defaultItems(0)
+                                ->reorderable()
+                                ->collapsible()
+                                ->columnSpanFull(),
                         ])
                         ->columns(2),
                 ]),

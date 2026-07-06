@@ -32,6 +32,7 @@ use Spatie\MediaLibrary\InteractsWithMedia;
     'seo_canonical',
     'seo_robots',
     'seo_schema_json',
+    'faq',
     'published_at',
 ])]
 #[ObservedBy([PostObserver::class])]
@@ -65,6 +66,7 @@ class Post extends Model implements HasMedia
             'status' => PostStatus::class,
             'comments_enabled' => 'boolean',
             'seo_schema_json' => 'array',
+            'faq' => 'array',
             'published_at' => 'datetime',
             'reading_time_minutes' => 'integer',
         ];

@@ -15,6 +15,16 @@ class ConvertContentImages extends Command
 {
     private const MAX_WIDTH = 1200;
 
+    /**
+     * Largeurs des variantes srcset. Le CSS .prose plafonne l'affichage à
+     * 37.5rem (600 px) : 400/800 couvrent le mobile, 1200 les écrans Retina.
+     *
+     * @var list<int>
+     */
+    private const VARIANT_WIDTHS = [400, 800];
+
+    private const SIZES_ATTRIBUTE = '(min-width: 640px) 600px, 100vw';
+
     private const WEBP_QUALITY = 80;
 
     public function handle(): int
@@ -42,26 +52,28 @@ class ConvertContentImages extends Command
 
             $webp = preg_replace('/\.(jpe?g|png)$/i', '.webp', $file);
 
-            if ($disk->exists($webp)) {
-                continue;
+            if (! $disk->exists($webp)) {
+                $converted++;
+
+                if ($dry) {
+                    $this->line("[dry] {$file} → {$webp}");
+
+                    continue;
+                }
+
+                if (! $this->createWebp($disk->path($file), $disk->path($webp))) {
+                    $this->warn("Conversion impossible : {$file}");
+                    $converted--;
+
+                    continue;
+                }
+
+                $this->line("✓ {$file} → ".$this->formatKb($disk->size($file)).' → '.$this->formatKb($disk->size($webp)));
             }
 
-            $converted++;
-
-            if ($dry) {
-                $this->line("[dry] {$file} → {$webp}");
-
-                continue;
+            if (! $dry) {
+                $this->createVariants($disk, $webp);
             }
-
-            if (! $this->createWebp($disk->path($file), $disk->path($webp))) {
-                $this->warn("Conversion impossible : {$file}");
-                $converted--;
-
-                continue;
-            }
-
-            $this->line("✓ {$file} → ".$this->formatKb($disk->size($file)).' → '.$this->formatKb($disk->size($webp)));
         }
 
         return $converted;
@@ -117,8 +129,43 @@ class ConvertContentImages extends Command
     }
 
     /**
+     * Variantes réduites pour srcset, générées depuis le WebP principal.
+     */
+    private function createVariants(Filesystem $disk, string $webp): void
+    {
+        $size = @getimagesize($disk->path($webp));
+
+        if ($size === false) {
+            return;
+        }
+
+        foreach (self::VARIANT_WIDTHS as $width) {
+            $variant = $this->variantPath($webp, $width);
+
+            if ($size[0] <= $width || $disk->exists($variant)) {
+                continue;
+            }
+
+            $image = @imagecreatefromwebp($disk->path($webp));
+
+            if ($image === false) {
+                return;
+            }
+
+            $resized = imagescale($image, $width);
+            imagedestroy($image);
+
+            if ($resized !== false) {
+                imagewebp($resized, $disk->path($variant), self::WEBP_QUALITY);
+                imagedestroy($resized);
+            }
+        }
+    }
+
+    /**
      * Aligne les attributs width/height hérités de WordPress (ex. 2880×1920)
-     * sur les dimensions réelles du fichier WebP servi.
+     * sur les dimensions réelles du fichier WebP servi, et ajoute le srcset
+     * responsive quand des variantes existent.
      */
     private function syncDimensionAttributes(string $tag, Filesystem $disk): string
     {
@@ -126,15 +173,51 @@ class ConvertContentImages extends Command
             return $tag;
         }
 
-        $size = @getimagesize($disk->path($match[1]));
+        $webp = $match[1];
+        $size = @getimagesize($disk->path($webp));
 
         if ($size === false) {
             return $tag;
         }
 
         $tag = preg_replace('/width="\d+"/i', 'width="'.$size[0].'"', $tag);
+        $tag = preg_replace('/height="\d+"/i', 'height="'.$size[1].'"', $tag);
 
-        return preg_replace('/height="\d+"/i', 'height="'.$size[1].'"', $tag);
+        return $this->addSrcset($tag, $disk, $webp, $size[0]);
+    }
+
+    private function addSrcset(string $tag, Filesystem $disk, string $webp, int $fullWidth): string
+    {
+        if (str_contains($tag, 'srcset=')) {
+            return $tag;
+        }
+
+        $candidates = [];
+
+        foreach (self::VARIANT_WIDTHS as $width) {
+            if ($disk->exists($this->variantPath($webp, $width))) {
+                $candidates[] = '/storage/'.$this->variantPath($webp, $width)." {$width}w";
+            }
+        }
+
+        if ($candidates === []) {
+            return $tag;
+        }
+
+        $candidates[] = "/storage/{$webp} {$fullWidth}w";
+
+        $srcset = implode(', ', $candidates);
+
+        return preg_replace(
+            '/^<img/i',
+            '<img srcset="'.$srcset.'" sizes="'.self::SIZES_ATTRIBUTE.'"',
+            $tag,
+        );
+    }
+
+    private function variantPath(string $webp, int $width): string
+    {
+        return preg_replace('/\.webp$/i', "-{$width}w.webp", $webp);
     }
 
     private function createWebp(string $source, string $destination): bool
