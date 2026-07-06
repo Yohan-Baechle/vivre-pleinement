@@ -31,7 +31,7 @@ class SitemapController extends Controller
             ]);
 
             Post::query()
-                ->published()
+                ->indexable()
                 ->orderByDesc('updated_at')
                 ->get(['slug', 'updated_at'])
                 ->each(function ($post) use ($items) {
@@ -64,7 +64,7 @@ class SitemapController extends Controller
                 });
 
             Video::query()
-                ->published()
+                ->indexable()
                 ->orderByDesc('updated_at')
                 ->get(['slug', 'updated_at'])
                 ->each(function ($video) use ($items) {
@@ -148,7 +148,7 @@ class SitemapController extends Controller
     private function videoSitemapQuery(): Collection
     {
         return Video::query()
-            ->published()
+            ->indexable()
             ->orderByDesc('published_at')
             ->get([
                 'id', 'slug', 'title', 'youtube_id', 'thumbnail_url',

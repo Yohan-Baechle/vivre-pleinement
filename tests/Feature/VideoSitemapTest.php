@@ -44,6 +44,30 @@ it('recovers when the video sitemap cache holds a corrupted value', function () 
         ->assertSee(route('videos.show', $video), false);
 });
 
+it('excludes noindexed videos from both sitemaps', function () {
+    $indexable = Video::factory()->create();
+    $hidden = Video::factory()->create(['seo_robots' => 'noindex, follow']);
+
+    $this->get('/sitemap-videos.xml')
+        ->assertOk()
+        ->assertSee(route('videos.show', $indexable), false)
+        ->assertDontSee(route('videos.show', $hidden), false);
+
+    $this->get('/sitemap.xml')
+        ->assertOk()
+        ->assertSee(route('videos.show', $indexable), false)
+        ->assertDontSee(route('videos.show', $hidden), false);
+});
+
+it('renders a single noindex meta robots on a noindexed video page', function () {
+    $video = Video::factory()->create(['seo_robots' => 'noindex, follow']);
+
+    $html = $this->get(route('videos.show', $video->slug))->assertOk()->getContent();
+
+    expect(substr_count($html, '<meta name="robots"'))->toBe(1)
+        ->and($html)->toContain('noindex, follow');
+});
+
 it('does not emit content_loc for youtube-hosted videos', function () {
     Video::factory()->create();
 

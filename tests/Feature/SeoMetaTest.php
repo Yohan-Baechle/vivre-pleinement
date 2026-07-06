@@ -152,6 +152,19 @@ it('keeps the default indexable meta robots on first listing pages', function ()
     }
 });
 
+it('renders a single meta robots tag on a post with a custom seo_robots', function () {
+    Post::factory()->create([
+        'slug' => 'article-noindex',
+        'status' => 'published',
+        'seo_robots' => 'noindex, follow',
+    ]);
+
+    $html = $this->get('/blog/article-noindex')->assertOk()->getContent();
+
+    expect(substr_count($html, '<meta name="robots"'))->toBe(1)
+        ->and($html)->toContain('noindex, follow');
+});
+
 it('ignores a stale migrated seo_canonical and points to the new blog URL', function () {
     Post::factory()->create([
         'slug' => 'ergophobie-peur-du-travail',

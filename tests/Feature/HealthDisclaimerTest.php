@@ -15,6 +15,14 @@ it('shows the health disclaimer and crisis numbers on articles', function () {
         ->assertSee('prévention du suicide');
 });
 
+it('keeps the disclaimer and CTA out of search snippets via data-nosnippet', function () {
+    $post = Post::factory()->create(['status' => 'published']);
+
+    $html = $this->get(route('blog.show', $post->slug))->assertOk()->getContent();
+
+    expect(substr_count($html, 'data-nosnippet'))->toBe(2);
+});
+
 it('shows the health disclaimer and crisis numbers on video pages', function () {
     $video = Video::factory()->create();
 
