@@ -41,7 +41,12 @@ class SeedWordPressRedirects extends Command
             '/coaching' => '/reservation',
             '/category/blessures-de-lame' => '/blog/categorie/blessures-emotionnelles-et-traumatismes',
             '/category/developpement-personnel' => '/blog',
+            '/wp-content/uploads/2020/10/Liberer-pression-sociale.jpg' => '/blog/normes-sociales',
         ];
+
+        foreach (range(2, 10) as $page) {
+            $pageMap["/blog/page/{$page}"] = '/blog?page='.$page;
+        }
 
         foreach ($pageMap as $from => $to) {
             $created += $this->upsert($from, $to);

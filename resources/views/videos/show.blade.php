@@ -41,12 +41,7 @@
                 'interactionType' => ['@type' => 'WatchAction'],
                 'userInteractionCount' => $video->view_count,
             ] : null,
-            'author' => [
-                '@type' => 'Person',
-                '@id' => url('/').'#laura',
-                'name' => 'Laura Baechlé',
-                'url' => url('/'),
-            ],
+            'author' => \App\Support\AuthorEntity::person(),
             'publisher' => [
                 '@type' => 'Organization',
                 '@id' => url('/').'#organization',
