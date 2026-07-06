@@ -50,6 +50,40 @@ it('converts legacy images to capped-width webp and rewrites the content', funct
         ->and($content)->not->toContain('width="2880"');
 });
 
+it('generates srcset variants and wires them on the img tag', function () {
+    fakeBlogImage('blog-images/exemple.jpg');
+    $post = Post::factory()->create([
+        'status' => 'published',
+        'content' => '<img width="2880" height="1920" src="/storage/blog-images/exemple.jpg" alt="">',
+    ]);
+
+    $this->artisan('posts:convert-content-images')->assertSuccessful();
+
+    expect(Storage::disk('public')->exists('blog-images/exemple-400w.webp'))->toBeTrue()
+        ->and(Storage::disk('public')->exists('blog-images/exemple-800w.webp'))->toBeTrue();
+
+    $content = $post->refresh()->content;
+    expect($content)->toContain('srcset="/storage/blog-images/exemple-400w.webp 400w, /storage/blog-images/exemple-800w.webp 800w, /storage/blog-images/exemple.webp 1200w"')
+        ->and($content)->toContain('sizes="(min-width: 640px) 600px, 100vw"');
+
+    $this->artisan('posts:convert-content-images')->assertSuccessful();
+
+    expect(substr_count($post->refresh()->content, 'srcset='))->toBe(1);
+});
+
+it('skips srcset for images smaller than the variant widths', function () {
+    fakeBlogImage('blog-images/petite.jpg', 350);
+    $post = Post::factory()->create([
+        'status' => 'published',
+        'content' => '<img width="350" height="233" src="/storage/blog-images/petite.jpg" alt="">',
+    ]);
+
+    $this->artisan('posts:convert-content-images')->assertSuccessful();
+
+    expect(Storage::disk('public')->exists('blog-images/petite-400w.webp'))->toBeFalse()
+        ->and($post->refresh()->content)->not->toContain('srcset=');
+});
+
 it('keeps the original file on disk for legacy inbound traffic', function () {
     fakeBlogImage('blog-images/exemple.jpg');
     Post::factory()->create([

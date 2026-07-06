@@ -62,6 +62,24 @@
         ];
     @endphp
     <script type="application/ld+json">{!! json_encode($articleLd, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG) !!}</script>
+
+    @if (! empty($post->faq))
+        @php
+            $faqLd = [
+                '@context' => 'https://schema.org',
+                '@type' => 'FAQPage',
+                'mainEntity' => collect($post->faq)->map(fn ($item) => [
+                    '@type' => 'Question',
+                    'name' => $item['question'],
+                    'acceptedAnswer' => [
+                        '@type' => 'Answer',
+                        'text' => strip_tags(html_entity_decode($item['answer'], ENT_QUOTES | ENT_HTML5)),
+                    ],
+                ])->all(),
+            ];
+        @endphp
+        <script type="application/ld+json">{!! json_encode($faqLd, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG) !!}</script>
+    @endif
 @endpush
 
 @section('body')
@@ -219,6 +237,22 @@
                     </button>
                 </div>
             </div>
+
+            @if (! empty($post->faq))
+                <section class="mt-14" aria-labelledby="article-faq-heading">
+                    <p class="text-xs font-medium tracking-wider text-teal-700 uppercase">Questions fréquentes</p>
+                    <h2 id="article-faq-heading" class="text-ink mt-2 font-serif text-2xl font-medium tracking-tight sm:text-3xl">
+                        Vos questions sur le sujet
+                    </h2>
+                    <div class="mt-6 space-y-4">
+                        @foreach ($post->faq as $item)
+                            <x-accordion-item :question="$item['question']" :open="$loop->first">
+                                {!! $item['answer'] !!}
+                            </x-accordion-item>
+                        @endforeach
+                    </div>
+                </section>
+            @endif
 
             <x-author-card class="mt-14" />
 
