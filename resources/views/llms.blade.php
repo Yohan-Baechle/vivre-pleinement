@@ -8,6 +8,7 @@ Laura Baechlé accompagne des personnes en visioconférence ou par téléphone p
 
 - [Accueil]({{ route('home') }}): présentation de Laura Baechlé et de son approche ACT.
 - [À propos]({{ route('about') }}): parcours et méthode de Laura Baechlé.
+- [La thérapie ACT]({{ route('therapie-act') }}): définition, principes et efficacité de la thérapie d'acceptation et d'engagement.
 - [Prendre rendez-vous]({{ route('booking.index') }}): réservation de séances d'accompagnement individuel (visio/téléphone), avec FAQ.
 - [Formations]({{ route('courses.index') }}): formations en ligne pour se libérer des troubles anxieux.
 - [Mon livre]({{ route('book.show') }}): livre de Laura Baechlé sur les troubles anxieux.

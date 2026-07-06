@@ -20,13 +20,32 @@
                     ...array_filter(['sameAs' => array_values(\App\Support\SiteContact::socials())]),
                 ],
                 [
+                    '@type' => 'Organization',
+                    '@id' => $home.'#organization',
+                    'name' => 'Vivre Pleinement',
+                    'url' => $home,
+                    'logo' => [
+                        '@type' => 'ImageObject',
+                        'url' => asset('images/logo@4x.webp'),
+                    ],
+                    'founder' => ['@id' => $home.'#laura'],
+                ],
+                [
                     '@type' => 'WebSite',
                     '@id' => $home.'#website',
                     'url' => $home,
                     'name' => 'Vivre Pleinement',
                     'description' => 'Se libérer des troubles anxieux : outils, ressources et accompagnement par Laura Baechlé.',
-                    'publisher' => ['@id' => $home.'#laura'],
+                    'publisher' => ['@id' => $home.'#organization'],
                     'inLanguage' => 'fr-FR',
+                    'potentialAction' => [
+                        '@type' => 'SearchAction',
+                        'target' => [
+                            '@type' => 'EntryPoint',
+                            'urlTemplate' => route('blog.index').'?q={search_term_string}',
+                        ],
+                        'query-input' => 'required name=search_term_string',
+                    ],
                 ],
                 [
                     '@type' => 'WebPage',

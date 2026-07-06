@@ -2,7 +2,9 @@
 
 namespace App\Observers;
 
+use App\Enums\PostStatus;
 use App\Models\Post;
+use App\Support\IndexNow;
 use App\Support\InternalLinking;
 use App\Support\VideoArticleMatcher;
 use Illuminate\Support\Facades\Cache;
@@ -19,6 +21,10 @@ class PostObserver
     public function saved(Post $post): void
     {
         $this->flushCaches($post);
+
+        if ($post->status === PostStatus::Published && $post->published_at?->isPast()) {
+            IndexNow::ping(route('blog.show', $post->slug));
+        }
     }
 
     public function deleted(Post $post): void

@@ -34,6 +34,7 @@ Route::get('/youtube/oauth/redirect', [YoutubeOAuthController::class, 'redirect'
 Route::get('/youtube/oauth/callback', [YoutubeOAuthController::class, 'callback'])->name('youtube.oauth.callback');
 
 Route::view('/a-propos', 'about.index')->name('about');
+Route::view('/therapie-act', 'therapie-act.index')->name('therapie-act');
 
 Route::get('/contact', [ContactController::class, 'show'])->name('contact');
 Route::post('/contact', [ContactController::class, 'send'])->name('contact.send');
@@ -168,3 +169,7 @@ Route::prefix('blog')->name('blog.')->group(function () {
 Route::get('/sitemap.xml', [SitemapController::class, 'index'])->name('sitemap');
 Route::get('/sitemap-videos.xml', [SitemapController::class, 'videos'])->name('sitemap.videos');
 Route::get('/llms.txt', [SitemapController::class, 'llms'])->name('llms');
+
+if ($indexNowKey = config('services.indexnow.key')) {
+    Route::get("/{$indexNowKey}.txt", fn () => response($indexNowKey)->header('Content-Type', 'text/plain'));
+}
