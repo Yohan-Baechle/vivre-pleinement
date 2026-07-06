@@ -1,6 +1,6 @@
 @extends('layouts.site')
 
-@section('title', ($course->seo_title ?: $course->title).' · Formation')
+@section('title', $course->seo_title ?: $course->title.' · Formation')
 @section('description', $course->seo_description ?: $course->subtitle)
 @section('canonical', route('courses.show', $course))
 

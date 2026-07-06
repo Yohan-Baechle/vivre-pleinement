@@ -39,6 +39,8 @@ class SeedWordPressRedirects extends Command
             '/categorie-produit/ebook' => '/livre',
             '/categorie-produit/ebook-coaching' => '/livre',
             '/coaching' => '/reservation',
+            '/category/blessures-de-lame' => '/blog/categorie/blessures-emotionnelles-et-traumatismes',
+            '/category/developpement-personnel' => '/blog',
         ];
 
         foreach ($pageMap as $from => $to) {

@@ -7,6 +7,7 @@ use App\Models\Course;
 use App\Models\Post;
 use App\Models\Tag;
 use App\Models\Video;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Cache;
 
@@ -105,22 +106,54 @@ class SitemapController extends Controller
 
     public function videos(): Response
     {
-        $videos = Cache::remember(
-            'sitemap.videos',
-            now()->addHour(),
-            fn () => Video::query()
-                ->published()
-                ->orderByDesc('published_at')
-                ->get([
-                    'id', 'slug', 'title', 'youtube_id', 'thumbnail_url',
-                    'seo_description', 'summary', 'description',
-                    'duration_seconds', 'published_at', 'view_count',
-                ]),
-        );
+        $videos = Cache::remember('sitemap.videos', now()->addHour(), $this->videoSitemapQuery(...));
+
+        if (! $videos instanceof Collection || $videos->contains(fn ($video) => ! $video instanceof Video)) {
+            Cache::forget('sitemap.videos');
+
+            $videos = Cache::remember('sitemap.videos', now()->addHour(), $this->videoSitemapQuery(...));
+        }
 
         return response()
             ->view('sitemap-videos', ['videos' => $videos])
             ->header('Content-Type', 'application/xml; charset=UTF-8')
             ->header('Cache-Control', 'public, max-age=3600');
+    }
+
+    /**
+     * Fichier de découverte pour les crawlers IA (spécification llmstxt.org).
+     */
+    public function llms(): Response
+    {
+        $data = Cache::remember('llms.txt', now()->addHour(), fn (): array => [
+            'categories' => Category::query()->orderBy('name')->get(['name', 'slug', 'description']),
+            'pillarPosts' => Post::query()
+                ->published()
+                ->whereIn('slug', [
+                    'trouble-anxieux-generalise', 'ruminations', 'phobie-sociale',
+                    'toc-troubles-obsessionnels-compulsifs', 'angoisse-matinale', 'burn-out',
+                ])
+                ->get(['id', 'slug', 'title']),
+        ]);
+
+        return response()
+            ->view('llms', $data)
+            ->header('Content-Type', 'text/plain; charset=UTF-8')
+            ->header('Cache-Control', 'public, max-age=3600');
+    }
+
+    /**
+     * @return Collection<int, Video>
+     */
+    private function videoSitemapQuery(): Collection
+    {
+        return Video::query()
+            ->published()
+            ->orderByDesc('published_at')
+            ->get([
+                'id', 'slug', 'title', 'youtube_id', 'thumbnail_url',
+                'seo_description', 'summary', 'description',
+                'duration_seconds', 'published_at', 'view_count',
+            ]);
     }
 }

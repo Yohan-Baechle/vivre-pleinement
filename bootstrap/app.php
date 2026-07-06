@@ -2,6 +2,7 @@
 
 use App\Http\Middleware\EnsureEnrolled;
 use App\Http\Middleware\HandleRedirects;
+use App\Http\Middleware\SecureHeaders;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
@@ -14,6 +15,7 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->append(HandleRedirects::class);
+        $middleware->append(SecureHeaders::class);
         // Le webhook Stripe (Cashier, préfixe cashier.path) ne doit pas exiger de CSRF.
         $middleware->validateCsrfTokens(except: ['stripe/*']);
 
