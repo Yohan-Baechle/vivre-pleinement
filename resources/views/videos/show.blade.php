@@ -249,9 +249,9 @@
             </section>
         @endif
 
-        <x-content-cta :category="$category" class="mx-auto max-w-5xl px-4 pt-12 sm:px-6 lg:px-10" />
+        <x-health-disclaimer class="mx-auto max-w-5xl px-4 pt-10 sm:px-6 lg:px-10" />
 
-        <x-health-disclaimer class="mx-auto max-w-5xl px-4 pt-8 sm:px-6 lg:px-10" />
+        <x-content-cta :category="$category" class="mx-auto max-w-5xl px-4 pt-10 sm:px-6 lg:px-10" />
 
         <div class="pb-12 sm:pb-16"></div>
     </article>
