@@ -8,17 +8,7 @@
         $jsonLd = [
             '@context' => 'https://schema.org',
             '@graph' => [
-                [
-                    '@type' => 'Person',
-                    '@id' => $home.'#laura',
-                    'name' => 'Laura Baechlé',
-                    'jobTitle' => 'Praticienne ACT en accompagnement des troubles anxieux',
-                    'url' => $home,
-                    'image' => $img,
-                    'description' => "Praticienne ACT spécialisée dans l'accompagnement des personnes souffrant de troubles anxieux : anxiété généralisée (TAG), phobies, TOC, burnout.",
-                    'knowsAbout' => ['Troubles anxieux', 'Anxiété généralisée', 'TAG', 'Phobies', 'TOC', 'Burnout', 'Thérapie ACT', 'Gestion du stress', 'Bien-être mental'],
-                    ...array_filter(['sameAs' => array_values(\App\Support\SiteContact::socials())]),
-                ],
+                \App\Support\AuthorEntity::person(),
                 [
                     '@type' => 'Organization',
                     '@id' => $home.'#organization',

@@ -61,6 +61,23 @@ it('maps the old WooCommerce product categories to the book page', function () {
         ->to_path->toBe('/livre');
 });
 
+it('maps WordPress blog pagination and the indexed legacy image', function () {
+    $this->artisan('seo:wp-redirects')->assertSuccessful();
+
+    expect(Redirect::where('from_path', '/blog/page/3')->first())
+        ->not->toBeNull()
+        ->to_path->toBe('/blog?page=3')
+        ->and(Redirect::where('from_path', '/wp-content/uploads/2020/10/Liberer-pression-sociale.jpg')->first())
+        ->not->toBeNull()
+        ->to_path->toBe('/blog/normes-sociales');
+});
+
+it('redirects a paginated WordPress URL even with its Divi query string', function () {
+    Redirect::create(['from_path' => '/blog/page/3', 'to_path' => '/blog?page=3', 'status_code' => 301]);
+
+    $this->get('/blog/page/3/?et_blog')->assertStatus(301)->assertRedirect(url('/blog?page=3'));
+});
+
 it('preserves the URL fragment when redirecting to an internal anchor', function () {
     Redirect::create(['from_path' => '/ancienne-page', 'to_path' => '/#a-propos', 'status_code' => 301]);
 

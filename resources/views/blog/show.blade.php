@@ -2,6 +2,7 @@
 
 @php
     use App\Support\AffiliateLinks;
+    use App\Support\AuthorEntity;
     use App\Support\Toc;
 
     $toc = Toc::build($post->content);
@@ -46,7 +47,7 @@
             'image' => $cover ? [$cover] : [],
             'datePublished' => $post->published_at?->toIso8601String(),
             'dateModified' => $post->lastModifiedAt()?->toIso8601String(),
-            'author' => ['@type' => 'Person', '@id' => url('/').'#laura', 'name' => 'Laura Baechlé', 'url' => url('/')],
+            'author' => AuthorEntity::person(),
             'publisher' => [
                 '@type' => 'Organization',
                 '@id' => url('/').'#organization',
@@ -219,7 +220,9 @@
                 </div>
             </div>
 
-            <x-content-cta :category="$category" class="mt-14" />
+            <x-author-card class="mt-14" />
+
+            <x-content-cta :category="$category" class="mt-10" />
 
             <x-health-disclaimer class="mt-8" />
         </div>
