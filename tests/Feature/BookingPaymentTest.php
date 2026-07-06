@@ -11,13 +11,14 @@ use App\Models\AppointmentService;
 use App\Models\Availability;
 use App\Services\BookingPaymentService;
 use Carbon\CarbonImmutable;
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
 use Illuminate\Support\Facades\Mail;
 use Laravel\Cashier\Events\WebhookReceived;
 use Livewire\Livewire;
+use Stripe\Exception\ApiConnectionException;
 use Stripe\PaymentIntent;
 
-uses(RefreshDatabase::class);
+uses(LazilyRefreshDatabase::class);
 
 function payableService(int $priceCents = 7000): AppointmentService
 {
@@ -27,13 +28,7 @@ function payableService(int $priceCents = 7000): AppointmentService
         'min_notice_hours' => 12,
     ]);
     foreach (range(0, 6) as $dow) {
-        Availability::create([
-            'appointment_service_id' => null,
-            'day_of_week' => $dow,
-            'start_time' => '08:00',
-            'end_time' => '20:00',
-            'is_active' => true,
-        ]);
+        Availability::factory()->dayOfWeek($dow)->create();
     }
 
     return $service;
@@ -85,6 +80,25 @@ it('renders the payment page with a client secret for a payable appointment', fu
         ->assertOk()
         ->assertSee('pi_test_secret_123', escape: false)
         ->assertSee('payment-element', escape: false);
+});
+
+it('returns a 503 instead of a raw 500 when Stripe is unavailable', function () {
+    $service = payableService();
+    $appointment = Appointment::factory()->create([
+        'appointment_service_id' => $service->id,
+        'token' => Appointment::generateToken(),
+        'status' => AppointmentStatus::Pending,
+        'payment_status' => PaymentStatus::Unpaid,
+        'price_cents' => 7000,
+    ]);
+
+    $this->mock(BookingPaymentService::class)
+        ->shouldReceive('createPaymentIntent')
+        ->once()
+        ->andThrow(new ApiConnectionException('Stripe est indisponible'));
+
+    $this->get(route('booking.pay', $appointment->token))
+        ->assertStatus(503);
 });
 
 it('redirects the payment page to confirmation if already paid', function () {
@@ -196,5 +210,23 @@ it('is idempotent on duplicate paid webhooks', function () {
 
     app(BookingPaymentService::class)->fulfill($appointment);
 
+    Mail::assertNothingQueued();
+});
+
+it('rembourse automatiquement un second paiement arrivé sur un rendez-vous déjà payé', function () {
+    Mail::fake();
+    $appointment = Appointment::factory()->create([
+        'payment_status' => PaymentStatus::Paid,
+        'status' => AppointmentStatus::Confirmed,
+        'stripe_payment_intent_id' => 'pi_premier',
+    ]);
+
+    $this->partialMock(BookingPaymentService::class, function ($mock) {
+        $mock->shouldReceive('refundPaymentIntent')->once()->with('pi_second');
+    });
+
+    app(BookingPaymentService::class)->fulfill($appointment, 'pi_second');
+
+    expect($appointment->fresh()->stripe_payment_intent_id)->toBe('pi_premier');
     Mail::assertNothingQueued();
 });

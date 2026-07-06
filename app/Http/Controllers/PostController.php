@@ -3,11 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\Enums\CommentStatus;
+use App\Http\Requests\PostIndexFormRequest;
 use App\Models\Category;
 use App\Models\Post;
 use App\Models\Tag;
 use App\Support\InternalLinking;
-use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\View\View;
@@ -20,21 +20,16 @@ class PostController extends Controller
      * Page blog. Le listing interactif (recherche, tri, pagination, chips) est
      * géré par le composant Livewire PostSearch ; le contrôleur ne fournit que
      * les métadonnées SEO, la sidebar (catégories/tags en liens indexables) et
-     * l'aperçu pour le JSON-LD de la page canonique.
+     * $previewPosts, un aperçu (featured + premiers articles) pour le JSON-LD
+     * de la page canonique non filtrée uniquement — le listing affiché vient
+     * de Livewire.
      */
-    public function index(Request $request): View
+    public function index(PostIndexFormRequest $request): View
     {
-        $validated = $request->validate([
-            'q' => 'nullable|string|max:120',
-            'category' => 'nullable|string|max:120',
-            'tag' => 'nullable|string|max:120',
-            'sort' => 'nullable|in:recent,oldest',
-        ]);
+        $validated = $request->validated();
 
         $hasFilters = collect(['q', 'category', 'tag'])->some(fn ($k) => ! empty($validated[$k] ?? null));
 
-        // Aperçu (featured + premiers articles) uniquement pour le JSON-LD de la
-        // page canonique non filtrée. Le listing affiché vient de Livewire.
         $previewPosts = collect();
         if (! $hasFilters && ($validated['sort'] ?? 'recent') === 'recent') {
             $previewPosts = Post::query()
@@ -82,7 +77,9 @@ class PostController extends Controller
             ->with(['categories', 'tags', 'media'])
             ->whereHas('categories', fn ($q) => $q->where('categories.id', $category->id))
             ->orderByDesc('published_at')
-            ->paginate(self::PER_PAGE)
+            ->paginate(self::PER_PAGE, [
+                'id', 'slug', 'title', 'excerpt', 'published_at', 'reading_time_minutes',
+            ])
             ->withQueryString();
 
         return view('blog.taxonomy', [
@@ -101,7 +98,9 @@ class PostController extends Controller
             ->with(['categories', 'tags', 'media'])
             ->whereHas('tags', fn ($q) => $q->where('tags.id', $tag->id))
             ->orderByDesc('published_at')
-            ->paginate(self::PER_PAGE)
+            ->paginate(self::PER_PAGE, [
+                'id', 'slug', 'title', 'excerpt', 'published_at', 'reading_time_minutes',
+            ])
             ->withQueryString();
 
         return view('blog.taxonomy', [

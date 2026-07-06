@@ -49,6 +49,15 @@ class Course extends Model implements HasMedia
     use HasPriceInCents;
     use SoftDeletes;
 
+    /**
+     * @var array<string, mixed>
+     */
+    protected $attributes = [
+        'currency' => 'EUR',
+        'status' => 'draft',
+        'position' => 0,
+    ];
+
     protected function casts(): array
     {
         return [

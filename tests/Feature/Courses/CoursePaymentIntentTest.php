@@ -3,10 +3,10 @@
 use App\Models\Course;
 use App\Models\Enrollment;
 use App\Services\CoursePaymentService;
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
 use Stripe\PaymentIntent;
 
-uses(RefreshDatabase::class);
+uses(LazilyRefreshDatabase::class);
 
 function enrollmentWithIntent(?string $intentId, int $priceCents = 14900): Enrollment
 {

@@ -30,6 +30,13 @@ class Comment extends Model
 
     use SoftDeletes;
 
+    /**
+     * @var array<string, mixed>
+     */
+    protected $attributes = [
+        'status' => 'approved',
+    ];
+
     protected function casts(): array
     {
         return [

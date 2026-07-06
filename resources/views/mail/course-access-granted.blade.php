@@ -6,7 +6,7 @@ Bonjour {{ $enrollment->student->name }},
 Votre paiement a bien été reçu : vous avez désormais **accès à vie** à la formation suivante.
 
 **Formation :** {{ $enrollment->course->title }}\
-**Montant :** {{ number_format($enrollment->amount_paid_cents / 100, 2, ',', ' ') }} €
+**Montant :** {{ \Illuminate\Support\Number::currency($enrollment->amount_paid_cents / 100, in: 'EUR', locale: 'fr') }}
 
 Vous pouvez commencer dès maintenant, à votre rythme, depuis votre espace.
 

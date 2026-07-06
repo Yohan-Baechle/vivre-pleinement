@@ -52,9 +52,6 @@
                             <svg class="size-4 transition group-open/user:rotate-180" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
                         </summary>
 
-                        {{-- Calque de fermeture au clic extérieur --}}
-                        <label class="fixed inset-0 z-40 hidden cursor-default group-open/user:block" aria-hidden="true"></label>
-
                         <div class="ring-ink/5 absolute right-0 z-50 mt-2 w-60 overflow-hidden rounded-2xl bg-white p-2 shadow-lg ring-1">
                             <div class="px-3 py-2">
                                 <p class="text-ink truncate text-sm font-medium">{{ $studentUser->name }}</p>
@@ -88,8 +85,11 @@
                         </div>
                     </details>
                 @else
-                    <a href="{{ route('student.login') }}" class="text-ink-soft hidden rounded-full px-3 py-2 text-xs font-medium transition hover:bg-teal-50 hover:text-teal-700 md:inline-flex sm:text-sm">
-                        Connexion élève
+                    <a href="{{ route('student.login') }}" class="text-ink-soft hidden items-center gap-2 rounded-full py-1.5 pr-4 pl-1.5 text-xs font-medium transition hover:bg-teal-50 hover:text-teal-700 md:inline-flex sm:text-sm">
+                        <span class="flex size-6 items-center justify-center rounded-full bg-teal-100 text-teal-800">
+                            <svg class="size-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 10v6M2 10l10-5 10 5-10 5-10-5Z"/><path d="M6 12v5c0 1.5 2.5 3 6 3s6-1.5 6-3v-5"/></svg>
+                        </span>
+                        Se connecter
                     </a>
                 @endauth
 
@@ -150,8 +150,11 @@
                         </button>
                     </form>
                 @else
-                    <a href="{{ route('student.login') }}" class="block rounded-2xl px-4 py-3 transition hover:bg-teal-50 hover:text-teal-700">
-                        Connexion élève
+                    <a href="{{ route('student.login') }}" class="flex items-center gap-2.5 rounded-2xl px-4 py-3 transition hover:bg-teal-50 hover:text-teal-700">
+                        <span class="flex size-7 items-center justify-center rounded-full bg-teal-100 text-teal-800">
+                            <svg class="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 10v6M2 10l10-5 10 5-10 5-10-5Z"/><path d="M6 12v5c0 1.5 2.5 3 6 3s6-1.5 6-3v-5"/></svg>
+                        </span>
+                        Se connecter
                     </a>
                 @endauth
             </li>

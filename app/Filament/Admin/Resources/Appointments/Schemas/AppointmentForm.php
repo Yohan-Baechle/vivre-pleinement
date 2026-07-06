@@ -4,7 +4,9 @@ namespace App\Filament\Admin\Resources\Appointments\Schemas;
 
 use App\Enums\AppointmentChannel;
 use App\Enums\AppointmentStatus;
+use App\Models\Appointment;
 use App\Models\AppointmentService;
+use App\Services\AppointmentSlotService;
 use Carbon\Carbon;
 use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\Select;
@@ -52,7 +54,28 @@ class AppointmentForm
                         ->displayFormat('d/m/Y H:i')
                         ->required()
                         ->after('starts_at')
-                        ->helperText('Calculée automatiquement selon la prestation. Ajustez si besoin.'),
+                        ->helperText('Calculée automatiquement selon la prestation. Ajustez si besoin.')
+                        ->rule(function (Get $get, ?Appointment $record) {
+                            return function (string $attribute, $value, \Closure $fail) use ($get, $record) {
+                                $serviceId = $get('appointment_service_id');
+                                $startsAt = $get('starts_at');
+
+                                if (! $serviceId || ! $startsAt || ! $value) {
+                                    return;
+                                }
+
+                                $hasOverlap = app(AppointmentSlotService::class)->hasOverlap(
+                                    (int) $serviceId,
+                                    Carbon::parse($startsAt),
+                                    Carbon::parse($value),
+                                    $record?->id,
+                                );
+
+                                if ($hasOverlap) {
+                                    $fail('Ce créneau chevauche un autre rendez-vous déjà réservé pour cette prestation.');
+                                }
+                            };
+                        }),
 
                     Select::make('status')
                         ->label('Statut')

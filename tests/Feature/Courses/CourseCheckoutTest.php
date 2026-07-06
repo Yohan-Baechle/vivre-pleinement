@@ -5,10 +5,11 @@ use App\Models\Course;
 use App\Models\Enrollment;
 use App\Models\Student;
 use App\Services\CoursePaymentService;
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
+use Stripe\Exception\ApiConnectionException;
 use Stripe\PaymentIntent;
 
-uses(RefreshDatabase::class);
+uses(LazilyRefreshDatabase::class);
 
 beforeEach(function () {
     // Évite tout appel réseau vers Stripe : on simule un PaymentIntent.
@@ -74,4 +75,23 @@ it('exige une authentification élève pour acheter', function () {
 
     $this->post(route('courses.checkout.start', $course))
         ->assertRedirect(route('student.login'));
+});
+
+it('retourne un 503 au lieu d\'un 500 brut quand Stripe est indisponible', function () {
+    $student = Student::factory()->create();
+    $course = Course::factory()->create();
+
+    Enrollment::factory()->pending()->create([
+        'student_id' => $student->id,
+        'course_id' => $course->id,
+    ]);
+
+    $this->mock(CoursePaymentService::class)
+        ->shouldReceive('getOrCreatePaymentIntent')
+        ->once()
+        ->andThrow(new ApiConnectionException('Stripe est indisponible'));
+
+    $this->actingAs($student, 'student')
+        ->get(route('courses.checkout.pay', $course))
+        ->assertStatus(503);
 });

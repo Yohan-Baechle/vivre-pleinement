@@ -1,12 +1,3 @@
-@php
-    $articles = \App\Models\Post::query()
-        ->published()
-        ->with(['categories', 'media'])
-        ->orderByDesc('published_at')
-        ->limit(3)
-        ->get();
-@endphp
-
 @if ($articles->isNotEmpty())
     <x-section
         id="blog"

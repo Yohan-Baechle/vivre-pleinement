@@ -7,12 +7,15 @@ use App\Models\Course;
 use App\Models\Enrollment;
 use Filament\Widgets\StatsOverviewWidget;
 use Filament\Widgets\StatsOverviewWidget\Stat;
+use Illuminate\Support\Number;
 
 class CourseSalesStats extends StatsOverviewWidget
 {
     protected static ?int $sort = 4;
 
     protected ?string $heading = 'Formations';
+
+    protected ?string $pollingInterval = null;
 
     protected function getStats(): array
     {
@@ -27,7 +30,7 @@ class CourseSalesStats extends StatsOverviewWidget
             ->first();
 
         return [
-            Stat::make('Chiffre d\'affaires formations', number_format($revenueCents / 100, 2, ',', ' ').' €')
+            Stat::make('Chiffre d\'affaires formations', Number::currency($revenueCents / 100, in: 'EUR', locale: 'fr'))
                 ->description('Ventes confirmées')
                 ->descriptionIcon('heroicon-m-banknotes')
                 ->color('success')

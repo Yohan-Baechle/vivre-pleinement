@@ -3,10 +3,14 @@
 namespace App\Notifications;
 
 use Illuminate\Auth\Notifications\ResetPassword;
+use Illuminate\Bus\Queueable;
+use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 
-class StudentResetPassword extends ResetPassword
+class StudentResetPassword extends ResetPassword implements ShouldQueue
 {
+    use Queueable;
+
     /**
      * Construit le lien de réinitialisation pointant vers l'espace élève.
      */

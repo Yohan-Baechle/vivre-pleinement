@@ -7,9 +7,9 @@ use App\Models\Post;
 use App\Models\User;
 use App\Models\Video;
 use Filament\Actions\Testing\TestAction;
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
 
-uses(RefreshDatabase::class);
+uses(LazilyRefreshDatabase::class);
 
 beforeEach(fn () => $this->actingAs(User::factory()->create()));
 

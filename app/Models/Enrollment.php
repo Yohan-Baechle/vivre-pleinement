@@ -24,6 +24,15 @@ class Enrollment extends Model
     /** @use HasFactory<EnrollmentFactory> */
     use HasFactory;
 
+    /**
+     * @var array<string, mixed>
+     */
+    protected $attributes = [
+        'status' => 'pending',
+        'amount_paid_cents' => 0,
+        'currency' => 'EUR',
+    ];
+
     protected function casts(): array
     {
         return [

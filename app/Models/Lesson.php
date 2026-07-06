@@ -25,6 +25,14 @@ class Lesson extends Model
     /** @use HasFactory<LessonFactory> */
     use HasFactory;
 
+    /**
+     * @var array<string, mixed>
+     */
+    protected $attributes = [
+        'position' => 0,
+        'is_free_preview' => false,
+    ];
+
     protected function casts(): array
     {
         return [

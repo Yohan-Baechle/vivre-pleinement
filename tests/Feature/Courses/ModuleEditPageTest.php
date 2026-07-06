@@ -2,7 +2,7 @@
 
 use App\Models\Module;
 use App\Models\User;
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
 
 test('la page edit du module se charge sans erreur', function () {
     $admin = User::factory()->create();
@@ -11,4 +11,4 @@ test('la page edit du module se charge sans erreur', function () {
         ->get("/espace-pro/modules/{$module->id}/edit")
         ->assertOk()
         ->assertSee($module->title);
-})->uses(RefreshDatabase::class);
+})->uses(LazilyRefreshDatabase::class);

@@ -7,9 +7,9 @@ use App\Models\Availability;
 use App\Models\DateOverride;
 use App\Services\AppointmentSlotService;
 use Carbon\CarbonImmutable;
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
 
-uses(RefreshDatabase::class);
+uses(LazilyRefreshDatabase::class);
 
 /**
  * Returns the next occurrence of a given weekday (Carbon dayOfWeek, 0=Sun),
@@ -34,12 +34,10 @@ function serviceWithAvailability(int $dayOfWeek, string $start = '09:00', string
         'max_advance_days' => 60,
     ], $attributes));
 
-    Availability::create([
-        'appointment_service_id' => null,
+    Availability::factory()->create([
         'day_of_week' => $dayOfWeek,
         'start_time' => $start,
         'end_time' => $end,
-        'is_active' => true,
     ]);
 
     return $service;
@@ -115,7 +113,7 @@ it('blocks the whole day with a full-day override', function () {
     $day = nextWeekday(3);
     $service = serviceWithAvailability($day->dayOfWeek, '09:00', '12:00');
 
-    DateOverride::create(['date' => $day->toDateString()]);
+    DateOverride::factory()->closed()->create(['date' => $day->toDateString()]);
 
     expect(app(AppointmentSlotService::class)->slotsForDate($service, $day))->toBeEmpty();
 });
@@ -124,11 +122,7 @@ it('blocks only the overlapping range of a partial override', function () {
     $day = nextWeekday(3);
     $service = serviceWithAvailability($day->dayOfWeek, '09:00', '12:00');
 
-    DateOverride::create([
-        'date' => $day->toDateString(),
-        'start_time' => '09:00',
-        'end_time' => '10:00',
-    ]);
+    DateOverride::factory()->partial('09:00', '10:00')->create(['date' => $day->toDateString()]);
 
     $slots = app(AppointmentSlotService::class)->slotsForDate($service, $day);
 

@@ -8,6 +8,7 @@ use App\Mail\CoursePurchaseNotification;
 use App\Models\Enrollment;
 use App\Models\Student;
 use App\Support\SiteContact;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use Laravel\Cashier\Cashier;
@@ -119,6 +120,8 @@ class CoursePaymentService
      * Active l'inscription après paiement réussi, puis notifie l'élève et l'admin.
      * Idempotent : un webhook dupliqué pour une inscription déjà active ne fait
      * rien ; un paiement concurrent (intent différent) est remboursé d'office.
+     * Verrouille la ligne le temps de la vérification pour empêcher deux workers
+     * de traiter le même webhook en double (deux mails de bienvenue).
      * Le montant et la devise enregistrés viennent du payload Stripe : c'est ce
      * qui a réellement été payé, pas le prix courant du cours. Le cours est
      * chargé withTrashed : un cours supprimé entre le paiement et le webhook ne
@@ -130,22 +133,39 @@ class CoursePaymentService
         ?int $amountReceivedCents = null,
         ?string $currency = null,
     ): void {
-        if ($enrollment->status === EnrollmentStatus::Active) {
-            $this->refundDuplicatePayment($enrollment, $paymentIntentId);
+        // Seule la vérification + la mise à jour du statut sont verrouillées :
+        // l'appel réseau Stripe (remboursement) et l'envoi des mails se font
+        // après la validation (COMMIT) de la transaction, pour ne jamais faire
+        // lire à un job de mail en file un enregistrement pas encore validé.
+        [$outcome, $locked] = DB::transaction(function () use ($enrollment, $paymentIntentId, $amountReceivedCents, $currency) {
+            /** @var Enrollment $locked */
+            $locked = Enrollment::query()->whereKey($enrollment->id)->lockForUpdate()->firstOrFail();
 
-            return;
-        }
+            if ($locked->status === EnrollmentStatus::Active) {
+                return ['duplicate', $locked];
+            }
 
-        $enrollment->loadMissing(['student', 'course' => fn ($query) => $query->withTrashed()]);
+            $locked->loadMissing(['student', 'course' => fn ($query) => $query->withTrashed()]);
 
-        $enrollment->update([
-            'status' => EnrollmentStatus::Active,
-            'amount_paid_cents' => $amountReceivedCents ?? $enrollment->course->price_cents,
-            'currency' => $currency !== null ? strtoupper($currency) : $enrollment->course->currency,
-            'stripe_payment_intent_id' => $paymentIntentId,
-            'purchased_at' => now(),
-        ]);
+            $locked->update([
+                'status' => EnrollmentStatus::Active,
+                'amount_paid_cents' => $amountReceivedCents ?? $locked->course->price_cents,
+                'currency' => $currency !== null ? strtoupper($currency) : $locked->course->currency,
+                'stripe_payment_intent_id' => $paymentIntentId,
+                'purchased_at' => now(),
+            ]);
 
+            return ['fulfilled', $locked];
+        });
+
+        match ($outcome) {
+            'duplicate' => $this->refundDuplicatePayment($locked, $paymentIntentId),
+            'fulfilled' => $this->sendAccessGranted($locked),
+        };
+    }
+
+    private function sendAccessGranted(Enrollment $enrollment): void
+    {
         $fresh = $enrollment->fresh(['student']);
         $fresh->setRelation('course', $enrollment->course);
 

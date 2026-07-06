@@ -2,11 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\VideoIndexFormRequest;
 use App\Models\Category;
 use App\Models\Video;
 use App\Support\VideoArticleMatcher;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Http\Request;
 use Illuminate\View\View;
 
 class VideoController extends Controller
@@ -18,21 +18,18 @@ class VideoController extends Controller
     /**
      * Page liste des vidéos. Le listing interactif (recherche, filtres,
      * pagination) est géré par le composant Livewire VideoSearch ; le contrôleur
-     * ne fournit que les métadonnées SEO (titre, catégories, JSON-LD ItemList).
+     * ne fournit que les métadonnées SEO (titre, catégories) et $topVideos pour
+     * le JSON-LD ItemList de la page canonique uniquement.
      */
-    public function index(Request $request): View
+    public function index(VideoIndexFormRequest $request): View
     {
-        $validated = $request->validate([
-            'category' => 'nullable|string|max:120',
-            'q' => 'nullable|string|max:120',
-        ]);
+        $validated = $request->validated();
 
         $categories = Category::query()
             ->whereHas('videos', fn (Builder $q) => $q->published())
             ->orderBy('name')
             ->get();
 
-        // Pour le JSON-LD ItemList de la page canonique uniquement.
         $topVideos = Video::query()
             ->published()
             ->orderByDesc('published_at')
@@ -68,7 +65,7 @@ class VideoController extends Controller
             )
             ->orderByDesc('published_at')
             ->limit(self::RELATED_LIMIT)
-            ->get();
+            ->get(['id', 'slug', 'title', 'youtube_id', 'thumbnail_url', 'duration_seconds', 'published_at']);
 
         return view('videos.show', [
             'video' => $video,

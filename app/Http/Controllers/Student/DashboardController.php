@@ -21,9 +21,7 @@ class DashboardController extends Controller
             ->orderByPivot('purchased_at', 'desc')
             ->get();
 
-        $progress = $courses->mapWithKeys(fn ($course) => [
-            $course->id => CourseProgress::percent($student, $course),
-        ]);
+        $progress = CourseProgress::percentForCourses($student, $courses);
 
         return view('student.dashboard', [
             'student' => $student,

@@ -4,11 +4,13 @@ namespace App\Livewire;
 
 use App\Models\Category;
 use App\Models\Video;
+use App\Support\LikeSearch;
 use Illuminate\Contracts\View\View;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Collection;
 use Livewire\Attributes\Computed;
 use Livewire\Attributes\Url;
+use Livewire\Attributes\Validate;
 use Livewire\Component;
 use Livewire\WithPagination;
 
@@ -19,10 +21,23 @@ class VideoSearch extends Component
     private const PER_PAGE = 12;
 
     #[Url(as: 'q')]
+    #[Validate('string|max:100')]
     public string $search = '';
 
     #[Url]
+    #[Validate('string|max:100')]
     public string $category = '';
+
+    /**
+     * Tronque défensivement les valeurs venues de l'URL : #[Validate] ne
+     * s'applique qu'aux mises à jour ultérieures via wire:model, pas à
+     * l'hydratation initiale depuis la query string.
+     */
+    public function mount(): void
+    {
+        $this->search = mb_substr($this->search, 0, 100);
+        $this->category = mb_substr($this->category, 0, 100);
+    }
 
     /**
      * Réinitialise la pagination dès que la recherche change.
@@ -76,12 +91,17 @@ class VideoSearch extends Component
         return Video::query()->published()->count();
     }
 
+    /**
+     * La recherche filtre sur title/summary/intro sans les charger : la carte
+     * vidéo n'affiche que les colonnes listées dans le paginate() ci-dessous,
+     * intro et transcript (longText) n'y sont jamais nécessaires.
+     * La collation utf8mb4_unicode_ci de MariaDB est insensible à la casse
+     * ET aux accents : « depersonnalisation » trouve « dépersonnalisation ».
+     */
     public function render(): View
     {
         $term = trim($this->search);
 
-        // La collation utf8mb4_unicode_ci de MariaDB est insensible à la casse
-        // ET aux accents : « depersonnalisation » trouve « dépersonnalisation ».
         $videos = Video::query()
             ->published()
             ->with('categories')
@@ -90,7 +110,7 @@ class VideoSearch extends Component
                 fn (Builder $cq) => $cq->where('slug', $this->category),
             ))
             ->when($term !== '', function (Builder $q) use ($term): void {
-                $like = '%'.str_replace(['%', '_'], ['\%', '\_'], $term).'%';
+                $like = LikeSearch::wrap($term);
 
                 $q->where(function (Builder $sub) use ($like): void {
                     $sub->where('title', 'like', $like)
@@ -99,7 +119,10 @@ class VideoSearch extends Component
                 });
             })
             ->orderByDesc('published_at')
-            ->paginate(self::PER_PAGE);
+            ->paginate(self::PER_PAGE, [
+                'id', 'slug', 'title', 'youtube_id', 'thumbnail_url',
+                'duration_seconds', 'published_at',
+            ]);
 
         return view('livewire.video-search', [
             'videos' => $videos,

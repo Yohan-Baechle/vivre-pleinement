@@ -2,9 +2,9 @@
 
 use App\Models\Category;
 use App\Models\Post;
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
 
-uses(RefreshDatabase::class);
+uses(LazilyRefreshDatabase::class);
 
 /** Compte les balises <meta name="description"> et renvoie le content de la première. */
 function metaDescription(string $html): array

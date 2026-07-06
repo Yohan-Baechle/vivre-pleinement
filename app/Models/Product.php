@@ -36,6 +36,14 @@ class Product extends Model implements HasMedia
     use HasPriceInCents;
     use SoftDeletes;
 
+    /**
+     * @var array<string, mixed>
+     */
+    protected $attributes = [
+        'currency' => 'EUR',
+        'is_active' => true,
+    ];
+
     protected function casts(): array
     {
         return [

@@ -2,6 +2,10 @@
 
 @section('title', 'Paiement · '.$course->title)
 
+@php
+    use Illuminate\Support\Number;
+@endphp
+
 @push('head')
     <meta name="robots" content="noindex,nofollow">
 @endpush
@@ -23,12 +27,12 @@
                 <p class="text-xs font-medium tracking-wider text-teal-700 uppercase">Votre formation</p>
                 <div class="mt-3 flex items-baseline justify-between gap-4">
                     <p class="text-ink font-serif text-xl font-medium">{{ $course->title }}</p>
-                    <p class="text-ink font-serif text-xl font-medium">{{ number_format($course->price, 2, ',', ' ') }} €</p>
+                    <p class="text-ink font-serif text-xl font-medium">{{ Number::currency($course->price, in: 'EUR', locale: 'fr') }}</p>
                 </div>
                 <p class="text-ink-soft mt-1 text-sm">Paiement unique · accès à vie</p>
             </div>
 
-            @php $amountLabel = number_format($course->price, 2, ',', ' ').' €'; @endphp
+            @php $amountLabel = Number::currency($course->price, in: 'EUR', locale: 'fr'); @endphp
 
             {{-- Paiement --}}
             <form id="payment-form"

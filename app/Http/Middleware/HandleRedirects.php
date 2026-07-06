@@ -27,8 +27,7 @@ class HandleRedirects
             return $response;
         }
 
-        $redirect->increment('hit_count');
-        $redirect->forceFill(['last_hit_at' => now()])->saveQuietly();
+        $redirect->increment('hit_count', 1, ['last_hit_at' => now()]);
 
         $target = str_starts_with($redirect->to_path, 'http')
             ? $redirect->to_path

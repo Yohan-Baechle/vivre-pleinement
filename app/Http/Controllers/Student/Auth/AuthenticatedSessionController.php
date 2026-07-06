@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Student\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\StudentLoginFormRequest;
 use Illuminate\Auth\Events\Lockout;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -21,12 +22,9 @@ class AuthenticatedSessionController extends Controller
         return view('student.auth.login');
     }
 
-    public function store(Request $request): RedirectResponse
+    public function store(StudentLoginFormRequest $request): RedirectResponse
     {
-        $credentials = $request->validate([
-            'email' => ['required', 'string', 'email'],
-            'password' => ['required', 'string'],
-        ]);
+        $credentials = $request->validated();
 
         $this->ensureIsNotRateLimited($request);
 

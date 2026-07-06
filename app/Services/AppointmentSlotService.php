@@ -189,9 +189,28 @@ class AppointmentSlotService
      */
     public function hasConflictingAppointment(Appointment $appointment): bool
     {
-        return $this->overlapQuery($appointment->appointment_service_id, $appointment->starts_at, $appointment->ends_at)
-            ->where('id', '!=', $appointment->id)
-            ->exists();
+        return $this->hasOverlap(
+            $appointment->appointment_service_id,
+            $appointment->starts_at,
+            $appointment->ends_at,
+            $appointment->id,
+        );
+    }
+
+    /**
+     * Indique si un autre rendez-vous bloquant chevauche la fenêtre donnée pour
+     * cette prestation. Utilisé par le formulaire admin pour empêcher la
+     * création/modification d'un rendez-vous en double-réservation.
+     */
+    public function hasOverlap(int $serviceId, CarbonInterface $start, CarbonInterface $end, ?int $excludingAppointmentId = null): bool
+    {
+        $query = $this->overlapQuery($serviceId, $start, $end);
+
+        if ($excludingAppointmentId !== null) {
+            $query->where('id', '!=', $excludingAppointmentId);
+        }
+
+        return $query->exists();
     }
 
     /**

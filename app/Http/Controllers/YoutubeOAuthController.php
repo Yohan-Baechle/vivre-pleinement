@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Services\YoutubeCaptions;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Response;
+use Illuminate\Support\Str;
 use Throwable;
 
 /**
@@ -18,14 +19,22 @@ class YoutubeOAuthController extends Controller
 
     private const SCOPE = 'https://www.googleapis.com/auth/youtube.force-ssl';
 
+    private const STATE_SESSION_KEY = 'youtube_oauth_state';
+
     /**
-     * Redirige vers l'écran de consentement Google.
+     * Redirige vers l'écran de consentement Google. Le paramètre state est
+     * généré et stocké en session, puis revérifié au retour pour empêcher
+     * qu'un tiers ne déclenche le callback avec son propre code d'autorisation
+     * (CSRF sur le flux OAuth).
      */
     public function redirect(Request $request)
     {
         $clientId = config('services.youtube.oauth_client_id');
 
         abort_unless($clientId, 404);
+
+        $state = Str::random(40);
+        $request->session()->put(self::STATE_SESSION_KEY, $state);
 
         $authUrl = 'https://accounts.google.com/o/oauth2/v2/auth?'.http_build_query([
             'client_id' => $clientId,
@@ -34,6 +43,7 @@ class YoutubeOAuthController extends Controller
             'scope' => self::SCOPE,
             'access_type' => 'offline',
             'prompt' => 'consent',
+            'state' => $state,
         ]);
 
         return redirect()->away($authUrl);
@@ -45,6 +55,13 @@ class YoutubeOAuthController extends Controller
     public function callback(Request $request)
     {
         abort_unless(config('services.youtube.oauth_client_id'), 404);
+
+        $expectedState = $request->session()->pull(self::STATE_SESSION_KEY);
+
+        if (! is_string($expectedState) || ! hash_equals($expectedState, (string) $request->query('state'))) {
+            return Response::make('État OAuth invalide ou expiré. Recommencez le flux depuis /youtube/oauth/redirect.', 400)
+                ->header('Content-Type', 'text/html; charset=UTF-8');
+        }
 
         if ($error = $request->query('error')) {
             return Response::make('Autorisation refusée : '.e($error), 400)
@@ -74,6 +91,8 @@ class YoutubeOAuthController extends Controller
             )->header('Content-Type', 'text/html; charset=UTF-8');
         }
 
+        $escapedRefreshToken = e($refreshToken);
+
         $html = <<<HTML
         <!doctype html><html lang="fr"><head><meta charset="utf-8">
         <title>YouTube OAuth — Succès</title>
@@ -82,7 +101,7 @@ class YoutubeOAuthController extends Controller
         .ok{color:#047857}</style></head><body>
         <h1 class="ok">✅ Autorisation réussie</h1>
         <p>Copiez cette ligne dans votre fichier <strong>.env</strong> :</p>
-        <code>YOUTUBE_OAUTH_REFRESH_TOKEN={$refreshToken}</code>
+        <code>YOUTUBE_OAUTH_REFRESH_TOKEN={$escapedRefreshToken}</code>
         <p>Puis lancez&nbsp;:</p>
         <code>vendor/bin/sail artisan youtube:fetch-transcripts --limit=3</code>
         <p>Vous pouvez fermer cet onglet.</p>

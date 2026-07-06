@@ -4,6 +4,10 @@
 @section('description', "Accompagnement individuel en thérapie d'acceptation et d'engagement (ACT) pour vous libérer de vos troubles anxieux. Par téléphone ou en visio, avec Laura Baechlé.")
 @section('canonical', route('booking.index'))
 
+@php
+    use Illuminate\Support\Number;
+@endphp
+
 @push('head')
     @php
         $offers = $services->map(fn ($s) => [
@@ -48,8 +52,8 @@
             ])->all(),
         ];
     @endphp
-    <script type="application/ld+json">{!! json_encode($bookingLd, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!}</script>
-    <script type="application/ld+json">{!! json_encode($faqLd, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!}</script>
+    <script type="application/ld+json">{!! json_encode($bookingLd, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG) !!}</script>
+    <script type="application/ld+json">{!! json_encode($faqLd, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG) !!}</script>
 @endpush
 
 @section('body')
@@ -315,7 +319,7 @@
                 <div class="border-cream-300 flex flex-wrap items-baseline justify-center gap-x-4 gap-y-1 border-b pb-6 text-center">
                     <h3 class="text-ink font-serif text-2xl font-medium">{{ $primaryService->name }}</h3>
                     <p class="text-ink-soft">
-                        <span class="text-ink font-serif text-2xl font-medium">{{ $primaryService->isFree() ? 'Gratuit' : number_format($primaryService->price, 0, ',', ' ').' €' }}</span>
+                        <span class="text-ink font-serif text-2xl font-medium">{{ $primaryService->isFree() ? 'Gratuit' : Number::currency($primaryService->price, in: 'EUR', locale: 'fr') }}</span>
                         · {{ $primaryService->duration_minutes }} min · par téléphone ou en visio
                     </p>
                 </div>

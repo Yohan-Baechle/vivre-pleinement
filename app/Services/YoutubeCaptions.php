@@ -53,7 +53,7 @@ class YoutubeCaptions
      */
     public function exchangeAuthorizationCode(string $code, string $redirectUri): array
     {
-        $response = Http::asForm()->post(self::TOKEN_URL, [
+        $response = Http::asForm()->timeout(30)->post(self::TOKEN_URL, [
             'code' => $code,
             'client_id' => $this->clientId,
             'client_secret' => $this->clientSecret,
@@ -147,7 +147,7 @@ class YoutubeCaptions
             );
         }
 
-        $response = Http::asForm()->post(self::TOKEN_URL, [
+        $response = Http::asForm()->timeout(30)->post(self::TOKEN_URL, [
             'client_id' => $this->clientId,
             'client_secret' => $this->clientSecret,
             'refresh_token' => $this->refreshToken,
@@ -165,7 +165,7 @@ class YoutubeCaptions
     {
         return Http::withToken($this->accessToken())
             ->timeout(30)
-            ->retry(2, 500)
+            ->retry(2, 500, throw: false)
             ->acceptJson();
     }
 }

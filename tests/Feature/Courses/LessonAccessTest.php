@@ -5,9 +5,9 @@ use App\Models\Enrollment;
 use App\Models\Lesson;
 use App\Models\Module;
 use App\Models\Student;
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
 
-uses(RefreshDatabase::class);
+uses(LazilyRefreshDatabase::class);
 
 /**
  * @return array{0: Course, 1: Lesson}
@@ -88,4 +88,17 @@ it('protège l\'espace élève des visiteurs non connectés', function () {
     [$course, $lesson] = courseWithLesson();
 
     $this->get(route('student.course', $course))->assertRedirect(route('student.login'));
+});
+
+it('404 sur une leçon d\'une autre formation, même avec une inscription valide', function () {
+    [$course, $lesson] = courseWithLesson();
+    [$otherCourse, $otherLesson] = courseWithLesson();
+
+    $student = Student::factory()->create();
+    Enrollment::factory()->create(['student_id' => $student->id, 'course_id' => $course->id]);
+    Enrollment::factory()->create(['student_id' => $student->id, 'course_id' => $otherCourse->id]);
+
+    $this->actingAs($student, 'student')
+        ->get(route('student.lesson', [$course, $otherLesson]))
+        ->assertNotFound();
 });

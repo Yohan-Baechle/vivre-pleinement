@@ -9,7 +9,7 @@
 
     @include('layouts.partials.navbar')
 
-    <main id="main" class="bg-cream-50 min-h-screen pt-32 pb-16 sm:pt-36 sm:pb-20">
+    <main id="main" class="bg-cream-50 flex min-h-screen flex-col pt-32 pb-16 sm:pt-36 sm:pb-20">
         @yield('student')
     </main>
 

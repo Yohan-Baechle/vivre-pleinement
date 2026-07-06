@@ -3,9 +3,9 @@
 use App\Models\Category;
 use App\Models\Post;
 use App\Models\Video;
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
 
-uses(RefreshDatabase::class);
+uses(LazilyRefreshDatabase::class);
 
 it('links a video to its article from the youtube description url', function () {
     $post = Post::factory()->create(['slug' => 'phobie-de-conduire']);
