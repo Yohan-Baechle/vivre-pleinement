@@ -43,13 +43,16 @@
             ] : null,
             'author' => [
                 '@type' => 'Person',
+                '@id' => url('/').'#laura',
                 'name' => 'Laura Baechlé',
                 'url' => url('/'),
             ],
             'publisher' => [
                 '@type' => 'Organization',
+                '@id' => url('/').'#organization',
                 'name' => 'Vivre Pleinement',
                 'url' => url('/'),
+                'logo' => ['@type' => 'ImageObject', 'url' => asset('images/logo@4x.webp')],
             ],
             'inLanguage' => 'fr-FR',
         ];

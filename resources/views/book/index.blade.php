@@ -52,6 +52,18 @@
         ];
     @endphp
     <script type="application/ld+json">{!! json_encode($productLd, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG) !!}</script>
+
+    @php
+        $breadcrumbLd = [
+            '@context' => 'https://schema.org',
+            '@type' => 'BreadcrumbList',
+            'itemListElement' => [
+                ['@type' => 'ListItem', 'position' => 1, 'name' => 'Accueil', 'item' => route('home')],
+                ['@type' => 'ListItem', 'position' => 2, 'name' => 'Le livre'],
+            ],
+        ];
+    @endphp
+    <script type="application/ld+json">{!! json_encode($breadcrumbLd, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG) !!}</script>
 @endpush
 
 @section('body')

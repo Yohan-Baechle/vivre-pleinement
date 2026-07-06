@@ -3,6 +3,7 @@
 namespace App\Observers;
 
 use App\Models\Course;
+use App\Support\IndexNow;
 use Illuminate\Support\Facades\Cache;
 
 class CourseObserver
@@ -10,6 +11,10 @@ class CourseObserver
     public function saved(Course $course): void
     {
         $this->flushCaches();
+
+        if ($course->isPublished()) {
+            IndexNow::ping(route('courses.show', $course));
+        }
     }
 
     public function deleted(Course $course): void
