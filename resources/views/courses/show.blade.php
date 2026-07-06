@@ -4,6 +4,42 @@
 @section('description', $course->seo_description ?: $course->subtitle)
 @section('canonical', route('courses.show', $course))
 
+@push('head')
+    @php
+        $cover = $course->getFirstMediaUrl('cover');
+        $courseLd = array_filter([
+            '@context' => 'https://schema.org',
+            '@type' => 'Course',
+            'name' => $course->title,
+            'description' => $course->seo_description ?: $course->subtitle ?: str(strip_tags($course->description ?? ''))->limit(300)->toString(),
+            'url' => route('courses.show', $course),
+            'image' => $cover ?: null,
+            'inLanguage' => 'fr-FR',
+            'provider' => [
+                '@type' => 'Organization',
+                'name' => 'Vivre Pleinement',
+                'url' => url('/'),
+            ],
+            'offers' => [
+                '@type' => 'Offer',
+                'price' => number_format($course->price, 2, '.', ''),
+                'priceCurrency' => $course->currency,
+                'availability' => 'https://schema.org/InStock',
+                'url' => route('courses.show', $course),
+                'category' => 'Paid',
+            ],
+            'hasCourseInstance' => [
+                '@type' => 'CourseInstance',
+                'courseMode' => 'Online',
+                'courseWorkload' => $course->duration_minutes ? 'PT'.$course->duration_minutes.'M' : null,
+            ],
+        ], fn ($value) => $value !== null && $value !== '');
+
+        $courseLd['hasCourseInstance'] = array_filter($courseLd['hasCourseInstance']);
+    @endphp
+    <script type="application/ld+json">{!! json_encode($courseLd, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG) !!}</script>
+@endpush
+
 @php
     use Illuminate\Support\Number;
 
