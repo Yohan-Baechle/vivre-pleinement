@@ -24,11 +24,9 @@
 @section('description', $metaDesc)
 @section('canonical', route('videos.index', $hasCategory ? ['category' => $activeCategory] : []))
 
-@push('head')
-    @unless ($isIndexable)
-        <meta name="robots" content="noindex, follow">
-    @endunless
+@section('robots', $isIndexable ? 'index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1' : 'noindex, follow')
 
+@push('head')
     @if ($isIndexable && ! $hasCategory)
         @php
             $itemListLd = [

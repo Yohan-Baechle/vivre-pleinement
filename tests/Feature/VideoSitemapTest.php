@@ -34,6 +34,25 @@ it('flushes the sitemap cache when a post is saved', function () {
     expect(Cache::has('sitemap.urls'))->toBeFalse();
 });
 
+it('recovers when the video sitemap cache holds a corrupted value', function () {
+    $video = Video::factory()->create();
+
+    Cache::put('sitemap.videos', ['cached'], now()->addHour());
+
+    $this->get('/sitemap-videos.xml')
+        ->assertOk()
+        ->assertSee(route('videos.show', $video), false);
+});
+
+it('does not emit content_loc for youtube-hosted videos', function () {
+    Video::factory()->create();
+
+    $this->get('/sitemap-videos.xml')
+        ->assertOk()
+        ->assertDontSee('video:content_loc', false)
+        ->assertSee('video:player_loc', false);
+});
+
 it('flushes both sitemap caches when a video is saved', function () {
     Cache::put('sitemap.urls', ['cached'], now()->addHour());
     Cache::put('sitemap.videos', ['cached'], now()->addHour());

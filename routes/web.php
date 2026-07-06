@@ -167,3 +167,4 @@ Route::prefix('blog')->name('blog.')->group(function () {
 
 Route::get('/sitemap.xml', [SitemapController::class, 'index'])->name('sitemap');
 Route::get('/sitemap-videos.xml', [SitemapController::class, 'videos'])->name('sitemap.videos');
+Route::get('/llms.txt', [SitemapController::class, 'llms'])->name('llms');

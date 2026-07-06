@@ -17,6 +17,7 @@
                     'image' => $img,
                     'description' => "Praticienne ACT spécialisée dans l'accompagnement des personnes souffrant de troubles anxieux : anxiété généralisée (TAG), phobies, TOC, burnout.",
                     'knowsAbout' => ['Troubles anxieux', 'Anxiété généralisée', 'TAG', 'Phobies', 'TOC', 'Burnout', 'Thérapie ACT', 'Gestion du stress', 'Bien-être mental'],
+                    ...array_filter(['sameAs' => array_values(\App\Support\SiteContact::socials())]),
                 ],
                 [
                     '@type' => 'WebSite',

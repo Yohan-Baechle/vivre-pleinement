@@ -16,11 +16,7 @@
 @section('canonical', $taxonomyUrl)
 @section('description', $description)
 
-@push('head')
-    @if ($posts->currentPage() > 1)
-        <meta name="robots" content="noindex, follow">
-    @endif
-@endpush
+@section('robots', $posts->currentPage() > 1 ? 'noindex, follow' : 'index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1')
 
 @section('body')
     @include('layouts.partials.navbar')

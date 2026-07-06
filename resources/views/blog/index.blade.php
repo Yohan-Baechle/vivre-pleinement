@@ -22,10 +22,9 @@
 @section('description', $metaDesc)
 @section('canonical', route('blog.index').($page > 1 ? '?page='.$page : ''))
 
+@section('robots', ($hasFilters || $page > 1) ? 'noindex, follow' : 'index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1')
+
 @push('head')
-    @if ($hasFilters || $page > 1)
-        <meta name="robots" content="noindex, follow">
-    @endif
     <link rel="alternate" type="application/rss+xml" title="Vivre Pleinement - Blog" href="{{ route('blog.rss') }}">
 
     <meta property="og:type" content="website">
