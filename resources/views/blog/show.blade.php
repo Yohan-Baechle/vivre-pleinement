@@ -212,6 +212,10 @@
                     </button>
                 </div>
             </div>
+
+            <x-content-cta :category="$category" class="mt-14" />
+
+            <x-health-disclaimer class="mt-8" />
         </div>
     </article>
 

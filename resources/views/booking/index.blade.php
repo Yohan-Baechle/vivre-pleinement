@@ -80,6 +80,12 @@
                 <p class="text-ink font-serif mt-5 text-xl font-medium sm:text-2xl">
                     Par téléphone ou en visio
                 </p>
+                @if ($primaryService)
+                    <p class="mt-4 inline-flex flex-wrap items-baseline justify-center gap-x-2 rounded-full bg-white/80 px-5 py-2 ring-1 ring-teal-200">
+                        <span class="text-ink font-serif text-lg font-medium">{{ $primaryService->isFree() ? 'Gratuit' : Number::currency($primaryService->price, in: 'EUR', locale: 'fr') }}</span>
+                        <span class="text-ink-soft text-sm">· séance de {{ $primaryService->duration_minutes }} min</span>
+                    </p>
+                @endif
                 <p class="text-ink-soft mx-auto mt-5 max-w-2xl text-base sm:text-lg">
                     Afin d'obtenir un accompagnement individuel, personnalisé et unique pour vous libérer de
                     vos troubles anxieux
