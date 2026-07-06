@@ -182,7 +182,29 @@
                 </aside>
             </div>
         </div>
+
+        <div class="h-20 lg:hidden" aria-hidden="true"></div>
     </main>
+
+    {{-- Barre d'achat mobile : prix et CTA visibles sans scroller (la carte d'achat n'apparaît qu'en bas de page sur petit écran) --}}
+    <div class="border-ink/10 fixed inset-x-0 bottom-0 z-40 border-t bg-white/95 px-4 py-3 backdrop-blur-sm lg:hidden" data-nosnippet>
+        <div class="mx-auto flex max-w-lg items-center justify-between gap-4">
+            <div class="min-w-0">
+                <p class="text-ink font-serif text-xl leading-none font-medium">{{ Number::currency($course->price, in: 'EUR', locale: 'fr') }}</p>
+                <p class="text-ink-muted mt-1 text-xs">Paiement unique · accès à vie</p>
+            </div>
+            @if ($hasAccess)
+                <x-button :href="route('student.course', $course)" size="sm" arrow>Accéder</x-button>
+            @elseif (auth('student')->check())
+                <form method="POST" action="{{ route('courses.checkout.start', $course) }}">
+                    @csrf
+                    <x-button type="submit" size="sm" arrow>Acheter la formation</x-button>
+                </form>
+            @else
+                <x-button :href="route('student.register', ['course' => $course->slug])" size="sm" arrow>Acheter la formation</x-button>
+            @endif
+        </div>
+    </div>
 
     @include('home.sections.footer')
 @endsection
