@@ -9,6 +9,13 @@ use Illuminate\Support\Facades\Cache;
 
 class PostObserver
 {
+    public function saving(Post $post): void
+    {
+        if ($post->isDirty('content')) {
+            $post->reading_time_minutes = Post::computeReadingTimeMinutes((string) $post->content);
+        }
+    }
+
     public function saved(Post $post): void
     {
         $this->flushCaches($post);

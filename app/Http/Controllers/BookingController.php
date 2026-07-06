@@ -12,6 +12,7 @@ use App\Support\IcsCalendar;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Response;
 use Illuminate\View\View;
+use Stripe\Exception\ApiErrorException;
 
 class BookingController extends Controller
 {
@@ -56,7 +57,13 @@ class BookingController extends Controller
 
         abort_unless($appointment->price_cents > 0 && $appointment->isManageable(), 404);
 
-        $intent = $payments->createPaymentIntent($appointment);
+        try {
+            $intent = $payments->createPaymentIntent($appointment);
+        } catch (ApiErrorException $e) {
+            report($e);
+
+            abort(503, 'Le paiement est momentanément indisponible. Merci de réessayer dans quelques instants.');
+        }
 
         return view('booking.pay', [
             'appointment' => $appointment,

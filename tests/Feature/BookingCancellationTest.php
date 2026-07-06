@@ -11,23 +11,17 @@ use App\Models\AppointmentService;
 use App\Models\Availability;
 use App\Services\AppointmentSlotService;
 use Carbon\CarbonImmutable;
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
 use Illuminate\Support\Facades\Mail;
 use Livewire\Livewire;
 
-uses(RefreshDatabase::class);
+uses(LazilyRefreshDatabase::class);
 
 function serviceWithDailyAvailability(): AppointmentService
 {
     $service = AppointmentService::factory()->create(['duration_minutes' => 30, 'min_notice_hours' => 12]);
     foreach (range(0, 6) as $dow) {
-        Availability::create([
-            'appointment_service_id' => null,
-            'day_of_week' => $dow,
-            'start_time' => '08:00',
-            'end_time' => '20:00',
-            'is_active' => true,
-        ]);
+        Availability::factory()->dayOfWeek($dow)->create();
     }
 
     return $service;

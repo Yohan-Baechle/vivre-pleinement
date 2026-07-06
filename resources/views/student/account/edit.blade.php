@@ -2,11 +2,6 @@
 
 @section('title', 'Mon compte · Espace formation')
 
-@php
-    $fieldClasses = 'mt-2 w-full rounded-2xl border-0 bg-cream-50 px-4 py-3 text-sm text-ink ring-1 ring-ink/10 transition placeholder:text-ink-muted focus:bg-white focus:ring-2 focus:ring-teal-500 focus:outline-hidden';
-    $labelClasses = 'text-ink-muted block text-xs font-medium tracking-wider uppercase';
-@endphp
-
 @section('student')
     <div class="site-container">
         <x-student-nav :student="$student" />
@@ -34,26 +29,16 @@
                     @csrf
                     @method('PATCH')
 
-                    <div>
-                        <label for="name" class="{{ $labelClasses }}">Prénom et nom</label>
-                        <input type="text" id="name" name="name" value="{{ old('name', $student->name) }}" required autocomplete="name"
-                               class="{{ $fieldClasses }} @error('name') ring-rose-400 @enderror">
-                        @error('name')<p class="mt-1 text-xs text-rose-700">{{ $message }}</p>@enderror
-                    </div>
+                    <x-form-field name="name" label="Prénom et nom" :value="old('name', $student->name)" required autocomplete="name" />
 
-                    <div>
-                        <label for="email" class="{{ $labelClasses }}">Email</label>
-                        <input type="email" id="email" name="email" value="{{ old('email', $student->email) }}" required autocomplete="email"
-                               class="{{ $fieldClasses }} @error('email') ring-rose-400 @enderror">
-                        @error('email')<p class="mt-1 text-xs text-rose-700">{{ $message }}</p>@enderror
-
+                    <x-form-field name="email" label="Email" type="email" :value="old('email', $student->email)" required autocomplete="email">
                         @if (! $student->hasVerifiedEmail())
                             <p class="mt-2 text-xs text-rose-700">
                                 Votre adresse e-mail n'est pas encore confirmée.
                                 <a href="{{ route('student.verification.notice') }}" class="underline hover:text-rose-800">Renvoyer le lien de confirmation</a>
                             </p>
                         @endif
-                    </div>
+                    </x-form-field>
 
                     <x-button type="submit">Enregistrer</x-button>
                 </form>
@@ -68,25 +53,11 @@
                     @csrf
                     @method('PUT')
 
-                    <div>
-                        <label for="current_password" class="{{ $labelClasses }}">Mot de passe actuel</label>
-                        <input type="password" id="current_password" name="current_password" autocomplete="current-password"
-                               class="{{ $fieldClasses }} @error('current_password') ring-rose-400 @enderror">
-                        @error('current_password')<p class="mt-1 text-xs text-rose-700">{{ $message }}</p>@enderror
-                    </div>
+                    <x-form-field name="current_password" label="Mot de passe actuel" type="password" autocomplete="current-password" />
 
-                    <div>
-                        <label for="password" class="{{ $labelClasses }}">Nouveau mot de passe</label>
-                        <input type="password" id="password" name="password" autocomplete="new-password"
-                               class="{{ $fieldClasses }} @error('password') ring-rose-400 @enderror">
-                        @error('password')<p class="mt-1 text-xs text-rose-700">{{ $message }}</p>@enderror
-                    </div>
+                    <x-form-field name="password" label="Nouveau mot de passe" type="password" autocomplete="new-password" />
 
-                    <div>
-                        <label for="password_confirmation" class="{{ $labelClasses }}">Confirmer le nouveau mot de passe</label>
-                        <input type="password" id="password_confirmation" name="password_confirmation" autocomplete="new-password"
-                               class="{{ $fieldClasses }}">
-                    </div>
+                    <x-form-field name="password_confirmation" label="Confirmer le nouveau mot de passe" type="password" autocomplete="new-password" :show-error-ring="false" :show-error-message="false" />
 
                     <x-button type="submit">Modifier le mot de passe</x-button>
                 </form>
@@ -145,39 +116,4 @@
         </div>
     </dialog>
 
-    <script>
-        (() => {
-            const dialog = document.getElementById('delete-account-dialog');
-            if (! dialog) return;
-
-            const openBtn = document.querySelector('[data-open-delete-dialog]');
-            const closeBtn = dialog.querySelector('[data-close-delete-dialog]');
-            const input = dialog.querySelector('[data-delete-confirm]');
-            const submit = dialog.querySelector('[data-delete-submit]');
-
-            const reset = () => {
-                input.value = '';
-                submit.disabled = true;
-            };
-
-            openBtn?.addEventListener('click', () => {
-                reset();
-                dialog.showModal();
-                input.focus();
-            });
-
-            closeBtn?.addEventListener('click', () => dialog.close());
-
-            input?.addEventListener('input', () => {
-                submit.disabled = input.value.trim().toUpperCase() !== 'SUPPRIMER';
-            });
-
-            // Clic sur le fond (backdrop) : ferme la modale.
-            dialog.addEventListener('click', (event) => {
-                if (event.target === dialog) dialog.close();
-            });
-
-            dialog.addEventListener('close', reset);
-        })();
-    </script>
 @endsection

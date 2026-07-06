@@ -20,6 +20,13 @@ class Module extends Model
     use HasFactory;
 
     /**
+     * @var array<string, mixed>
+     */
+    protected $attributes = [
+        'position' => 0,
+    ];
+
+    /**
      * @return BelongsTo<Course, $this>
      */
     public function course(): BelongsTo

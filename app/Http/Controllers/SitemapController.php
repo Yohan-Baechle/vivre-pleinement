@@ -111,7 +111,11 @@ class SitemapController extends Controller
             fn () => Video::query()
                 ->published()
                 ->orderByDesc('published_at')
-                ->get(),
+                ->get([
+                    'id', 'slug', 'title', 'youtube_id', 'thumbnail_url',
+                    'seo_description', 'summary', 'description',
+                    'duration_seconds', 'published_at', 'view_count',
+                ]),
         );
 
         return response()

@@ -3,8 +3,8 @@
 namespace App\Http\Controllers\Student\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\StudentPasswordResetLinkFormRequest;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Password;
 use Illuminate\View\View;
 
@@ -15,10 +15,8 @@ class PasswordResetLinkController extends Controller
         return view('student.auth.forgot-password');
     }
 
-    public function store(Request $request): RedirectResponse
+    public function store(StudentPasswordResetLinkFormRequest $request): RedirectResponse
     {
-        $request->validate(['email' => ['required', 'email']]);
-
         $status = Password::broker('students')->sendResetLink(
             $request->only('email')
         );

@@ -3,12 +3,17 @@
 use App\Models\Student;
 use App\Notifications\StudentVerifyEmail;
 use Illuminate\Auth\Events\Verified;
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\URL;
 
-uses(RefreshDatabase::class);
+uses(LazilyRefreshDatabase::class);
+
+it('met en file d\'attente la notification de vérification d\'e-mail', function () {
+    expect(new StudentVerifyEmail)->toBeInstanceOf(ShouldQueue::class);
+});
 
 it('redirige un élève non vérifié vers la page de confirmation depuis le tableau de bord', function () {
     $student = Student::factory()->unverified()->create();
@@ -27,8 +32,6 @@ it('laisse un élève vérifié accéder au tableau de bord', function () {
 });
 
 it('vérifie l\'e-mail via le lien signé', function () {
-    Event::fake();
-
     $student = Student::factory()->unverified()->create();
 
     $url = URL::temporarySignedRoute(
@@ -36,6 +39,8 @@ it('vérifie l\'e-mail via le lien signé', function () {
         now()->addMinutes(60),
         ['id' => $student->id, 'hash' => sha1($student->getEmailForVerification())],
     );
+
+    Event::fake();
 
     $this->actingAs($student, 'student')
         ->get($url)

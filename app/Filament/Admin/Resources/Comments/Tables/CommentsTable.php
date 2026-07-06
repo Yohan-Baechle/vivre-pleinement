@@ -30,8 +30,7 @@ class CommentsTable
                 TextColumn::make('content')
                     ->label('Commentaire')
                     ->limit(80)
-                    ->wrap()
-                    ->html(),
+                    ->wrap(),
 
                 TextColumn::make('post.title')
                     ->label('Article')
@@ -79,7 +78,7 @@ class CommentsTable
                         ->label('Approuver')
                         ->icon('heroicon-o-check-circle')
                         ->color('success')
-                        ->action(fn (Collection $records) => $records->each->update(['status' => CommentStatus::Approved])),
+                        ->action(fn (Collection $records) => $records->toQuery()->update(['status' => CommentStatus::Approved])),
                     DeleteBulkAction::make(),
                     ForceDeleteBulkAction::make(),
                     RestoreBulkAction::make(),

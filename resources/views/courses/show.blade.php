@@ -5,6 +5,8 @@
 @section('canonical', route('courses.show', $course))
 
 @php
+    use Illuminate\Support\Number;
+
     $lessonCount = $course->modules->sum(fn ($module) => $module->lessons->count());
 @endphp
 
@@ -106,7 +108,7 @@
                             @endif
 
                             <div class="p-6 sm:p-8">
-                                <p class="text-ink font-serif text-3xl font-medium">{{ number_format($course->price, 2, ',', ' ') }} €</p>
+                                <p class="text-ink font-serif text-3xl font-medium">{{ Number::currency($course->price, in: 'EUR', locale: 'fr') }}</p>
                                 <p class="text-ink-muted mt-1 text-sm">Paiement unique · accès à vie</p>
 
                                 @if ($hasAccess)

@@ -17,6 +17,7 @@ use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Illuminate\Support\Facades\Cache;
 use UnitEnum;
 
 class CourseResource extends Resource
@@ -39,7 +40,11 @@ class CourseResource extends Resource
 
     public static function getNavigationBadge(): ?string
     {
-        $drafts = Course::query()->where('status', CourseStatus::Draft)->count();
+        $drafts = Cache::remember(
+            'filament.badge.courses.draft',
+            now()->addMinute(),
+            fn () => Course::query()->where('status', CourseStatus::Draft)->count(),
+        );
 
         return $drafts > 0 ? (string) $drafts : null;
     }

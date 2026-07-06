@@ -6,9 +6,9 @@ use App\Models\Lesson;
 use App\Models\Module;
 use App\Models\Student;
 use App\Support\StudentAnonymizer;
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
 
-uses(RefreshDatabase::class);
+uses(LazilyRefreshDatabase::class);
 
 it('anonymise le compte élève en conservant la vente', function () {
     $student = Student::factory()->create(['name' => 'Camille Dupont', 'email' => 'camille@example.com']);

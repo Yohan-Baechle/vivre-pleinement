@@ -3,6 +3,8 @@
 ])
 
 @php
+    use Illuminate\Support\Number;
+
     $media = $course->getFirstMedia('cover');
     $url = route('courses.show', $course);
 @endphp
@@ -41,7 +43,7 @@
 
         <div class="mt-5 flex items-center justify-between">
             <span class="text-ink font-serif text-lg font-medium">
-                {{ number_format($course->price, 2, ',', ' ') }} €
+                {{ Number::currency($course->price, in: 'EUR', locale: 'fr') }}
             </span>
             <span class="inline-flex items-center gap-1.5 text-sm font-medium text-teal-700">
                 Découvrir

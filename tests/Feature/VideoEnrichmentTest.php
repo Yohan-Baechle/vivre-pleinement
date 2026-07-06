@@ -2,10 +2,10 @@
 
 use App\Models\Category;
 use App\Models\Video;
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
 use Illuminate\Support\Facades\File;
 
-uses(RefreshDatabase::class);
+uses(LazilyRefreshDatabase::class);
 
 function writeEnrichmentFile(array $videos): string
 {

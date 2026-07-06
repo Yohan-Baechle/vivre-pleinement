@@ -3,9 +3,9 @@
 use App\Models\Course;
 use App\Models\Student;
 use App\Models\User;
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
 
-uses(RefreshDatabase::class);
+uses(LazilyRefreshDatabase::class);
 
 it('inscrit un nouvel élève sur le guard student', function () {
     $response = $this->post(route('student.register.store'), [

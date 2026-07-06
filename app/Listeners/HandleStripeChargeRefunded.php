@@ -5,10 +5,22 @@ namespace App\Listeners;
 use App\Models\Enrollment;
 use App\Services\CoursePaymentService;
 use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Support\Facades\Log;
 use Laravel\Cashier\Events\WebhookReceived;
+use Throwable;
 
 class HandleStripeChargeRefunded implements ShouldQueue
 {
+    /**
+     * @var int
+     */
+    public $tries = 5;
+
+    /**
+     * @var array<int, int>
+     */
+    public $backoff = [30, 60, 300, 900];
+
     public function __construct(
         private CoursePaymentService $coursePayments,
     ) {}
@@ -38,5 +50,19 @@ class HandleStripeChargeRefunded implements ShouldQueue
         if ($enrollment !== null) {
             $this->coursePayments->refund($enrollment);
         }
+    }
+
+    /**
+     * Toutes les tentatives ont échoué : un remboursement Stripe existe sans
+     * que l'accès à la formation ait été révoqué côté application.
+     */
+    public function failed(WebhookReceived $event, Throwable $exception): void
+    {
+        report($exception);
+
+        Log::critical('Échec définitif du traitement de charge.refunded : accès formation potentiellement non révoqué.', [
+            'payload' => $event->payload,
+            'exception' => $exception->getMessage(),
+        ]);
     }
 }

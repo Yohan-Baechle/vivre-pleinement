@@ -3,12 +3,12 @@
 namespace App\Http\Controllers\Student;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\UpdateStudentPasswordFormRequest;
+use App\Http\Requests\UpdateStudentProfileFormRequest;
 use App\Models\Student;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Validation\Rule;
-use Illuminate\Validation\Rules\Password;
 use Illuminate\View\View;
 
 class AccountController extends Controller
@@ -24,15 +24,12 @@ class AccountController extends Controller
      * Met à jour le nom et l'e-mail. Un changement d'e-mail repasse le compte en
      * « non vérifié » et renvoie un lien de confirmation.
      */
-    public function updateProfile(Request $request): RedirectResponse
+    public function updateProfile(UpdateStudentProfileFormRequest $request): RedirectResponse
     {
         /** @var Student $student */
         $student = $request->user('student');
 
-        $validated = $request->validate([
-            'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'string', 'lowercase', 'email', 'max:255', Rule::unique('students', 'email')->ignore($student->id)],
-        ]);
+        $validated = $request->validated();
 
         $emailChanged = $validated['email'] !== $student->email;
 
@@ -56,15 +53,12 @@ class AccountController extends Controller
     /**
      * Change le mot de passe après vérification du mot de passe actuel.
      */
-    public function updatePassword(Request $request): RedirectResponse
+    public function updatePassword(UpdateStudentPasswordFormRequest $request): RedirectResponse
     {
         /** @var Student $student */
         $student = $request->user('student');
 
-        $validated = $request->validate([
-            'current_password' => ['required', 'current_password:student'],
-            'password' => ['required', 'confirmed', Password::defaults()],
-        ]);
+        $validated = $request->validated();
 
         $student->update([
             'password' => Hash::make($validated['password']),

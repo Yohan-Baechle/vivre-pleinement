@@ -3,12 +3,12 @@
 namespace App\Http\Controllers\Student\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\RegisterStudentFormRequest;
 use App\Models\Student;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Validation\Rules\Password;
 use Illuminate\View\View;
 
 class RegisteredStudentController extends Controller
@@ -20,15 +20,9 @@ class RegisteredStudentController extends Controller
         ]);
     }
 
-    public function store(Request $request): RedirectResponse
+    public function store(RegisterStudentFormRequest $request): RedirectResponse
     {
-        $validated = $request->validate([
-            'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:students,email'],
-            'password' => ['required', 'confirmed', Password::defaults()],
-        ]);
-
-        $student = Student::create($validated);
+        $student = Student::create($request->validated());
 
         event(new Registered($student));
 

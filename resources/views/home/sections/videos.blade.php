@@ -1,12 +1,3 @@
-@php
-    $videos = \App\Models\Video::query()
-        ->published()
-        ->with('categories')
-        ->orderByDesc('published_at')
-        ->limit(3)
-        ->get();
-@endphp
-
 @if ($videos->isNotEmpty())
     <x-section
         id="videos"

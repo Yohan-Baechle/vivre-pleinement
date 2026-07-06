@@ -3,10 +3,10 @@
 use App\Models\Category;
 use App\Models\Course;
 use App\Models\Tag;
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
 use Illuminate\Support\Facades\Cache;
 
-uses(RefreshDatabase::class);
+uses(LazilyRefreshDatabase::class);
 
 it('flushes the sitemap cache when a category changes', function () {
     Cache::put('sitemap.urls', ['cached'], now()->addHour());

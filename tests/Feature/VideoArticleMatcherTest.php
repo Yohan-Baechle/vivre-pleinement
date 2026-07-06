@@ -4,9 +4,9 @@ use App\Models\Category;
 use App\Models\Post;
 use App\Models\Video;
 use App\Support\VideoArticleMatcher;
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
 
-uses(RefreshDatabase::class);
+uses(LazilyRefreshDatabase::class);
 
 function categorizedVideo(Category $c, array $attrs = []): Video
 {

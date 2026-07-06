@@ -9,6 +9,7 @@ use App\Services\CoursePaymentService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
+use Stripe\Exception\ApiErrorException;
 
 class CourseCheckoutController extends Controller
 {
@@ -49,7 +50,13 @@ class CourseCheckoutController extends Controller
             ->where('course_id', $course->id)
             ->firstOrFail();
 
-        $intent = $payments->getOrCreatePaymentIntent($enrollment);
+        try {
+            $intent = $payments->getOrCreatePaymentIntent($enrollment);
+        } catch (ApiErrorException $e) {
+            report($e);
+
+            abort(503, 'Le paiement est momentanément indisponible. Merci de réessayer dans quelques instants.');
+        }
 
         return view('courses.pay', [
             'course' => $course,

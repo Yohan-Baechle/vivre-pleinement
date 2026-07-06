@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\NewsletterFormRequest;
-use App\Support\BrevoNewsletter;
+use App\Jobs\SubscribeToNewsletterJob;
 use App\Support\SubmissionThrottle;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
@@ -12,7 +12,7 @@ use RuntimeException;
 
 class NewsletterController extends Controller
 {
-    public function store(NewsletterFormRequest $request, BrevoNewsletter $newsletter): RedirectResponse|JsonResponse
+    public function store(NewsletterFormRequest $request): RedirectResponse|JsonResponse
     {
         $key = 'newsletter:'.$request->ip();
         if (SubmissionThrottle::exceeded($key)) {
@@ -25,11 +25,11 @@ class NewsletterController extends Controller
         $data = $request->validated();
 
         try {
-            $newsletter->subscribeToVideoList(
+            dispatch(new SubscribeToNewsletterJob(
                 email: $data['email'],
                 firstName: $data['first_name'],
                 redirectionUrl: route('newsletter.confirmed'),
-            );
+            ));
         } catch (RuntimeException $e) {
             Log::warning('Échec inscription newsletter Brevo.', ['message' => $e->getMessage()]);
 

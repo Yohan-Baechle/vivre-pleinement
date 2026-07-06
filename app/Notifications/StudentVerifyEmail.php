@@ -3,13 +3,17 @@
 namespace App\Notifications;
 
 use Illuminate\Auth\Notifications\VerifyEmail;
+use Illuminate\Bus\Queueable;
+use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\URL;
 
-class StudentVerifyEmail extends VerifyEmail
+class StudentVerifyEmail extends VerifyEmail implements ShouldQueue
 {
+    use Queueable;
+
     /**
      * Construit l'URL signée de vérification pointant vers l'espace élève.
      */

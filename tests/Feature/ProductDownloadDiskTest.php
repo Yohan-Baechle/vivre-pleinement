@@ -1,11 +1,11 @@
 <?php
 
 use App\Models\Product;
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
 
-uses(RefreshDatabase::class);
+uses(LazilyRefreshDatabase::class);
 
 it('stocke le fichier vendu sur le disque privé', function () {
     Storage::fake('local');

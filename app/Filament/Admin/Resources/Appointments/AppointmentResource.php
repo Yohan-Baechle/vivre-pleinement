@@ -14,6 +14,7 @@ use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
+use Illuminate\Support\Facades\Cache;
 use UnitEnum;
 
 class AppointmentResource extends Resource
@@ -41,7 +42,11 @@ class AppointmentResource extends Resource
 
     public static function getNavigationBadge(): ?string
     {
-        $pending = static::getModel()::query()->where('status', AppointmentStatus::Pending)->count();
+        $pending = Cache::remember(
+            'filament.badge.appointments.pending',
+            now()->addMinute(),
+            fn () => static::getModel()::query()->where('status', AppointmentStatus::Pending)->count(),
+        );
 
         return $pending > 0 ? (string) $pending : null;
     }

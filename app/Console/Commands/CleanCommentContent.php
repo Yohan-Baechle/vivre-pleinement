@@ -18,7 +18,7 @@ class CleanCommentContent extends Command
         $changed = 0;
 
         foreach (Comment::query()->cursor() as $comment) {
-            $clean = CommentSanitizer::clean($comment->content);
+            $clean = self::clean($comment->content);
 
             if ($clean === $comment->content) {
                 continue;
@@ -39,5 +39,10 @@ class CleanCommentContent extends Command
         $this->info("{$changed} commentaire(s) {$verb}.");
 
         return self::SUCCESS;
+    }
+
+    public static function clean(string $content): string
+    {
+        return CommentSanitizer::clean($content);
     }
 }

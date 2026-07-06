@@ -9,10 +9,10 @@ use App\Models\Appointment;
 use App\Models\AppointmentService;
 use App\Support\Settings;
 use Carbon\CarbonImmutable;
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
 use Illuminate\Support\Facades\Mail;
 
-uses(RefreshDatabase::class);
+uses(LazilyRefreshDatabase::class);
 
 beforeEach(function () {
     Settings::flush();
@@ -90,6 +90,19 @@ it('sends a follow-up and marks completed after the appointment', function () {
         ->and($appointment->fresh()->followed_up_at)->not->toBeNull();
 });
 
+it('follow-up run is idempotent — a second run sends nothing new', function () {
+    Mail::fake();
+    $past = CarbonImmutable::now()->subHours(2);
+    appointmentAt($past->subMinutes(30), ['starts_at' => $past->subMinutes(30), 'ends_at' => $past]);
+
+    $this->artisan('appointments:send-reminders');
+    Mail::assertQueued(AppointmentFollowUp::class, 1);
+
+    $this->artisan('appointments:send-reminders');
+    // Toujours 1 au total : le 2e run n'envoie rien.
+    Mail::assertQueued(AppointmentFollowUp::class, 1);
+});
+
 it('does not remind appointments outside the window', function () {
     Mail::fake();
     appointmentAt(CarbonImmutable::now()->addDays(5));
@@ -112,6 +125,22 @@ it('cancels a stale unpaid checkout and emails the client', function () {
     expect($appointment->fresh()->status)->toBe(AppointmentStatus::Cancelled)
         ->and($appointment->fresh()->cancelled_at)->not->toBeNull();
     Mail::assertQueued(AppointmentCheckoutExpired::class);
+});
+
+it('stale checkout sweep is idempotent — a second run sends nothing new', function () {
+    Mail::fake();
+    appointmentAt(CarbonImmutable::now()->addDays(3), [
+        'status' => AppointmentStatus::Pending,
+        'payment_status' => PaymentStatus::Unpaid,
+        'created_at' => CarbonImmutable::now()->subMinutes(31),
+    ]);
+
+    $this->artisan('appointments:send-reminders');
+    Mail::assertQueued(AppointmentCheckoutExpired::class, 1);
+
+    $this->artisan('appointments:send-reminders');
+    // Toujours 1 au total : le 2e run n'envoie rien.
+    Mail::assertQueued(AppointmentCheckoutExpired::class, 1);
 });
 
 it('leaves a recent unpaid checkout alone', function () {

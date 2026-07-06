@@ -3,7 +3,7 @@
 @section('title', 'Vérifiez votre adresse e-mail · Espace formation')
 
 @section('student')
-    <div class="site-container">
+    <div class="site-container flex flex-1 flex-col justify-center">
         <div class="mx-auto max-w-md">
             <div class="ring-ink/5 rounded-4xl bg-white p-6 shadow-sm ring-1 sm:p-10">
                 <h1 class="text-ink font-serif text-3xl font-medium tracking-tight">Confirmez votre e-mail</h1>

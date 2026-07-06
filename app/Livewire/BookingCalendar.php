@@ -115,17 +115,36 @@ class BookingCalendar extends Component
     #[Computed]
     public function slots(): array
     {
-        if ($this->selectedDate === null) {
+        if ($this->selectedDateStart === null) {
             return [];
         }
 
         return $this->slotService()
-            ->slotsForDate($this->service, CarbonImmutable::parse($this->selectedDate))
+            ->slotsForDate($this->service, $this->selectedDateStart)
             ->map(fn (array $slot) => [
                 'value' => $slot['start']->toIso8601String(),
                 'label' => $slot['label'],
             ])
             ->all();
+    }
+
+    /**
+     * Parse défensivement la date sélectionnée : une propriété publique
+     * Livewire reste modifiable côté client, donc une valeur qui n'est pas
+     * une date ne doit jamais faire planter le rendu.
+     */
+    #[Computed]
+    public function selectedDateStart(): ?CarbonImmutable
+    {
+        if (! $this->selectedDate) {
+            return null;
+        }
+
+        try {
+            return CarbonImmutable::parse($this->selectedDate);
+        } catch (\Throwable) {
+            return null;
+        }
     }
 
     public function previousMonth(): void
@@ -169,7 +188,7 @@ class BookingCalendar extends Component
             'channel' => ['required', Rule::enum(AppointmentChannel::class)],
             'notes' => ['nullable', 'string', 'max:2000'],
             'consent' => ['accepted'],
-            'selectedSlot' => ['required', 'string'],
+            'selectedSlot' => ['required', 'string', 'date'],
             'website' => ['prohibited'],
         ], [
             'firstName.required' => 'Votre prénom est requis.',
@@ -178,6 +197,7 @@ class BookingCalendar extends Component
             'channel.required' => 'Veuillez choisir le format du rendez-vous.',
             'consent.accepted' => 'Vous devez accepter le traitement de vos données.',
             'selectedSlot.required' => 'Veuillez choisir un créneau.',
+            'selectedSlot.date' => 'Ce créneau n\'est plus valide. Merci d\'en choisir un autre.',
             'website.prohibited' => 'Erreur de soumission.',
         ]);
 
@@ -224,8 +244,9 @@ class BookingCalendar extends Component
 
     private function reschedule(): mixed
     {
-        $this->validate(['selectedSlot' => ['required', 'string']], [
+        $this->validate(['selectedSlot' => ['required', 'string', 'date']], [
             'selectedSlot.required' => 'Veuillez choisir un nouveau créneau.',
+            'selectedSlot.date' => 'Ce créneau n\'est plus valide. Merci d\'en choisir un autre.',
         ]);
 
         $appointment = Appointment::query()->where('token', $this->rescheduleToken)->firstOrFail();
@@ -273,9 +294,9 @@ class BookingCalendar extends Component
             return null;
         }
 
-        $start = CarbonImmutable::parse($this->selectedSlot);
+        $start = $this->selectedSlotStart;
 
-        if (! $this->slotService()->isSlotBookable($this->service, $start)) {
+        if ($start === null || ! $this->slotService()->isSlotBookable($this->service, $start)) {
             $this->selectedSlot = null;
             $this->addError('selectedSlot', 'Ce créneau vient d\'être réservé. Merci d\'en choisir un autre.');
 
@@ -296,6 +317,25 @@ class BookingCalendar extends Component
     private function slotService(): AppointmentSlotService
     {
         return app(AppointmentSlotService::class);
+    }
+
+    /**
+     * Parse défensivement le créneau sélectionné : une propriété publique
+     * Livewire reste modifiable côté client (wire:model / $set), donc une
+     * valeur qui n'est pas une date ne doit jamais faire planter le rendu.
+     */
+    #[Computed]
+    public function selectedSlotStart(): ?CarbonImmutable
+    {
+        if (! $this->selectedSlot) {
+            return null;
+        }
+
+        try {
+            return CarbonImmutable::parse($this->selectedSlot);
+        } catch (\Throwable) {
+            return null;
+        }
     }
 
     public function render(): View

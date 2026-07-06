@@ -34,11 +34,30 @@ use Illuminate\Support\Str;
     'reminded_24h_at',
     'reminded_1h_at',
     'followed_up_at',
+    'stripe_payment_intent_id',
 ])]
 class Appointment extends Model
 {
     /** @use HasFactory<AppointmentFactory> */
     use HasFactory;
+
+    /**
+     * @var array<string, mixed>
+     */
+    protected $attributes = [
+        'status' => 'confirmed',
+        'price_cents' => 0,
+        'payment_status' => 'unpaid',
+        'channel' => 'video',
+    ];
+
+    protected static function booted(): void
+    {
+        static::creating(function (Appointment $appointment): void {
+            $appointment->reference ??= self::generateReference();
+            $appointment->token ??= self::generateToken();
+        });
+    }
 
     protected function casts(): array
     {

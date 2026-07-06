@@ -13,6 +13,8 @@ class VideoStatsOverview extends StatsOverviewWidget
 {
     protected ?string $heading = 'État des vidéos';
 
+    protected ?string $pollingInterval = null;
+
     protected function getStats(): array
     {
         $base = Video::query()->published();

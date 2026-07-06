@@ -76,7 +76,7 @@ class LessonPlayer extends Component
 
     public function nextLesson(): ?Lesson
     {
-        $lessons = $this->lessons();
+        $lessons = $this->lessons;
         $index = $lessons->search(fn (Lesson $lesson) => $lesson->id === $this->lesson->id);
 
         return $index === false ? null : $lessons->get($index + 1);
@@ -84,7 +84,7 @@ class LessonPlayer extends Component
 
     public function previousLesson(): ?Lesson
     {
-        $lessons = $this->lessons();
+        $lessons = $this->lessons;
         $index = $lessons->search(fn (Lesson $lesson) => $lesson->id === $this->lesson->id);
 
         return $index === false || $index === 0 ? null : $lessons->get($index - 1);
