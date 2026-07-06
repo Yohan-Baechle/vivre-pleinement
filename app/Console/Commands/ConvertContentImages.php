@@ -6,13 +6,14 @@ use App\Models\Post;
 use Illuminate\Console\Attributes\Description;
 use Illuminate\Console\Attributes\Signature;
 use Illuminate\Console\Command;
+use Illuminate\Contracts\Filesystem\Filesystem;
 use Illuminate\Support\Facades\Storage;
 
 #[Signature('posts:convert-content-images {--dry-run : Affiche les changements sans convertir ni enregistrer}')]
-#[Description('Convertit les images legacy du contenu des articles en WebP (max 1600 px) et remplace fetchpriority="high" par loading="lazy".')]
+#[Description('Convertit les images legacy du contenu des articles en WebP (max 1200 px), aligne les attributs width/height et remplace fetchpriority="high" par loading="lazy".')]
 class ConvertContentImages extends Command
 {
-    private const MAX_WIDTH = 1600;
+    private const MAX_WIDTH = 1200;
 
     private const WEBP_QUALITY = 80;
 
@@ -91,7 +92,7 @@ class ConvertContentImages extends Command
                         $tag = preg_replace('/^<img/i', '<img loading="lazy"', $tag);
                     }
 
-                    return $tag;
+                    return $this->syncDimensionAttributes($tag, $disk);
                 },
                 $post->content,
             );
@@ -113,6 +114,27 @@ class ConvertContentImages extends Command
         }
 
         return $rewritten;
+    }
+
+    /**
+     * Aligne les attributs width/height hérités de WordPress (ex. 2880×1920)
+     * sur les dimensions réelles du fichier WebP servi.
+     */
+    private function syncDimensionAttributes(string $tag, Filesystem $disk): string
+    {
+        if (! preg_match('/src="\/storage\/(blog-images\/[^"]+\.webp)"/i', $tag, $match) || ! $disk->exists($match[1])) {
+            return $tag;
+        }
+
+        $size = @getimagesize($disk->path($match[1]));
+
+        if ($size === false) {
+            return $tag;
+        }
+
+        $tag = preg_replace('/width="\d+"/i', 'width="'.$size[0].'"', $tag);
+
+        return preg_replace('/height="\d+"/i', 'height="'.$size[1].'"', $tag);
     }
 
     private function createWebp(string $source, string $destination): bool
