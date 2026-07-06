@@ -53,3 +53,24 @@ it('leaves unrelated paragraphs untouched', function () {
     $in = '<p>J\'aime mon travail au quotidien.</p>';
     expect(CleanPostContent::clean($in))->toBe($in);
 });
+
+it('removes the migrated variants with broken emojis', function () {
+    expect(CleanPostContent::clean("<p>Fin.</p>\n<p>(si mon travail vous aide ????)</p>"))
+        ->toBe('<p>Fin.</p>');
+
+    expect(CleanPostContent::clean("<p>Fin.</p>\n<p>(Si vous souhaitez soutenir mon travail ????)</p>"))
+        ->toBe('<p>Fin.</p>');
+
+    expect(CleanPostContent::clean("<p>Fin.</p>\n<p>Si vous appréciez mon travail ????</p>"))
+        ->toBe('<p>Fin.</p>');
+});
+
+it('removes paragraphs mentioning Tipeee', function () {
+    $in = "<p>Fin.</p>\n<p>Si mon travail vous aide à vous sentir mieux, vous pouvez me faire un petit donc sur Tipeee : </p>";
+    expect(CleanPostContent::clean($in))->toBe('<p>Fin.</p>');
+});
+
+it('strips divi block comments and resulting empty paragraphs', function () {
+    $in = '<p><!-- divi:paragraph -->Texte utile.</p><p><!-- /divi:buttons --></p><p> </p>';
+    expect(CleanPostContent::clean($in))->toBe('<p>Texte utile.</p>');
+});
