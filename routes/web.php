@@ -166,10 +166,24 @@ Route::prefix('espace-formation')->name('student.')->middleware('auth:student')-
     });
 });
 
-Route::get('/livre', [BookController::class, 'show'])->name('book.show');
-Route::get('/livre/commande/{offer}', [BookController::class, 'checkout'])
-    ->name('book.checkout')
-    ->where('offer', 'livre|livre-coaching');
+/*
+ * Le tunnel d'achat du livre s'appuie sur le token de la commande, jamais sur
+ * son identifiant : ces URL sont publiques et donnent accès au fichier vendu
+ * comme aux coordonnées de l'acheteur.
+ */
+Route::controller(BookController::class)->group(function () {
+    Route::get('/livre', 'show')->name('book.show');
+    Route::get('/livre/commande/{offer}', 'checkout')
+        ->name('book.checkout')
+        ->where('offer', 'livre|livre-coaching');
+    Route::post('/livre/commande/{offer}', 'start')
+        ->name('book.start')
+        ->where('offer', 'livre|livre-coaching');
+    Route::get('/livre/paiement/{order:token}', 'pay')->name('book.pay');
+    Route::get('/livre/merci/{order:token}', 'success')->name('book.success');
+    Route::get('/livre/telecharger/{order:token}', 'download')->name('book.download');
+    Route::get('/livre/coaching/{order:token}', 'coaching')->name('book.coaching');
+});
 
 Route::prefix('videos')->name('videos.')->controller(VideoController::class)->group(function () {
     Route::get('/', 'index')->name('index');
