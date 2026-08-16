@@ -2,7 +2,6 @@
 
 namespace App\Filament\Admin\Resources\Courses;
 
-use App\Enums\CourseStatus;
 use App\Filament\Admin\Resources\Courses\Pages\CreateCourse;
 use App\Filament\Admin\Resources\Courses\Pages\EditCourse;
 use App\Filament\Admin\Resources\Courses\Pages\ListCourses;
@@ -17,7 +16,6 @@ use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
-use Illuminate\Support\Facades\Cache;
 use UnitEnum;
 
 class CourseResource extends Resource
@@ -32,27 +30,11 @@ class CourseResource extends Resource
 
     protected static ?string $pluralModelLabel = 'Formations';
 
-    protected static ?int $navigationSort = 1;
+    protected static ?int $navigationSort = 10;
 
-    protected static string|UnitEnum|null $navigationGroup = 'Formations';
+    protected static string|UnitEnum|null $navigationGroup = 'Boutique';
 
     protected static ?string $recordTitleAttribute = 'title';
-
-    public static function getNavigationBadge(): ?string
-    {
-        $drafts = Cache::remember(
-            'filament.badge.courses.draft',
-            now()->addMinute(),
-            fn () => Course::query()->where('status', CourseStatus::Draft)->count(),
-        );
-
-        return $drafts > 0 ? (string) $drafts : null;
-    }
-
-    public static function getNavigationBadgeColor(): ?string
-    {
-        return 'gray';
-    }
 
     public static function getGloballySearchableAttributes(): array
     {

@@ -191,6 +191,53 @@ class AppointmentSlotService
     }
 
     /**
+     * Indique si une plage horaire tombe dans les horaires d'ouverture de la
+     * prestation et hors de toute fermeture exceptionnelle. Ne dit rien des
+     * rendez-vous déjà posés : sert à avertir l'admin qui saisit un
+     * rendez-vous hors créneaux, pas à l'en empêcher.
+     */
+    public function isWithinOpeningHours(
+        AppointmentService $service,
+        CarbonImmutable $start,
+        CarbonImmutable $end,
+    ): bool {
+        $date = $start->startOfDay();
+
+        $overrides = DateOverride::query()
+            ->whereDate('date', $date->toDateString())
+            ->get();
+
+        foreach ($overrides as $override) {
+            if ($override->isFullDay()) {
+                return false;
+            }
+
+            $blockStart = $this->applyTime($date, $override->start_time);
+            $blockEnd = $this->applyTime($date, $override->end_time);
+
+            if ($start->lessThan($blockEnd) && $end->greaterThan($blockStart)) {
+                return false;
+            }
+        }
+
+        return Availability::query()
+            ->where('is_active', true)
+            ->where('day_of_week', $start->dayOfWeek)
+            ->where(function ($query) use ($service) {
+                $query->whereNull('appointment_service_id')
+                    ->orWhere('appointment_service_id', $service->id);
+            })
+            ->get()
+            ->contains(function (Availability $availability) use ($date, $start, $end) {
+                $windowStart = $this->applyTime($date, $availability->start_time);
+                $windowEnd = $this->applyTime($date, $availability->end_time);
+
+                return $start->greaterThanOrEqualTo($windowStart)
+                    && $end->lessThanOrEqualTo($windowEnd);
+            });
+    }
+
+    /**
      * Vérifie côté serveur qu'un début de créneau précis est réellement
      * réservable.
      */

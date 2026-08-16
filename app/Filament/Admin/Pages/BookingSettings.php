@@ -26,7 +26,7 @@ class BookingSettings extends Page
 
     protected static string|UnitEnum|null $navigationGroup = 'Rendez-vous';
 
-    protected static ?int $navigationSort = 30;
+    protected static ?int $navigationSort = 50;
 
     protected string $view = 'filament.admin.pages.booking-settings';
 

@@ -28,6 +28,11 @@ class VideosTable
     public static function configure(Table $table): Table
     {
         return $table
+            ->persistFiltersInSession()
+            ->persistSortInSession()
+            ->emptyStateHeading('Aucune vidéo synchronisée')
+            ->emptyStateDescription('Lancez « Synchroniser depuis YouTube » '
+                .'pour importer les vidéos de la chaîne.')
             ->columns([
                 ImageColumn::make('thumbnail_url')
                     ->label('')
@@ -42,7 +47,7 @@ class VideosTable
                     ->sortable()
                     ->limit(60)
                     ->wrap()
-                    ->description(fn (Video $record) => 'YouTube ID : '.$record->youtube_id),
+                    ->tooltip(fn (Video $record) => 'Identifiant YouTube : '.$record->youtube_id),
 
                 TextColumn::make('status')
                     ->label('Statut')
