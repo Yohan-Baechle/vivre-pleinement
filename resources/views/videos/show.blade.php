@@ -89,7 +89,6 @@
                     @if ($category)
                         <a href="{{ route('videos.index', ['category' => $category->slug]) }}"
                            class="inline-flex items-center gap-2 rounded-full bg-white/80 px-4 py-1.5 text-xs font-medium text-teal-700 ring-1 ring-teal-200 transition hover:bg-white">
-                            <span class="size-1.5 rounded-full bg-teal-500"></span>
                             {{ $category->name }}
                         </a>
                     @endif
@@ -216,7 +215,7 @@
                         <label for="transcript-toggle"
                                class="inline-flex cursor-pointer items-center gap-2 text-sm font-medium text-teal-700 transition hover:text-teal-800">
                             Lire la transcription complète
-                            <svg class="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                            <svg class="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="m6 9 6 6 6-6"/>
                             </svg>
                         </label>
@@ -234,7 +233,7 @@
                    class="group ring-ink/5 mt-4 flex items-center gap-5 rounded-2xl bg-white p-5 ring-1 transition hover:ring-teal-200">
                     @if ($cover = $relatedPost->featuredImageUrl('thumb'))
                         <img src="{{ $cover }}" alt="" loading="lazy" width="96" height="96"
-                             class="size-20 flex-none rounded-xl object-cover sm:size-24">
+                             class="size-20 flex-none rounded-2xl object-cover sm:size-24">
                     @endif
                     <div class="min-w-0">
                         <p class="text-xs font-medium tracking-wider text-teal-700 uppercase">Article</p>

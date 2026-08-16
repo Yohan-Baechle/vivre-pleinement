@@ -11,7 +11,7 @@
     ];
 @endphp
 
-<div class="to-cream-50 pointer-events-none absolute inset-x-0 bottom-0 -z-10 h-screen bg-linear-to-b from-teal-50 via-sky-50" aria-hidden="true"></div>
+<div class="to-cream-50 pointer-events-none absolute inset-x-0 bottom-0 -z-10 h-[100dvh] bg-linear-to-b from-teal-50 via-sky-50" aria-hidden="true"></div>
 
 <div class="pointer-events-none absolute inset-x-0 bottom-0 select-none" aria-hidden="true">
     @foreach ($cloudLayers as $n => $layer)
@@ -26,7 +26,7 @@
                 alt=""
                 class="size-full"
             >
-            <div class="absolute inset-x-0 top-full h-screen w-full" style="background-color: {{ $layer['fill'] }}"></div>
+            <div class="absolute inset-x-0 top-full h-[100dvh] w-full" style="background-color: {{ $layer['fill'] }}"></div>
         </div>
     @endforeach
 </div>

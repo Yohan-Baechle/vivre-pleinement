@@ -28,7 +28,7 @@
         @foreach ($signs as $sign)
             <div class="group ring-ink/5 relative overflow-hidden rounded-3xl bg-white p-6 shadow-xs ring-1 transition hover:shadow-md sm:p-7">
                 <div class="flex size-11 items-center justify-center rounded-2xl bg-teal-50 text-teal-700 ring-1 ring-teal-100">
-                    <svg class="size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <svg class="size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                         <path d="{{ $sign['icon'] }}"/>
                     </svg>
                 </div>

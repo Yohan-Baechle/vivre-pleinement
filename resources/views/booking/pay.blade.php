@@ -33,7 +33,7 @@
                     <p class="text-ink font-serif text-xl font-medium">{{ Number::currency($appointment->price_cents / 100, in: 'EUR', locale: 'fr') }}</p>
                 </div>
                 <p class="text-ink-soft mt-1 text-sm">
-                    {{ $start->isoFormat('dddd D MMMM YYYY à H\hi') }} · {{ $appointment->service->duration_minutes }} min · en visioconférence
+                    {{ $start->isoFormat('dddd D MMMM YYYY à H\hi') }} · {{ $appointment->service->duration_minutes }} min, en visioconférence
                 </p>
             </div>
 
@@ -72,15 +72,15 @@
                 {{-- Réassurance --}}
                 <ul class="text-ink-muted mt-5 flex flex-wrap items-center justify-center gap-x-5 gap-y-2 text-xs">
                     <li class="inline-flex items-center gap-1.5">
-                        <svg class="size-3.5 text-teal-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>
+                        <svg class="size-3.5 text-teal-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>
                         Paiement sécurisé via Stripe
                     </li>
                     <li class="inline-flex items-center gap-1.5">
-                        <svg class="size-3.5 text-teal-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="m5 13 4 4L19 7"/></svg>
+                        <svg class="size-3.5 text-teal-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="m5 13 4 4L19 7"/></svg>
                         Annulation gratuite
                     </li>
                     <li class="inline-flex items-center gap-1.5">
-                        <svg class="size-3.5 text-teal-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="m5 13 4 4L19 7"/></svg>
+                        <svg class="size-3.5 text-teal-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="m5 13 4 4L19 7"/></svg>
                         Lien visio envoyé après paiement
                     </li>
                 </ul>

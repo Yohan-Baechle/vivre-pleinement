@@ -16,7 +16,7 @@
         'À propos' => [
             ['Qui suis-je', route('about')],
             ['Contact', route('contact')],
-            ['Prendre RDV', route('booking.index')],
+            ['Prendre rendez-vous', route('booking.index')],
         ],
     ];
     $socialIcons = [

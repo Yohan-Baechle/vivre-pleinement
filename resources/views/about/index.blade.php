@@ -22,7 +22,6 @@
 
             <div class="mt-6 max-w-3xl">
                 <p class="inline-flex items-center gap-2 rounded-full bg-white/80 px-4 py-1.5 text-xs font-medium text-teal-700 ring-1 ring-teal-200">
-                    <span class="size-1.5 rounded-full bg-teal-500"></span>
                     À propos
                 </p>
                 <h1 class="text-ink mt-5 font-serif text-4xl font-medium tracking-tight sm:text-5xl lg:text-6xl">

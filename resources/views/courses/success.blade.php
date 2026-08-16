@@ -16,7 +16,7 @@
         <div class="mx-auto max-w-xl px-4 text-center sm:px-6">
             @if ($hasAccess)
                 <span class="mx-auto flex size-16 items-center justify-center rounded-full bg-teal-100 text-teal-700">
-                    <svg class="size-8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>
+                    <svg class="size-8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>
                 </span>
                 <h1 class="text-ink mt-6 font-serif text-3xl font-medium tracking-tight sm:text-4xl">Merci, votre accès est ouvert !</h1>
                 <p class="text-ink-soft mt-3 text-sm">Vous pouvez commencer dès maintenant, à votre rythme.</p>

@@ -20,7 +20,6 @@
 
         <div class="lg:col-span-3">
             <p class="inline-flex items-center gap-2 rounded-full bg-teal-50 px-4 py-1.5 text-xs font-medium text-teal-700 ring-1 ring-teal-200">
-                <span class="size-1.5 rounded-full bg-teal-500"></span>
                 L'auteure
             </p>
             <h2 class="text-ink mt-5 font-serif text-3xl font-medium tracking-tight sm:text-4xl lg:text-5xl">

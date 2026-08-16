@@ -88,7 +88,7 @@
         <div class="ring-ink/5 w-full rounded-3xl bg-white p-6 shadow-xl ring-1 sm:p-8">
             <div class="flex items-start gap-4">
                 <span class="flex size-11 shrink-0 items-center justify-center rounded-full bg-rose-100 text-rose-700">
-                    <svg class="size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg>
+                    <svg class="size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg>
                 </span>
                 <div>
                     <h2 class="text-ink font-serif text-xl font-medium">Supprimer définitivement votre compte&nbsp;?</h2>

@@ -1,7 +1,7 @@
 @if ($videos->isNotEmpty())
     <x-section
         id="videos"
-        eyebrow="Sur YouTube"
+       
         title="Apprendre en vidéo."
         lead="Conseils et exercices courts pour avancer entre les séances."
         bg="bg-cream-50"

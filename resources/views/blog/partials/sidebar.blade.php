@@ -13,7 +13,7 @@
         <li>
             <a href="{{ BlogFilters::url('blog.index', $filters, ['category' => null]) }}"
                @class([
-                   'flex items-center justify-between rounded-xl px-3 py-2 text-sm transition',
+                   'flex items-center justify-between rounded-2xl px-3 py-2 text-sm transition',
                    'bg-teal-700 text-white shadow shadow-teal-700/20' => ! $activeCategory,
                    'text-ink-soft hover:bg-white hover:text-teal-700' => $activeCategory,
                ])>
@@ -25,7 +25,7 @@
             <li>
                 <a href="{{ BlogFilters::url('blog.index', $filters, ['category' => $category->slug]) }}"
                    @class([
-                       'flex items-center justify-between rounded-xl px-3 py-2 text-sm transition',
+                       'flex items-center justify-between rounded-2xl px-3 py-2 text-sm transition',
                        'bg-teal-700 text-white shadow shadow-teal-700/20' => $isActive,
                        'text-ink-soft hover:bg-white hover:text-teal-700' => ! $isActive,
                    ])>

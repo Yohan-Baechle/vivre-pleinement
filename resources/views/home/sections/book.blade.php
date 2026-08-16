@@ -1,3 +1,14 @@
+@php
+    /**
+     * Le prix vient du catalogue partagé avec la page du livre. Il n'est
+     * affiché que si l'offre est réellement achetable : annoncer un montant
+     * pour un produit indisponible enverrait le visiteur sur une impasse.
+     */
+    $bookPriceLabel = ($bookOffer?->isDeliverable() ?? false)
+        ? ' · '.rtrim(rtrim(number_format($bookOffer->price, 2, ',', "\u{202f}"), '0'), ',').' €'
+        : '';
+@endphp
+
 <section class="relative overflow-hidden bg-white py-20 sm:py-24 lg:py-32">
     <div class="site-container">
         <div class="group relative overflow-hidden rounded-4xl bg-linear-to-br from-teal-700 to-teal-800 shadow-2xl shadow-teal-700/20">
@@ -38,8 +49,7 @@
 
                 <div class="text-center lg:col-span-3 lg:text-left">
                     <p class="inline-flex items-center gap-2 rounded-full bg-white/15 px-4 py-1.5 text-xs font-medium text-white ring-1 ring-white/20 backdrop-blur-sm">
-                        <span class="bg-rose-soft size-1.5 rounded-full"></span>
-                        Le livre · 77 pages · PDF
+                        Le livre, 77 pages en PDF
                     </p>
                     <h2 class="mt-5 font-serif text-3xl leading-tight font-medium tracking-tight text-white sm:text-4xl lg:text-5xl">
                         Pensées intrusives, TOC, phobie d'impulsion&nbsp;?
@@ -50,10 +60,10 @@
 
                     <div class="mt-8 flex flex-wrap items-center justify-center gap-3 sm:gap-4 lg:justify-start">
                         <a href="{{ route('book.show') }}" class="group hover:bg-cream-50 inline-flex items-center gap-2 rounded-full bg-white px-7 py-3.5 text-sm font-medium text-teal-800 shadow-lg transition sm:text-base">
-                            Découvrir le livre · 37&nbsp;€
+                            Découvrir le livre{{ $bookPriceLabel }}
                         </a>
                         <span class="inline-flex items-center gap-1.5 text-xs text-teal-100 sm:text-sm">
-                            <svg class="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 12 2 2 4-4"/><path d="M21 12c0 4.97-4.03 9-9 9s-9-4.03-9-9 4.03-9 9-9 9 4.03 9 9z"/></svg>
+                            <svg class="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 12 2 2 4-4"/><path d="M21 12c0 4.97-4.03 9-9 9s-9-4.03-9-9 4.03-9 9-9 9 4.03 9 9z"/></svg>
                             Garantie 30 jours satisfait ou remboursé
                         </span>
                     </div>

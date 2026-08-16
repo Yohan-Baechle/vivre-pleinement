@@ -77,7 +77,7 @@
                                 {{ Str::upper(Str::substr($studentUser->name, 0, 1)) }}
                             </span>
                             <span class="max-w-[8rem] truncate">{{ Str::before($studentUser->name, ' ') ?: 'Mon espace' }}</span>
-                            <svg class="size-4 transition group-open/user:rotate-180" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
+                            <svg class="size-4 transition group-open/user:rotate-180" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
                         </summary>
 
                         <div class="ring-ink/5 absolute right-0 z-50 mt-2 w-60 overflow-hidden rounded-2xl bg-white p-2 shadow-lg ring-1">
@@ -87,7 +87,7 @@
                             </div>
                             <div class="border-ink/5 my-1 border-t"></div>
                             <a href="{{ route('student.dashboard') }}" @class([
-                                'flex items-center gap-2.5 rounded-xl px-3 py-2.5 text-sm font-medium transition hover:bg-teal-50 hover:text-teal-700',
+                                'flex items-center gap-2.5 rounded-2xl px-3 py-2.5 text-sm font-medium transition hover:bg-teal-50 hover:text-teal-700',
                                 'text-teal-700' => request()->routeIs('student.dashboard') || request()->routeIs('student.course') || request()->routeIs('student.lesson'),
                                 'text-ink-soft' => ! (request()->routeIs('student.dashboard') || request()->routeIs('student.course') || request()->routeIs('student.lesson')),
                             ])>
@@ -95,7 +95,7 @@
                                 Mes formations
                             </a>
                             <a href="{{ route('student.account.edit') }}" @class([
-                                'flex items-center gap-2.5 rounded-xl px-3 py-2.5 text-sm font-medium transition hover:bg-teal-50 hover:text-teal-700',
+                                'flex items-center gap-2.5 rounded-2xl px-3 py-2.5 text-sm font-medium transition hover:bg-teal-50 hover:text-teal-700',
                                 'text-teal-700' => request()->routeIs('student.account.*') || request()->routeIs('student.verification.*'),
                                 'text-ink-soft' => ! (request()->routeIs('student.account.*') || request()->routeIs('student.verification.*')),
                             ])>
@@ -105,7 +105,7 @@
                             <div class="border-ink/5 my-1 border-t"></div>
                             <form method="POST" action="{{ route('student.logout') }}">
                                 @csrf
-                                <button type="submit" class="text-ink-soft flex w-full items-center gap-2.5 rounded-xl px-3 py-2.5 text-left text-sm font-medium transition hover:bg-rose-50 hover:text-rose-700">
+                                <button type="submit" class="text-ink-soft flex w-full items-center gap-2.5 rounded-2xl px-3 py-2.5 text-left text-sm font-medium transition hover:bg-rose-50 hover:text-rose-700">
                                     <svg class="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="m16 17 5-5-5-5"/><path d="M21 12H9"/></svg>
                                     Se déconnecter
                                 </button>
@@ -115,7 +115,7 @@
                 @else
                     <a href="{{ route('student.login') }}" class="text-ink-soft hidden items-center gap-2 rounded-full py-1.5 pr-4 pl-1.5 text-xs font-medium transition hover:bg-teal-50 hover:text-teal-700 md:inline-flex sm:text-sm">
                         <span class="flex size-6 items-center justify-center rounded-full bg-teal-100 text-teal-800">
-                            <svg class="size-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 10v6M2 10l10-5 10 5-10 5-10-5Z"/><path d="M6 12v5c0 1.5 2.5 3 6 3s6-1.5 6-3v-5"/></svg>
+                            <svg class="size-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 10v6M2 10l10-5 10 5-10 5-10-5Z"/><path d="M6 12v5c0 1.5 2.5 3 6 3s6-1.5 6-3v-5"/></svg>
                         </span>
                         Se connecter
                     </a>
@@ -125,15 +125,15 @@
                     'inline-flex items-center gap-2 rounded-full bg-teal-700 px-4 py-2 text-xs font-medium text-white shadow transition hover:bg-teal-800 sm:px-5 sm:text-sm',
                     'bg-teal-800' => request()->routeIs('booking.*'),
                 ])>
-                    Prendre RDV
+                    Prendre rendez-vous
                     <span aria-hidden="true">→</span>
                 </a>
 
                 <span class="text-ink hover:bg-ink/5 flex size-9 cursor-pointer items-center justify-center rounded-full transition md:hidden" role="button" aria-label="Ouvrir le menu">
-                    <svg class="size-5 group-open:hidden" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+                    <svg class="size-5 group-open:hidden" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true">
                         <path d="M4 7h16M4 12h16M4 17h16"/>
                     </svg>
-                    <svg class="hidden size-5 group-open:block" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+                    <svg class="hidden size-5 group-open:block" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true">
                         <path d="M6 6l12 12M18 6 6 18"/>
                     </svg>
                 </span>
@@ -185,7 +185,7 @@
                 @else
                     <a href="{{ route('student.login') }}" class="flex items-center gap-2.5 rounded-2xl px-4 py-3 transition hover:bg-teal-50 hover:text-teal-700">
                         <span class="flex size-7 items-center justify-center rounded-full bg-teal-100 text-teal-800">
-                            <svg class="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 10v6M2 10l10-5 10 5-10 5-10-5Z"/><path d="M6 12v5c0 1.5 2.5 3 6 3s6-1.5 6-3v-5"/></svg>
+                            <svg class="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 10v6M2 10l10-5 10 5-10 5-10-5Z"/><path d="M6 12v5c0 1.5 2.5 3 6 3s6-1.5 6-3v-5"/></svg>
                         </span>
                         Se connecter
                     </a>
