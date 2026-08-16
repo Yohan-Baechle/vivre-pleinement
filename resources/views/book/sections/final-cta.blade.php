@@ -11,7 +11,6 @@
 
     <div class="relative mx-auto max-w-3xl px-4 text-center sm:px-6 lg:px-10">
         <p class="inline-flex items-center gap-2 rounded-full bg-white/80 px-4 py-1.5 text-xs font-medium text-teal-700 ring-1 ring-teal-200">
-            <span class="size-1.5 rounded-full bg-teal-500"></span>
             Dernière chose
         </p>
 
@@ -46,7 +45,7 @@
         </div>
 
         <p class="text-ink-muted mt-8 text-xs sm:text-sm">
-            Téléchargement immédiat · Paiement sécurisé · Garantie 30 jours
+            Téléchargement immédiat, paiement sécurisé, garantie 30 jours
         </p>
     </div>
 </section>

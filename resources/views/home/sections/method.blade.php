@@ -20,7 +20,7 @@
 
 <x-section
     id="methode"
-    eyebrow="Comment ça se passe"
+   
     title="Un chemin clair, en trois étapes."
     lead="Pas de surprise, pas de pression. Vous savez à quoi vous attendre dès le premier rendez-vous."
 >

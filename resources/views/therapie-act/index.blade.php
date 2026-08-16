@@ -38,7 +38,7 @@
     ];
 
     $processes = [
-        ['title' => "L'acceptation", 'text' => "Faire de la place aux émotions et sensations désagréables au lieu de les fuir ou de les combattre — car c'est la lutte qui entretient l'anxiété."],
+        ['title' => "L'acceptation", 'text' => "Faire de la place aux émotions et sensations désagréables au lieu de les fuir ou de les combattre, car c'est la lutte qui entretient l'anxiété."],
         ['title' => 'La défusion cognitive', 'text' => "Prendre de la distance avec vos pensées (« j'ai la pensée que… ») pour qu'elles cessent de dicter vos actions."],
         ['title' => "Le contact avec l'instant présent", 'text' => 'Revenir à ce qui se passe ici et maintenant, plutôt que de ruminer le passé ou d\'anticiper le pire.'],
         ['title' => 'Le soi-observateur', 'text' => "Découvrir que vous n'êtes pas vos pensées : vous êtes celui ou celle qui les observe."],
@@ -69,14 +69,13 @@
 
             <div class="mt-6 max-w-3xl">
                 <p class="inline-flex items-center gap-2 rounded-full bg-white/80 px-4 py-1.5 text-xs font-medium text-teal-700 ring-1 ring-teal-200">
-                    <span class="size-1.5 rounded-full bg-teal-500"></span>
                     Comprendre l'approche
                 </p>
                 <h1 class="text-ink mt-5 font-serif text-4xl font-medium tracking-tight sm:text-5xl">
                     La thérapie ACT, expliquée simplement
                 </h1>
                 <p class="text-ink-soft mt-5 max-w-2xl text-base sm:text-lg">
-                    Définition, principes, efficacité et déroulement d'une séance — par une praticienne
+                    Définition, principes, efficacité et déroulement d'une séance, par une praticienne
                     qui a d'abord utilisé l'ACT pour se libérer de ses propres troubles anxieux.
                 </p>
             </div>
@@ -85,7 +84,7 @@
 
     <main id="main">
 
-    <x-section bg="bg-cream-50" eyebrow="Définition" title="Qu'est-ce que la thérapie ACT ?" headerWidth="max-w-3xl">
+    <x-section bg="bg-cream-50" title="Qu'est-ce que la thérapie ACT ?" headerWidth="max-w-3xl">
         <div class="text-ink-soft mx-auto max-w-2xl space-y-6 text-base leading-relaxed sm:text-lg">
             <p>
                 La <strong class="text-ink">thérapie d'acceptation et d'engagement</strong> (ACT, prononcée
@@ -94,7 +93,7 @@
                 désagréables, l'ACT apprend à <strong class="text-ink">changer votre relation avec elles</strong> :
                 les accueillir sans lutter, prendre de la distance avec le mental, puis engager votre énergie
                 dans des actions alignées avec vos valeurs. Développée par le psychologue Steven C. Hayes dans
-                les années 1980, elle vise la <strong class="text-ink">flexibilité psychologique</strong> — la
+                les années 1980, elle vise la <strong class="text-ink">flexibilité psychologique</strong> : la
                 capacité à agir selon ce qui compte pour vous, même en présence d'anxiété. C'est cette
                 flexibilité, et non l'absence d'émotions difficiles, qui permet de retrouver une vie riche et
                 pleine de sens.
@@ -107,7 +106,7 @@
         </div>
     </x-section>
 
-    <x-section bg="bg-white" eyebrow="Les 6 processus" title="Comment fonctionne l'ACT ?"
+    <x-section bg="bg-white" title="Comment fonctionne l'ACT ?"
         lead="L'ACT développe la flexibilité psychologique à travers six processus complémentaires, souvent représentés en hexagone (l'« hexaflex »)." headerWidth="max-w-3xl">
         <div class="mx-auto grid max-w-5xl grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
             @foreach ($processes as $process)
@@ -122,7 +121,7 @@
         </div>
     </x-section>
 
-    <x-section bg="bg-cream-50" eyebrow="Efficacité" title="L'ACT est-elle validée scientifiquement ?" headerWidth="max-w-3xl">
+    <x-section bg="bg-cream-50" title="L'ACT est-elle validée scientifiquement ?" headerWidth="max-w-3xl">
         <div class="text-ink-soft mx-auto max-w-2xl space-y-6 text-base leading-relaxed sm:text-lg">
             <p>
                 Oui. L'efficacité de l'ACT est étudiée depuis plus de trente ans et appuyée par
@@ -137,13 +136,13 @@
             </p>
             <p>
                 Ce que cela signifie concrètement pour vous : l'ACT n'est ni une mode ni une méthode
-                miracle — c'est une approche structurée, enseignable et mesurable, dont les outils se
+                miracle : c'est une approche structurée, enseignable et mesurable, dont les outils se
                 pratiquent au quotidien.
             </p>
         </div>
     </x-section>
 
-    <x-section bg="bg-white" eyebrow="Pour qui ?" title="Dans quels cas l'ACT peut-elle vous aider ?" headerWidth="max-w-3xl">
+    <x-section bg="bg-white" title="Dans quels cas l'ACT peut-elle vous aider ?" headerWidth="max-w-3xl">
         <div class="text-ink-soft mx-auto max-w-2xl space-y-6 text-base leading-relaxed sm:text-lg">
             <p>
                 L'ACT est particulièrement adaptée aux troubles anxieux, là où la lutte contre les pensées
@@ -156,14 +155,14 @@
                 ou encore <a href="{{ url('/blog/burn-out') }}" class="font-medium text-teal-700 underline-offset-2 hover:underline">burn-out</a>.
             </p>
             <p>
-                J'ai moi-même traversé plusieurs de ces troubles avant de devenir praticienne — c'est
+                J'ai moi-même traversé plusieurs de ces troubles avant de devenir praticienne, c'est
                 l'ACT qui a marqué le tournant de mon parcours.
                 <a href="{{ route('about') }}" class="font-medium text-teal-700 underline-offset-2 hover:underline">Je raconte mon histoire ici</a>.
             </p>
         </div>
     </x-section>
 
-    <x-section bg="bg-cream-50" eyebrow="En pratique" title="Comment se déroule une séance avec moi ?" headerWidth="max-w-3xl">
+    <x-section bg="bg-cream-50" title="Comment se déroule une séance avec moi ?" headerWidth="max-w-3xl">
         <div class="text-ink-soft mx-auto max-w-2xl space-y-6 text-base leading-relaxed sm:text-lg">
             <p>
                 J'accompagne à distance, par téléphone ou en visioconférence. La première séance sert à
@@ -181,7 +180,7 @@
         </div>
     </x-section>
 
-    <x-section bg="bg-white" eyebrow="Questions fréquentes" title="Vos questions sur la thérapie ACT." headerWidth="max-w-3xl">
+    <x-section bg="bg-white" title="Vos questions sur la thérapie ACT." headerWidth="max-w-3xl">
         <div class="mx-auto max-w-3xl space-y-4">
             @foreach ($faq as $item)
                 <x-accordion-item :question="$item['q']" :open="$loop->first">

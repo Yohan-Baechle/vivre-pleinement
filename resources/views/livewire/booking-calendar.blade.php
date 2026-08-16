@@ -46,14 +46,14 @@
                     wire:loading.attr="disabled" wire:target="previousMonth,nextMonth"
                     class="text-ink ring-ink/10 hover:bg-cream-50 flex size-9 items-center justify-center rounded-full ring-1 transition focus-visible:ring-2 focus-visible:ring-teal-500 focus-visible:outline-hidden disabled:cursor-not-allowed disabled:opacity-30"
                     aria-label="Mois précédent">
-                <svg class="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="m15 18-6-6 6-6"/></svg>
+                <svg class="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="m15 18-6-6 6-6"/></svg>
             </button>
             <h3 class="text-ink font-serif text-lg font-medium" aria-live="off">{{ $monthNames[$month] }} {{ $year }}</h3>
             <button type="button" wire:click="nextMonth"
                     wire:loading.attr="disabled" wire:target="previousMonth,nextMonth"
                     class="text-ink ring-ink/10 hover:bg-cream-50 flex size-9 items-center justify-center rounded-full ring-1 transition focus-visible:ring-2 focus-visible:ring-teal-500 focus-visible:outline-hidden disabled:opacity-30"
                     aria-label="Mois suivant">
-                <svg class="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg>
+                <svg class="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg>
             </button>
         </div>
 
@@ -80,7 +80,7 @@
                     <button type="button" wire:key="day-{{ $date }}" wire:click="selectDate('{{ $date }}')"
                             wire:loading.attr="disabled" wire:target="selectDate,previousMonth,nextMonth"
                             @class([
-                                'aspect-square rounded-xl text-sm font-medium transition focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-teal-500',
+                                'aspect-square rounded-2xl text-sm font-medium transition focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-teal-500',
                                 'bg-teal-700 text-white shadow' => $isSelected,
                                 'bg-teal-50 text-teal-800 ring-1 ring-teal-200 hover:bg-teal-100' => ! $isSelected,
                             ])
@@ -90,7 +90,7 @@
                     </button>
                 @else
                     <div wire:key="day-{{ $date }}" @class([
-                            'flex aspect-square items-center justify-center rounded-xl text-sm text-ink-muted line-through decoration-ink-muted/30',
+                            'flex aspect-square items-center justify-center rounded-2xl text-sm text-ink-muted line-through decoration-ink-muted/30',
                             'ring-1 ring-teal-100' => $isToday,
                         ])
                         title="{{ $fullLabel }}, indisponible" aria-hidden="true">
@@ -120,7 +120,7 @@
                         @foreach ($this->slots as $slot)
                             <button type="button" wire:key="slot-{{ $slot['value'] }}" wire:click="selectSlot('{{ $slot['value'] }}')"
                                     @class([
-                                        'rounded-xl px-2 py-2.5 text-sm font-medium transition focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-teal-500',
+                                        'rounded-2xl px-2 py-2.5 text-sm font-medium transition focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-teal-500',
                                         'bg-teal-700 text-white shadow' => $selectedSlot === $slot['value'],
                                         'bg-cream-50 text-ink ring-1 ring-ink/10 hover:ring-teal-300' => $selectedSlot !== $slot['value'],
                                     ])
@@ -208,7 +208,7 @@
                                 <span class="text-ink-muted block text-xs">{{ $option['desc'] }}</span>
                             </span>
                             <span class="ring-ink/20 flex size-5 shrink-0 items-center justify-center rounded-full text-white ring-1 transition peer-checked:bg-teal-600 peer-checked:ring-teal-600" aria-hidden="true">
-                                <svg class="size-3 opacity-0 transition peer-checked:opacity-100" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13l4 4L19 7"/></svg>
+                                <svg class="size-3 opacity-0 transition peer-checked:opacity-100" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13l4 4L19 7"/></svg>
                             </span>
                         </label>
                     @endforeach
@@ -288,15 +288,15 @@
                 {{-- Réassurance --}}
                 <ul class="text-ink-muted flex flex-wrap items-center justify-center gap-x-5 gap-y-2 pt-1 text-xs">
                     <li class="inline-flex items-center gap-1.5">
-                        <svg class="size-3.5 text-teal-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="m5 13 4 4L19 7"/></svg>
+                        <svg class="size-3.5 text-teal-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="m5 13 4 4L19 7"/></svg>
                         Sans engagement
                     </li>
                     <li class="inline-flex items-center gap-1.5">
-                        <svg class="size-3.5 text-teal-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="m5 13 4 4L19 7"/></svg>
+                        <svg class="size-3.5 text-teal-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="m5 13 4 4L19 7"/></svg>
                         Annulable à tout moment
                     </li>
                     <li class="inline-flex items-center gap-1.5">
-                        <svg class="size-3.5 text-teal-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="m5 13 4 4L19 7"/></svg>
+                        <svg class="size-3.5 text-teal-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="m5 13 4 4L19 7"/></svg>
                         Lien visio envoyé avant
                     </li>
                 </ul>

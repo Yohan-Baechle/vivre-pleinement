@@ -80,7 +80,6 @@
 
             <div class="mt-6 max-w-3xl">
                 <p class="inline-flex items-center gap-2 rounded-full bg-white/80 px-4 py-1.5 text-xs font-medium text-teal-700 ring-1 ring-teal-200">
-                    <span class="size-1.5 rounded-full bg-teal-500"></span>
                     Le blog
                 </p>
                 <h1 class="text-ink mt-5 font-serif text-4xl font-medium tracking-tight sm:text-5xl lg:text-6xl">
@@ -110,7 +109,7 @@
             <div class="border-ink/10 bg-cream-50 sticky top-0 z-10 flex items-center justify-between gap-4 border-b px-6 py-4">
                 <p class="text-ink font-serif text-xl font-medium">Filtres</p>
                 <button type="button" data-drawer-close class="text-ink-soft ring-ink/5 flex size-9 items-center justify-center rounded-full bg-white ring-1 transition hover:text-teal-700" aria-label="Fermer">
-                    <svg class="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12"/></svg>
+                    <svg class="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12"/></svg>
                 </button>
             </div>
             <div class="space-y-8 p-6">

@@ -100,7 +100,6 @@
                     @if ($category)
                         <a href="{{ route('blog.category', $category->slug) }}"
                            class="inline-flex items-center gap-2 rounded-full bg-white/80 px-4 py-1.5 text-xs font-medium text-teal-700 ring-1 ring-teal-200 transition hover:bg-white">
-                            <span class="size-1.5 rounded-full bg-teal-500"></span>
                             {{ $category->name }}
                         </a>
                     @endif
@@ -150,7 +149,7 @@
                 <details class="ring-ink/5 group mb-10 rounded-3xl bg-white p-5 shadow-xs ring-1 lg:hidden">
                     <summary class="text-ink flex cursor-pointer list-none items-center justify-between font-medium">
                         <span class="text-ink-muted text-xs font-medium tracking-wider uppercase">Sommaire</span>
-                        <svg class="text-ink-muted size-5 transition group-open:rotate-180" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                        <svg class="text-ink-muted size-5 transition group-open:rotate-180" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
                             <path stroke-linecap="round" stroke-linejoin="round" d="m6 9 6 6 6-6"/>
                         </svg>
                     </summary>
@@ -222,7 +221,7 @@
                     <button type="button" data-copy-url="{{ $shareUrl }}" data-copied="false" aria-label="Copier le lien"
                             class="group ring-ink/5 text-ink-soft relative flex size-9 items-center justify-center rounded-full bg-white ring-1 transition hover:bg-teal-700 hover:text-white data-[copied=true]:bg-teal-700 data-[copied=true]:text-white">
                         {{-- Icône copie (état par défaut) --}}
-                        <svg class="size-4 transition group-data-[copied=true]:hidden" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                        <svg class="size-4 transition group-data-[copied=true]:hidden" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
                             <rect x="9" y="9" width="13" height="13" rx="2"/>
                             <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
                         </svg>
@@ -231,7 +230,7 @@
                             <path stroke-linecap="round" stroke-linejoin="round" d="M20 6 9 17l-5-5"/>
                         </svg>
                         {{-- Tooltip --}}
-                        <span class="bg-ink pointer-events-none absolute -top-9 left-1/2 -translate-x-1/2 scale-95 rounded-lg px-2.5 py-1 text-xs font-medium whitespace-nowrap text-white opacity-0 transition group-data-[copied=true]:scale-100 group-data-[copied=true]:opacity-100" role="status" aria-live="polite">
+                        <span class="bg-ink pointer-events-none absolute -top-9 left-1/2 -translate-x-1/2 scale-95 rounded-2xl px-2.5 py-1 text-xs font-medium whitespace-nowrap text-white opacity-0 transition group-data-[copied=true]:scale-100 group-data-[copied=true]:opacity-100" role="status" aria-live="polite">
                             Copié&nbsp;!
                         </span>
                     </button>
@@ -291,7 +290,7 @@
                 <a href="{{ route('blog.show', $pillar->slug) }}" class="group block py-6">
                     <p class="text-ink-muted text-sm">Vous avez aimé cet article&nbsp;?</p>
                     <div class="mt-4 flex items-start gap-5 sm:gap-8">
-                        <svg class="mt-1 size-10 shrink-0 text-teal-700/70 transition group-hover:translate-x-1 group-hover:-translate-y-1 group-hover:text-teal-700 sm:size-14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
+                        <svg class="mt-1 size-10 shrink-0 text-teal-700/70 transition group-hover:translate-x-1 group-hover:-translate-y-1 group-hover:text-teal-700 sm:size-14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M7 17 17 7M9 7h8v8"/>
                         </svg>
                         <div class="min-w-0">
@@ -310,7 +309,6 @@
                 <div class="flex items-end justify-between gap-6">
                     <div>
                         <p class="inline-flex items-center gap-2 rounded-full bg-teal-50 px-4 py-1.5 text-xs font-medium text-teal-700 ring-1 ring-teal-200">
-                            <span class="size-1.5 rounded-full bg-teal-500"></span>
                             À lire aussi
                         </p>
                         <h2 class="text-ink mt-4 font-serif text-2xl font-medium tracking-tight sm:text-3xl">

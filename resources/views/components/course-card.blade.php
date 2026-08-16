@@ -21,7 +21,7 @@
                 class="size-full object-cover transition duration-500 group-hover:scale-105" />
         @else
             <div class="flex size-full items-center justify-center">
-                <svg class="size-16 text-teal-700/30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
+                <svg class="size-16 text-teal-700/30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
                     <path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/>
                 </svg>
             </div>

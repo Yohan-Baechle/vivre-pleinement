@@ -93,7 +93,7 @@
 
             <a href="#troubles" aria-label="Découvrir la suite" class="absolute inset-x-0 bottom-6 z-[90] mx-auto flex w-fit flex-col items-center gap-1 text-teal-700/70 transition hover:text-teal-700">
                 <span class="text-[0.7rem] font-medium tracking-wider uppercase">Découvrir</span>
-                <svg class="scroll-hint size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <svg class="scroll-hint size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                     <path d="M6 9l6 6 6-6"/>
                 </svg>
             </a>
@@ -119,11 +119,10 @@
             <div class="grid gap-6 lg:grid-cols-5 lg:items-center lg:gap-10">
                 <div class="lg:col-span-2">
                     <div class="inline-flex items-center gap-2 rounded-full bg-teal-50 px-3 py-1 text-xs font-medium text-teal-700">
-                        <span class="size-1.5 rounded-full bg-teal-500"></span>
                         Vidéo offerte
                     </div>
                     <h2 class="text-ink mt-3 font-serif text-3xl leading-tight">Téléchargez votre<br>vidéo offerte</h2>
-                    <p class="text-ink-soft mt-2 text-sm">7 pièges de l'anxiété dans lesquels je suis tombée et qui m'ont maintenus dans cet état — ne faites pas les mêmes erreurs que moi pour guérir plus rapidement&nbsp;!</p>
+                    <p class="text-ink-soft mt-2 text-sm">7 pièges de l'anxiété dans lesquels je suis tombée et qui m'ont maintenus dans cet état. Ne faites pas les mêmes erreurs que moi pour guérir plus rapidement&nbsp;!</p>
                 </div>
                 @if (session('newsletter_status') === 'pending')
                     @include('home.partials.newsletter-success')

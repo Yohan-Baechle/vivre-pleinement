@@ -8,6 +8,27 @@
 
 /* ════════════════════════════════════════════════════════════
    Design tokens - identité Vivre Pleinement
+   ════════════════════════════════════════════════════════════
+
+   Conventions à tenir, faute de quoi l'interface se délite sans
+   qu'aucun écran ne paraisse fautif isolément :
+
+   Icônes SVG, épaisseur de trait
+     1.8  icônes d'interface (la valeur par défaut)
+     2.5  glyphes de validation, plus petits donc plus épais
+     4    arcs de spinner, décor et non icône
+
+   Rayons, échelle fermée : rien en dehors de ces six valeurs
+     rounded-full  éléments interactifs (boutons, pilules, badges)
+     rounded-5xl   panneaux décoratifs en fond de section
+     rounded-4xl   grandes surfaces de section
+     rounded-3xl   cartes
+     rounded-2xl   champs, petits blocs
+     rounded-sm    cases à cocher uniquement
+
+   Accent
+     teal, sur tout le site. rose-soft reste réservé aux ponctuations
+     décoratives sur fond teal, jamais comme second accent.
    ════════════════════════════════════════════════════════════ */
 @theme {
     --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',

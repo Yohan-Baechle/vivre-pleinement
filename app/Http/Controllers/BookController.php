@@ -6,6 +6,7 @@ use App\Models\AppointmentService;
 use App\Models\BookOrder;
 use App\Models\Product;
 use App\Services\BookPaymentService;
+use App\Support\BookOffers;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\RateLimiter;
@@ -15,19 +16,14 @@ use Symfony\Component\HttpFoundation\Response;
 
 class BookController extends Controller
 {
-    /**
-     * Slugs des deux produits vendus depuis la page du livre. C'est le seul
-     * contrat entre le catalogue et le tunnel d'achat : les renommer en admin
-     * casse le paiement (visiblement, en 404, jamais en silence).
-     *
-     * @var list<string>
-     */
-    private const OFFER_SLUGS = ['livre', 'livre-coaching'];
+    public function __construct(
+        private BookOffers $offers,
+    ) {}
 
     public function show(): View
     {
         return view('book.index', [
-            'offers' => $this->offers(),
+            'offers' => $this->offers->active()->all(),
         ]);
     }
 
@@ -168,19 +164,6 @@ class BookController extends Controller
     }
 
     /**
-     * @return array<string, Product>
-     */
-    private function offers(): array
-    {
-        return Product::query()
-            ->whereIn('slug', self::OFFER_SLUGS)
-            ->where('is_active', true)
-            ->get()
-            ->keyBy('slug')
-            ->all();
-    }
-
-    /**
      * Une offre n'est achetable que si elle est active *et* livrable. Le
      * 404 est volontaire : la page du livre n'affiche déjà plus de lien vers
      * une offre indisponible, n'y arrive donc qu'une URL forcée ou un lien
@@ -188,13 +171,9 @@ class BookController extends Controller
      */
     private function resolveOffer(string $offer): Product
     {
-        abort_unless(in_array($offer, self::OFFER_SLUGS, true), 404);
+        $product = $this->offers->find($offer);
 
-        $product = Product::query()
-            ->where('slug', $offer)
-            ->where('is_active', true)
-            ->firstOrFail();
-
+        abort_if($product === null, 404);
         abort_unless($product->isDeliverable(), 404);
 
         return $product;

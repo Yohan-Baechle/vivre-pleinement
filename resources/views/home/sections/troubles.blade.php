@@ -29,7 +29,7 @@
                 class="group border-ink/8 flex items-center gap-4 border-b py-4 last:border-b-0 sm:[&:nth-last-child(2):nth-child(odd)]:border-b-0"
             >
                 <span class="flex size-9 shrink-0 items-center justify-center rounded-full bg-teal-50 text-teal-700 ring-1 ring-teal-100 transition group-hover:bg-teal-100 group-hover:ring-teal-200" aria-hidden="true">
-                    <svg class="size-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <svg class="size-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
                         <path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5"/>
                     </svg>
                 </span>

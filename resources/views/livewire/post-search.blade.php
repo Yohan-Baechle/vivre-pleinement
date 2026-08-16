@@ -3,7 +3,7 @@
     <div class="mb-2 lg:hidden">
         <button type="button" data-drawer-open
                 class="text-ink-soft ring-ink/5 inline-flex items-center gap-2 rounded-full bg-white px-4 py-2 text-sm font-medium ring-1 transition hover:text-teal-700">
-            <svg class="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 4.5h18M3 12h18M3 19.5h18"/></svg>
+            <svg class="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M3 4.5h18M3 12h18M3 19.5h18"/></svg>
             Catégories &amp; tags
         </button>
     </div>
@@ -16,7 +16,7 @@
                 <label for="post-search" class="text-ink-muted block text-xs font-medium tracking-wider uppercase">Rechercher</label>
                 <div class="relative mt-2">
                     <span class="text-ink-muted pointer-events-none absolute inset-y-0 left-4 flex items-center">
-                        <svg class="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                        <svg class="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
                             <circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/>
                         </svg>
                     </span>
@@ -29,7 +29,7 @@
                         <button type="button" wire:click="clearSearch"
                                 class="text-ink-muted hover:text-ink absolute inset-y-0 right-3 flex items-center transition"
                                 aria-label="Effacer la recherche">
-                            <svg class="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12"/></svg>
+                            <svg class="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12"/></svg>
                         </button>
                     @endif
                 </div>
@@ -50,7 +50,7 @@
             <label for="post-search-mobile" class="sr-only">Rechercher un article</label>
             <div class="relative">
                 <span class="text-ink-muted pointer-events-none absolute inset-y-0 left-4 flex items-center">
-                    <svg class="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                    <svg class="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
                         <circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/>
                     </svg>
                 </span>
@@ -63,7 +63,7 @@
                     <button type="button" wire:click="clearSearch"
                             class="text-ink-muted hover:text-ink absolute inset-y-0 right-3 flex items-center transition"
                             aria-label="Effacer la recherche">
-                        <svg class="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12"/></svg>
+                        <svg class="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12"/></svg>
                     </button>
                 @endif
             </div>
@@ -90,7 +90,7 @@
 
             <div class="flex items-center gap-2">
                 <label for="sort" class="text-ink-muted text-xs">Trier&nbsp;:</label>
-                <select wire:model.live="sort" id="sort" class="text-ink ring-ink/10 rounded-xl border-0 bg-white py-1.5 pr-8 pl-3 text-sm ring-1 focus:ring-2 focus:ring-teal-500">
+                <select wire:model.live="sort" id="sort" class="text-ink ring-ink/10 rounded-2xl border-0 bg-white py-1.5 pr-8 pl-3 text-sm ring-1 focus:ring-2 focus:ring-teal-500">
                     <option value="recent">Plus récents</option>
                     <option value="oldest">Plus anciens</option>
                 </select>
@@ -127,7 +127,7 @@
             </div>
         @else
             <div class="border-ink/15 mt-10 rounded-3xl border border-dashed bg-white/60 p-12 text-center">
-                <svg class="text-ink-muted mx-auto size-10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="11" cy="11" r="8"/><path stroke-linecap="round" stroke-linejoin="round" d="m21 21-4.3-4.3"/></svg>
+                <svg class="text-ink-muted mx-auto size-10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="11" cy="11" r="8"/><path stroke-linecap="round" stroke-linejoin="round" d="m21 21-4.3-4.3"/></svg>
                 <p class="text-ink mt-4 font-serif text-xl">Aucun article trouvé.</p>
                 <p class="text-ink-soft mt-2 text-sm">Essayez avec d'autres mots-clés ou retirez des filtres.</p>
                 <button type="button" wire:click="clearAll" class="mt-6 inline-flex items-center gap-2 text-sm font-medium text-teal-700 hover:text-teal-800">

@@ -13,7 +13,6 @@
             <div class="mx-auto {{ $headerWidth }} text-center">
                 @if($eyebrow)
                     <p class="inline-flex items-center gap-2 rounded-full bg-teal-50 px-4 py-1.5 text-xs font-medium text-teal-700 ring-1 ring-teal-200">
-                        <span class="size-1.5 rounded-full bg-teal-500"></span>
                         {{ $eyebrow }}
                     </p>
                 @endif

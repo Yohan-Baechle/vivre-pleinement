@@ -40,7 +40,7 @@
                                             @endphp
                                             <li>
                                                 <a href="{{ route('student.lesson', [$course, $item]) }}" @class([
-                                                    'flex items-center gap-2.5 rounded-xl px-3 py-2 text-sm transition',
+                                                    'flex items-center gap-2.5 rounded-2xl px-3 py-2 text-sm transition',
                                                     'bg-teal-50 text-teal-800 font-medium' => $isCurrent,
                                                     'text-ink-soft hover:bg-cream-50' => ! $isCurrent,
                                                 ])>

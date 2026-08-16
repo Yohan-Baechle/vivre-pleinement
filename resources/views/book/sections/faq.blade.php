@@ -53,7 +53,7 @@
     <script type="application/ld+json">{!! json_encode($faqLd, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG) !!}</script>
 @endpush
 
-<x-section id="faq" bg="bg-cream-50" eyebrow="Questions fréquentes" title="Tout ce que vous voulez savoir avant d'acheter." lead="Si votre question n'est pas ici, écrivez-moi, je vous réponds personnellement.">
+<x-section id="faq" bg="bg-cream-50" title="Tout ce que vous voulez savoir avant d'acheter." lead="Si votre question n'est pas ici, écrivez-moi, je vous réponds personnellement.">
     <div class="mx-auto max-w-3xl space-y-4">
         @foreach ($faq as $item)
             <x-accordion-item :question="$item['q']" :open="$loop->first">

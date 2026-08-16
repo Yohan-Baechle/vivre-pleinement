@@ -1,7 +1,7 @@
 @if ($articles->isNotEmpty())
     <x-section
         id="blog"
-        eyebrow="Le blog"
+       
         title="Lire pour mieux comprendre."
         lead="Des articles fouillés pour comprendre l'anxiété et avancer entre les séances."
         bg="bg-cream-50"

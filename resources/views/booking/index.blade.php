@@ -70,7 +70,6 @@
 
             <div class="mx-auto mt-10 max-w-4xl text-center lg:mt-14">
                 <p class="inline-flex items-center gap-2 rounded-full bg-white/80 px-4 py-1.5 text-xs font-medium text-teal-700 ring-1 ring-teal-200">
-                    <span class="size-1.5 rounded-full bg-teal-500"></span>
                     Accompagnement en thérapie d'acceptation et d'engagement (ACT)
                 </p>
                 <h1 class="text-ink mt-6 font-serif text-3xl/tight font-medium tracking-tight sm:text-4xl/tight lg:text-5xl/tight">
@@ -113,7 +112,7 @@
                 @if ($primaryService && $upcomingSlots->isNotEmpty())
                     <div class="ring-ink/5 mx-auto mt-10 max-w-md rounded-3xl bg-white/80 p-5 shadow-lg shadow-teal-900/5 ring-1 backdrop-blur-xs sm:p-6">
                         <p class="text-ink-muted flex items-center justify-center gap-2 text-xs font-medium tracking-wider uppercase">
-                            <svg class="size-4 text-teal-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+                            <svg class="size-4 text-teal-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
                             Prochaines disponibilités
                         </p>
                         <div class="mt-4 flex flex-wrap justify-center gap-2.5">
@@ -239,7 +238,7 @@
                 'Fatigue mentale, burnout',
             ] as $domain)
                 <li class="bg-cream-50 ring-cream-200 inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm ring-1">
-                    <svg class="size-4 shrink-0 text-teal-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 12 2 2 4-4"/></svg>
+                    <svg class="size-4 shrink-0 text-teal-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 12 2 2 4-4"/></svg>
                     <span class="text-ink-soft">{{ $domain }}</span>
                 </li>
             @endforeach
@@ -325,7 +324,7 @@
                     <h3 class="text-ink font-serif text-2xl font-medium">{{ $primaryService->name }}</h3>
                     <p class="text-ink-soft">
                         <span class="text-ink font-serif text-2xl font-medium">{{ $primaryService->isFree() ? 'Gratuit' : Number::currency($primaryService->price, in: 'EUR', locale: 'fr') }}</span>
-                        · {{ $primaryService->duration_minutes }} min · par téléphone ou en visio
+                        · {{ $primaryService->duration_minutes }} min, par téléphone ou en visio
                     </p>
                 </div>
                 <div class="mt-8">

@@ -3,7 +3,7 @@
     <div class="mb-8">
         <label for="video-search" class="sr-only">Rechercher une vidéo</label>
         <div class="relative max-w-xl">
-            <svg class="text-ink-muted pointer-events-none absolute top-1/2 left-4 size-5 -translate-y-1/2" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+            <svg class="text-ink-muted pointer-events-none absolute top-1/2 left-4 size-5 -translate-y-1/2" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
                 <circle cx="11" cy="11" r="7"/>
                 <path stroke-linecap="round" d="m20 20-3.5-3.5"/>
             </svg>
@@ -22,7 +22,7 @@
                     class="text-ink-muted hover:text-ink absolute top-1/2 right-4 -translate-y-1/2 transition"
                     aria-label="Effacer la recherche"
                 >
-                    <svg class="size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                    <svg class="size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
                         <path stroke-linecap="round" d="M6 6l12 12M18 6 6 18"/>
                     </svg>
                 </button>
@@ -86,7 +86,7 @@
         </div>
     @else
         <div class="border-ink/15 rounded-3xl border border-dashed bg-white/60 p-12 text-center">
-            <svg class="text-ink-muted mx-auto size-10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <svg class="text-ink-muted mx-auto size-10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
                 <circle cx="11" cy="11" r="7"/>
                 <path stroke-linecap="round" d="m20 20-3.5-3.5"/>
             </svg>

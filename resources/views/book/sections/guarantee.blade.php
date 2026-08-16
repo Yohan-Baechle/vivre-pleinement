@@ -13,7 +13,6 @@
                 </div>
                 <div class="sm:col-span-3">
                     <p class="inline-flex items-center gap-2 rounded-full bg-teal-50 px-4 py-1.5 text-xs font-medium text-teal-700 ring-1 ring-teal-200">
-                        <span class="size-1.5 rounded-full bg-teal-500"></span>
                         Garantie satisfait ou remboursé
                     </p>
                     <h2 class="text-ink mt-4 font-serif text-2xl leading-tight font-medium sm:text-3xl">

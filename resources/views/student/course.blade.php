@@ -48,7 +48,7 @@
                                 <a href="{{ route('student.lesson', [$course, $lesson]) }}" class="hover:bg-cream-50 flex items-center gap-3 px-6 py-4 transition">
                                     @if ($isDone)
                                         <span class="flex size-6 shrink-0 items-center justify-center rounded-full bg-teal-600 text-white">
-                                            <svg class="size-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>
+                                            <svg class="size-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>
                                         </span>
                                     @else
                                         <span class="border-ink/15 flex size-6 shrink-0 items-center justify-center rounded-full border"></span>

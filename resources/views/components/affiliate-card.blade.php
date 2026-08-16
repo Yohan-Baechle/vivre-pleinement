@@ -18,7 +18,7 @@
 
 <div class="not-prose to-cream-50 relative mt-12 mb-8 rounded-3xl border border-teal-700/10 bg-linear-to-br from-teal-50/80 shadow-sm">
     <div class="ring-cream-50 absolute -top-6 left-1/2 flex size-14 -translate-x-1/2 items-center justify-center rounded-2xl bg-teal-700 text-white shadow-lg ring-4 shadow-teal-700/25 sm:left-8 sm:translate-x-0">
-        <svg class="size-7" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <svg class="size-7" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
             {!! $iconPath !!}
         </svg>
     </div>
