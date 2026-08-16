@@ -12,15 +12,7 @@
 <section class="relative overflow-hidden bg-white py-20 sm:py-24 lg:py-32">
     <div class="site-container">
         <div class="group relative overflow-hidden rounded-4xl bg-linear-to-br from-teal-700 to-teal-800 shadow-2xl shadow-teal-700/20">
-            <div class="pointer-events-none absolute inset-0 -z-0 overflow-hidden opacity-50">
-                <div class="cloud-r cloud-d-160 absolute top-8 -left-20">
-                    <div class="cloud-sway cloud-s-15 text-white/20">
-                        <svg class="size-32" viewBox="0 0 256 256" fill="currentColor" aria-hidden="true">
-                            <path d="M160.06,40A88.1,88.1,0,0,0,81.29,88.67h0A87.48,87.48,0,0,0,72,127.73,8.18,8.18,0,0,1,64.57,136,8,8,0,0,1,56,128a103.66,103.66,0,0,1,5.34-32.92,4,4,0,0,0-4.75-5.18A64.09,64.09,0,0,0,8,152c0,35.19,29.75,64,65,64H160a88.09,88.09,0,0,0,87.93-91.48C246.11,77.54,207.07,40,160.06,40Z"/>
-                        </svg>
-                    </div>
-                </div>
-            </div>
+            @include('home.partials.book-pages')
 
             <div class="relative grid grid-cols-1 items-center gap-10 px-8 py-12 sm:px-10 sm:py-16 lg:grid-cols-5 lg:gap-12 lg:px-14 lg:py-20">
                 <div class="flex justify-center lg:col-span-2">
