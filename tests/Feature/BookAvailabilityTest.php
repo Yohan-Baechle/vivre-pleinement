@@ -115,3 +115,30 @@ it('détourne du paiement une commande dont le fichier a disparu', function () {
         ->assertRedirect(route('book.show'))
         ->assertSessionHas('status');
 });
+
+it('ne répète pas l\'invitation à être prévenu sur chaque carte', function () {
+    $html = $this->get(route('book.show'))->assertOk()->getContent();
+
+    /**
+     * Une invitation par section, pas une par formule : quatre appels à
+     * l'action identiques sur la page seraient un doublon d'intention.
+     */
+    expect(substr_count($html, 'Être prévenu de la sortie'))->toBe(2)
+        ->and(substr_count($html, 'Bientôt disponible'))->toBe(2);
+});
+
+it('ne promet pas un paiement sécurisé quand rien n\'est en vente', function () {
+    $this->get(route('book.show'))
+        ->assertOk()
+        ->assertDontSee('Paiement sécurisé par Stripe');
+});
+
+it('rend les vrais boutons d\'achat dès que le fichier est en place', function () {
+    attachBookFile($this->solo);
+
+    $html = $this->get(route('book.show'))->assertOk()->getContent();
+
+    expect(substr_count($html, 'Être prévenu de la sortie'))->toBe(0)
+        ->and(substr_count($html, 'Bientôt disponible'))->toBe(0)
+        ->and($html)->toContain('Paiement sécurisé par Stripe');
+});
