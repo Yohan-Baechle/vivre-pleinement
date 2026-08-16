@@ -2,6 +2,7 @@
 
 namespace App\Filament\Admin\Resources\Products\Tables;
 
+use App\Models\Product;
 use Filament\Actions\ActionGroup;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\CreateAction;
@@ -50,6 +51,29 @@ class ProductsTable
                 IconColumn::make('is_active')
                     ->label('Actif')
                     ->boolean(),
+
+                /**
+                 * Sans fichier, le produit n'est pas achetable : la page du
+                 * livre remplace son bouton par une invitation à être
+                 * prévenu. Cette colonne évite d'avoir à ouvrir la fiche pour
+                 * comprendre pourquoi une offre a disparu de la vente.
+                 */
+                TextColumn::make('deliverable')
+                    ->label('Fichier')
+                    ->badge()
+                    ->state(fn (Product $record): string => match (true) {
+                        $record->usesInheritedFile() => 'Hérité du livre',
+                        $record->isDeliverable() => 'Présent',
+                        default => 'Manquant',
+                    })
+                    ->color(fn (string $state): string => match ($state) {
+                        'Présent' => 'success',
+                        'Hérité du livre' => 'info',
+                        default => 'danger',
+                    })
+                    ->tooltip(fn (Product $record): ?string => $record->isDeliverable()
+                        ? null
+                        : 'Tant qu\'aucun fichier n\'est rattaché, cette offre ne peut pas être achetée.'),
 
                 TextColumn::make('stripe_payment_link')
                     ->label('Paiement')

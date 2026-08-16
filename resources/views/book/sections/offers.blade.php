@@ -36,10 +36,13 @@
                 </li>
             </ul>
 
-            <a href="{{ route('book.checkout', 'livre') }}" class="group bg-ink shadow-ink/20 mt-8 inline-flex w-full items-center justify-center gap-2 rounded-full px-7 py-3.5 text-sm font-medium text-white shadow-lg transition hover:bg-teal-800 sm:text-base">
-                Obtenir le livre · {!! $offerPrice($offerSolo) !!}
-                <span class="transition group-hover:translate-x-0.5" aria-hidden="true">→</span>
-            </a>
+            <div class="mt-8">
+                <x-book-offer-cta
+                    slug="livre"
+                    :available="$offerAvailable('livre')"
+                    :label="'Obtenir le livre · '.$offerPrice($offerSolo)"
+                    class="bg-ink shadow-ink/20 inline-flex w-full items-center justify-center gap-2 rounded-full px-7 py-3.5 text-sm font-medium text-white shadow-lg transition hover:bg-teal-800 sm:text-base" />
+            </div>
         </article>
 
         <article class="relative flex flex-col rounded-4xl bg-linear-to-br from-teal-700 to-teal-800 p-8 text-white shadow-2xl shadow-teal-700/20 sm:p-10">
@@ -81,10 +84,13 @@
                 </li>
             </ul>
 
-            <a href="{{ route('book.checkout', 'livre-coaching') }}" class="group hover:bg-cream-50 mt-8 inline-flex w-full items-center justify-center gap-2 rounded-full bg-white px-7 py-3.5 text-sm font-medium text-teal-800 shadow-lg transition sm:text-base">
-                Obtenir le livre + coaching · {!! $offerPrice($offerCoaching) !!}
-                <span class="transition group-hover:translate-x-0.5" aria-hidden="true">→</span>
-            </a>
+            <div class="mt-8">
+                <x-book-offer-cta
+                    slug="livre-coaching"
+                    :available="$offerAvailable('livre-coaching')"
+                    :label="'Obtenir le livre + coaching · '.$offerPrice($offerCoaching)"
+                    class="hover:bg-cream-50 inline-flex w-full items-center justify-center gap-2 rounded-full bg-white px-7 py-3.5 text-sm font-medium text-teal-800 shadow-lg transition sm:text-base" />
+            </div>
         </article>
     </div>
 

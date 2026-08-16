@@ -9,7 +9,7 @@ Votre paiement a bien été reçu. Merci de votre confiance.
 **Référence :** {{ $order->reference }}\
 **Montant :** {{ \Illuminate\Support\Number::currency($order->amount_cents / 100, in: 'EUR', locale: 'fr') }}
 
-@if ($order->product->getFirstMedia('download'))
+@if ($order->product->isDeliverable())
 Le lien ci-dessous vous est personnel et reste valable
 {{ \App\Models\BookOrder::DOWNLOAD_LINK_DAYS }} jours. Passé ce délai, il vous
 en proposera automatiquement un nouveau : gardez simplement cet email.

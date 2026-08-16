@@ -22,6 +22,24 @@
 
         $offerPrice = fn (float $amount): string => rtrim(rtrim(number_format($amount, 2, ',', "\u{202f}"), '0'), ',').'&nbsp;€';
 
+        /**
+         * Une offre dont le fichier manque n'est pas achetable : les boutons
+         * le disent, et les données structurées annoncent OutOfStock plutôt
+         * que d'envoyer Google promouvoir un produit indisponible.
+         */
+        $offerAvailable = fn (string $slug): bool => ($offers[$slug] ?? null)?->isDeliverable() ?? false;
+        $availability = fn (string $slug): string => $offerAvailable($slug)
+            ? 'https://schema.org/InStock'
+            : 'https://schema.org/OutOfStock';
+
+        /**
+         * Une offre indisponible renvoie vers la page du livre : son URL de
+         * commande répond 404, l'annoncer à Google n'aurait pas de sens.
+         */
+        $offerUrl = fn (string $slug): string => $offerAvailable($slug)
+            ? route('book.checkout', $slug)
+            : $bookUrl;
+
         $productLd = [
             '@context' => 'https://schema.org',
             '@type' => 'Book',
@@ -45,16 +63,16 @@
                     'name' => 'Le livre seul (PDF)',
                     'price' => (string) $offerSolo,
                     'priceCurrency' => 'EUR',
-                    'availability' => 'https://schema.org/InStock',
-                    'url' => route('book.checkout', 'livre'),
+                    'availability' => $availability('livre'),
+                    'url' => $offerUrl('livre'),
                 ],
                 [
                     '@type' => 'Offer',
                     'name' => 'Le livre + 1h de coaching',
                     'price' => (string) $offerCoaching,
                     'priceCurrency' => 'EUR',
-                    'availability' => 'https://schema.org/InStock',
-                    'url' => route('book.checkout', 'livre-coaching'),
+                    'availability' => $availability('livre-coaching'),
+                    'url' => $offerUrl('livre-coaching'),
                 ],
             ],
         ];

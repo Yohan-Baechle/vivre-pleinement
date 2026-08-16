@@ -89,6 +89,16 @@ class BookController extends Controller
             return redirect()->route('book.success', $order->token);
         }
 
+        /**
+         * Le fichier a pu disparaître entre la création de la commande et le
+         * paiement : on ne débite pas pour un contenu devenu indisponible.
+         */
+        if (! $order->product->isDeliverable()) {
+            return redirect()
+                ->route('book.show')
+                ->with('status', 'Cette formule n\'est pas disponible à la vente pour le moment. Écrivez-moi et je vous préviens dès sa remise en ligne.');
+        }
+
         try {
             $intent = $payments->getOrCreatePaymentIntent($order);
         } catch (ApiErrorException $e) {
@@ -129,7 +139,7 @@ class BookController extends Controller
 
         abort_unless($order->isPaid(), 403, 'Cette commande ne donne pas accès au téléchargement.');
 
-        $media = $order->product->getFirstMedia('download');
+        $media = $order->product->deliverableMedia();
 
         abort_if($media === null, 404, 'Le fichier n\'est pas encore disponible.');
 
@@ -170,14 +180,24 @@ class BookController extends Controller
             ->all();
     }
 
+    /**
+     * Une offre n'est achetable que si elle est active *et* livrable. Le
+     * 404 est volontaire : la page du livre n'affiche déjà plus de lien vers
+     * une offre indisponible, n'y arrive donc qu'une URL forcée ou un lien
+     * périmé.
+     */
     private function resolveOffer(string $offer): Product
     {
         abort_unless(in_array($offer, self::OFFER_SLUGS, true), 404);
 
-        return Product::query()
+        $product = Product::query()
             ->where('slug', $offer)
             ->where('is_active', true)
             ->firstOrFail();
+
+        abort_unless($product->isDeliverable(), 404);
+
+        return $product;
     }
 
     /**
