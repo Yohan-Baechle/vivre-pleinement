@@ -201,3 +201,58 @@ it('opens every admin screen without an error', function (string $route) {
     'filament.admin.resources.enrollments.index',
     'filament.admin.resources.redirects.index',
 ]);
+
+it('gives every empty table an icon to go with its message', function () {
+    $missing = [];
+
+    $files = new RecursiveIteratorIterator(
+        new RecursiveDirectoryIterator(app_path('Filament')),
+    );
+
+    foreach ($files as $file) {
+        if ($file->getExtension() !== 'php') {
+            continue;
+        }
+
+        $contents = file_get_contents($file->getPathname());
+
+        if (str_contains($contents, '->emptyStateHeading(')
+            && ! str_contains($contents, '->emptyStateIcon(')) {
+            $missing[] = basename($file->getPathname());
+        }
+    }
+
+    expect($missing)->toBe([]);
+});
+
+it('gives every navigation group an icon', function () {
+    $withoutIcon = collect(Filament::getPanel('admin')->getNavigationGroups())
+        ->filter(fn ($group) => is_string($group) || blank($group->getIcon()))
+        ->map(fn ($group) => is_string($group) ? $group : $group->getLabel())
+        ->values()
+        ->all();
+
+    expect($withoutIcon)->toBe([]);
+});
+
+it('keeps emoji out of the interface chrome', function () {
+    $offenders = [];
+
+    $files = new RecursiveIteratorIterator(
+        new RecursiveDirectoryIterator(app_path('Filament')),
+    );
+
+    foreach ($files as $file) {
+        if ($file->getExtension() !== 'php') {
+            continue;
+        }
+
+        $contents = file_get_contents($file->getPathname());
+
+        if (preg_match('/[\x{26A0}\x{2709}\x{2713}\x{1F300}-\x{1FAFF}]/u', $contents)) {
+            $offenders[] = basename($file->getPathname());
+        }
+    }
+
+    expect($offenders)->toBe([]);
+});

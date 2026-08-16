@@ -8,6 +8,7 @@ use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ForceDeleteBulkAction;
 use Filament\Actions\RestoreBulkAction;
+use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\TrashedFilter;
@@ -20,6 +21,7 @@ class AppointmentServicesTable
         return $table
             ->defaultSort('sort_order')
             ->reorderable('sort_order')
+            ->emptyStateIcon(Heroicon::OutlinedSparkles)
             ->emptyStateHeading('Aucune prestation')
             ->emptyStateDescription('Une prestation décrit ce que le client '
                 .'réserve : sa durée, son prix et son délai de réservation.')

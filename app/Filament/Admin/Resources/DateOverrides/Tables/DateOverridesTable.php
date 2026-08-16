@@ -6,6 +6,7 @@ use App\Models\DateOverride;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
+use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\Filter;
 use Filament\Tables\Table;
@@ -17,6 +18,7 @@ class DateOverridesTable
     {
         return $table
             ->defaultSort('date')
+            ->emptyStateIcon(Heroicon::OutlinedNoSymbol)
             ->emptyStateHeading('Aucun blocage à venir')
             ->emptyStateDescription('Bloquez une période pour vos congés : '
                 .'aucun créneau ne sera proposé sur ces journées.')

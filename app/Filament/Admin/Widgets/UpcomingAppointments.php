@@ -8,6 +8,7 @@ use App\Services\AppointmentLifecycleService;
 use Carbon\CarbonImmutable;
 use Filament\Actions\Action;
 use Filament\Notifications\Notification;
+use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Filament\Widgets\TableWidget;
@@ -27,6 +28,7 @@ class UpcomingAppointments extends TableWidget
         return $table
             ->query(fn (): Builder => $this->getTableQuery())
             ->paginated(false)
+            ->emptyStateIcon(Heroicon::OutlinedCalendarDays)
             ->emptyStateHeading('Aucune séance dans les 7 jours')
             ->emptyStateDescription('Les réservations à venir s\'afficheront ici.')
             ->columns([
@@ -37,7 +39,7 @@ class UpcomingAppointments extends TableWidget
                 TextColumn::make('customer_full_name')
                     ->label('Client')
                     ->description(fn (Appointment $record) => filled($record->notes)
-                        ? '✉ '.Str::limit($record->notes, 70)
+                        ? 'Message : '.Str::limit($record->notes, 70)
                         : null),
 
                 TextColumn::make('service.name')

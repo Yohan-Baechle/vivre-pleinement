@@ -30,7 +30,7 @@ class Dashboard extends BaseDashboard
         if ($appointments > 0) {
             $waiting[] = trans_choice(
                 '{1} :count rendez-vous à confirmer'
-                    .'|]1,*[ :count rendez-vous à confirmer',
+                    .'|[2,*] :count rendez-vous à confirmer',
                 $appointments,
                 ['count' => $appointments],
             );
@@ -43,7 +43,7 @@ class Dashboard extends BaseDashboard
         if ($comments > 0) {
             $waiting[] = trans_choice(
                 '{1} :count commentaire à modérer'
-                    .'|]1,*[ :count commentaires à modérer',
+                    .'|[2,*] :count commentaires à modérer',
                 $comments,
                 ['count' => $comments],
             );

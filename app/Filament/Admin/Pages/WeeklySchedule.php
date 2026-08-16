@@ -74,6 +74,7 @@ class WeeklySchedule extends Page
             ->statePath('data')
             ->components([
                 Section::make('Prestation concernée')
+                    ->icon(Heroicon::OutlinedSparkles)
                     ->description('Un horaire commun à toutes les prestations, '
                         .'ou un horaire dédié à l\'une d\'elles.')
                     ->schema([
@@ -189,7 +190,7 @@ class WeeklySchedule extends Page
                 ? 'Aucune plage horaire : aucun créneau ne sera proposé.'
                 : trans_choice(
                     '{1} :count plage horaire enregistrée.'
-                        .'|]1,*[ :count plages horaires enregistrées.',
+                        .'|[2,*] :count plages horaires enregistrées.',
                     $created,
                     ['count' => $created],
                 ))
@@ -455,7 +456,7 @@ class WeeklySchedule extends Page
         }
 
         return trans_choice(
-            '{1} :count créneau|]1,*[ :count créneaux',
+            '{1} :count créneau|[2,*] :count créneaux',
             $total,
             ['count' => $total],
         )." de {$service->duration_minutes} min « {$service->name} »";

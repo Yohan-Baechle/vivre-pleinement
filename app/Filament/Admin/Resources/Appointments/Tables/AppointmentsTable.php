@@ -22,6 +22,7 @@ use Filament\Forms\Components\Select;
 use Filament\Notifications\Notification;
 use Filament\Schemas\Components\Utilities\Get;
 use Filament\Schemas\Components\Utilities\Set;
+use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
@@ -38,6 +39,7 @@ class AppointmentsTable
             ->defaultSort('starts_at')
             ->persistFiltersInSession()
             ->persistSortInSession()
+            ->emptyStateIcon(Heroicon::OutlinedCalendarDays)
             ->emptyStateHeading('Aucun rendez-vous à venir')
             ->emptyStateDescription('Les réservations prises sur le site '
                 .'arrivent ici. Vous pouvez aussi en ajouter une à la main.')
@@ -59,7 +61,7 @@ class AppointmentsTable
                     ->label('Client')
                     ->searchable(['customer_first_name', 'customer_last_name'])
                     ->description(fn (Appointment $record) => filled($record->notes)
-                        ? '✉ '.Str::limit($record->notes, 60)
+                        ? 'Message : '.Str::limit($record->notes, 60)
                         : null)
                     ->tooltip(fn (Appointment $record) => $record->notes),
 

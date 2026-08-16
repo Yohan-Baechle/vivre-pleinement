@@ -55,6 +55,7 @@ class ContactSettings extends Page
             ->statePath('data')
             ->components([
                 Section::make('Coordonnées publiques')
+                    ->icon(Heroicon::OutlinedMapPin)
                     ->description('Affichées sur la page Contact et le pied de page du site.')
                     ->columns(2)
                     ->schema([
@@ -72,6 +73,7 @@ class ContactSettings extends Page
                     ]),
 
                 Section::make('Réseaux sociaux')
+                    ->icon(Heroicon::OutlinedShare)
                     ->description('Collez l\'adresse complète de chaque profil. Les réseaux laissés vides n\'apparaissent pas sur le site.')
                     ->columns(2)
                     ->schema([
@@ -103,6 +105,7 @@ class ContactSettings extends Page
                     ]),
 
                 Section::make('Blog')
+                    ->icon(Heroicon::OutlinedNewspaper)
                     ->description('Réglages globaux des commentaires d\'articles.')
                     ->schema([
                         Toggle::make('comments_enabled')

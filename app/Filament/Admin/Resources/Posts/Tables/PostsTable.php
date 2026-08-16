@@ -15,6 +15,7 @@ use Filament\Actions\EditAction;
 use Filament\Actions\ForceDeleteBulkAction;
 use Filament\Actions\RestoreBulkAction;
 use Filament\Notifications\Notification;
+use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Columns\SpatieMediaLibraryImageColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
@@ -29,6 +30,7 @@ class PostsTable
         return $table
             ->persistFiltersInSession()
             ->persistSortInSession()
+            ->emptyStateIcon(Heroicon::OutlinedNewspaper)
             ->emptyStateHeading('Aucun article pour l\'instant')
             ->emptyStateDescription('Écrivez votre premier article : il '
                 .'apparaîtra sur le blog dès que vous le publierez.')
@@ -134,7 +136,7 @@ class PostsTable
                         ->action(fn (Collection $records) => self::changeStatus(
                             $records,
                             PostStatus::Published,
-                            '{1} :count article publié|]1,*[ :count articles publiés',
+                            '{1} :count article publié|[2,*] :count articles publiés',
                         ))
                         ->deselectRecordsAfterCompletion(),
 
@@ -149,7 +151,7 @@ class PostsTable
                             $records,
                             PostStatus::Draft,
                             '{1} :count article repassé en brouillon'
-                                .'|]1,*[ :count articles repassés en brouillon',
+                                .'|[2,*] :count articles repassés en brouillon',
                         ))
                         ->deselectRecordsAfterCompletion(),
 

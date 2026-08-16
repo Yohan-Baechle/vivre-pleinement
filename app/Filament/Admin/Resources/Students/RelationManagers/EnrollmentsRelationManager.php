@@ -28,6 +28,7 @@ class EnrollmentsRelationManager extends RelationManager
         return $table
             ->recordTitleAttribute('id')
             ->defaultSort('created_at', 'desc')
+            ->emptyStateIcon(Heroicon::OutlinedAcademicCap)
             ->emptyStateHeading('Aucune inscription')
             ->emptyStateDescription('Cet élève n\'a encore acheté aucune '
                 .'formation. Vous pouvez lui en offrir une.')

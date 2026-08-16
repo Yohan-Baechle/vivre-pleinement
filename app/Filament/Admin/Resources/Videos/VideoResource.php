@@ -65,7 +65,7 @@ class VideoResource extends Resource
     {
         return [
             'Statut' => $record->is_missing
-                ? '⚠️ Manquante sur YouTube'
+                ? 'Manquante sur YouTube'
                 : $record->status->getLabel(),
             'Publiée le' => $record->published_at?->format('d/m/Y') ?? '–',
         ];
