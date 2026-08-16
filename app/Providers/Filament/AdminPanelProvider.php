@@ -7,6 +7,7 @@ use App\Filament\Admin\Widgets\CourseSalesStats;
 use App\Filament\Admin\Widgets\LatestPosts;
 use App\Filament\Admin\Widgets\StatsOverview;
 use App\Filament\Admin\Widgets\UpcomingAppointments;
+use App\Filament\AvatarProviders\InitialsAvatarProvider;
 use Filament\Auth\MultiFactor\App\AppAuthentication;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
@@ -36,6 +37,7 @@ class AdminPanelProvider extends PanelProvider
                     ->brandName('Vivre Pleinement')
                     ->recoverable(),
             ], isRequired: true)
+            ->defaultAvatarProvider(InitialsAvatarProvider::class)
             ->brandName('Vivre Pleinement')
             ->brandLogo(asset('images/logo@2x.webp'))
             ->brandLogoHeight('2.5rem')
