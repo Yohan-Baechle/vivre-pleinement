@@ -4,6 +4,7 @@ use App\Enums\BookOrderStatus;
 use App\Models\BookOrder;
 use App\Models\Product;
 use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
+use Illuminate\Http\UploadedFile;
 
 uses(LazilyRefreshDatabase::class);
 
@@ -19,6 +20,13 @@ beforeEach(function () {
         'name' => 'Le livre + 1h de coaching',
         'price_cents' => 7000,
     ]);
+
+    /**
+     * Sans fichier livrable, aucune offre n'est achetable : la disponibilité
+     * a ses propres tests, ceux-ci portent sur le tunnel lui-même.
+     */
+    $this->solo->addMedia(UploadedFile::fake()->create('livre.pdf', 12))
+        ->toMediaCollection('download');
 });
 
 it('renders the book landing page', function () {

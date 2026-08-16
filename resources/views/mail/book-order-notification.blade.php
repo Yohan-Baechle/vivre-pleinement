@@ -13,7 +13,7 @@ Cette formule comprend **1 h de coaching**. Le lien de réservation à usage
 unique est parti avec l'email de confirmation.
 @endif
 
-@if (! $order->product->getFirstMedia('download'))
+@if (! $order->product->isDeliverable())
 ⚠️ **Aucun fichier n'est rattaché à ce produit** : le client n'a pas pu
 télécharger son livre. Ajoutez le PDF dans la fiche produit, puis renvoyez-lui
 le lien.

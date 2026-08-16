@@ -29,14 +29,20 @@
         </div>
 
         <div class="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row">
-            <a href="{{ route('book.checkout', 'livre') }}" class="group inline-flex w-full items-center justify-center gap-2 rounded-full bg-teal-700 px-7 py-3.5 text-sm font-medium text-white shadow-lg shadow-teal-700/20 transition hover:bg-teal-800 sm:w-auto sm:text-base">
-                Obtenir le livre · {!! $offerPrice($offerSolo) !!}
-                <span class="transition group-hover:translate-x-0.5" aria-hidden="true">→</span>
-            </a>
-            <a href="{{ route('book.checkout', 'livre-coaching') }}" class="group hover:bg-cream-50 inline-flex w-full items-center justify-center gap-2 rounded-full bg-white px-7 py-3.5 text-sm font-medium text-teal-800 shadow-xs ring-1 ring-teal-200 transition sm:w-auto sm:text-base">
-                Livre + coaching · {!! $offerPrice($offerCoaching) !!}
-                <span class="transition group-hover:translate-x-0.5" aria-hidden="true">→</span>
-            </a>
+            <div class="w-full sm:w-auto">
+                <x-book-offer-cta
+                    slug="livre"
+                    :available="$offerAvailable('livre')"
+                    :label="'Obtenir le livre · '.$offerPrice($offerSolo)"
+                    class="inline-flex w-full items-center justify-center gap-2 rounded-full bg-teal-700 px-7 py-3.5 text-sm font-medium text-white shadow-lg shadow-teal-700/20 transition hover:bg-teal-800 sm:w-auto sm:text-base" />
+            </div>
+            <div class="w-full sm:w-auto">
+                <x-book-offer-cta
+                    slug="livre-coaching"
+                    :available="$offerAvailable('livre-coaching')"
+                    :label="'Livre + coaching · '.$offerPrice($offerCoaching)"
+                    class="hover:bg-cream-50 inline-flex w-full items-center justify-center gap-2 rounded-full bg-white px-7 py-3.5 text-sm font-medium text-teal-800 shadow-xs ring-1 ring-teal-200 transition sm:w-auto sm:text-base" />
+            </div>
         </div>
 
         <p class="text-ink-muted mt-8 text-xs sm:text-sm">

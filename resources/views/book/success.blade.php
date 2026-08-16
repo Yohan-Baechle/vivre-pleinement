@@ -6,7 +6,7 @@
 
     $isProcessing = $order->status === BookOrderStatus::Pending;
     $isRefunded = $order->status === BookOrderStatus::Refunded;
-    $hasFile = $order->product->getFirstMedia('download') !== null;
+    $hasFile = $order->product->isDeliverable();
 @endphp
 
 @section('title', 'Merci · '.$order->product->name)
