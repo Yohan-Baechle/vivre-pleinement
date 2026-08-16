@@ -110,12 +110,23 @@ class BookController extends Controller
     }
 
     /**
-     * Sert le fichier vendu depuis le disque privé. Le token de la commande
-     * fait office de clé, et le statut est revérifié à chaque requête : un
-     * remboursement coupe le lien immédiatement, même déjà distribué.
+     * Sert le fichier vendu depuis le disque privé.
+     *
+     * Deux verrous indépendants : la signature, qui borne la durée de vie du
+     * lien distribué par email, et le statut de la commande, revérifié à
+     * chaque requête pour qu'un remboursement coupe l'accès immédiatement.
+     *
+     * Une signature périmée renvoie vers la page de commande plutôt que sur
+     * une erreur : l'acheteur y régénère un lien frais sans rien demander.
      */
-    public function download(BookOrder $order): Response
+    public function download(Request $request, BookOrder $order): Response|RedirectResponse
     {
+        if (! $request->hasValidSignature()) {
+            return redirect()
+                ->route('book.success', $order->token)
+                ->with('status', 'Votre lien de téléchargement avait expiré, en voici un nouveau.');
+        }
+
         abort_unless($order->isPaid(), 403, 'Cette commande ne donne pas accès au téléchargement.');
 
         $media = $order->product->getFirstMedia('download');

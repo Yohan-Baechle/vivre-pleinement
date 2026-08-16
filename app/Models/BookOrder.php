@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Str;
 
 #[Fillable([
@@ -90,9 +91,30 @@ class BookOrder extends Model
         return $this->belongsTo(Appointment::class, 'coaching_appointment_id');
     }
 
+    /**
+     * Durée de validité d'un lien de téléchargement. Assez long pour qu'un
+     * acheteur retrouve son email des semaines plus tard, assez court pour
+     * qu'un lien ayant fuité cesse de circuler.
+     */
+    public const DOWNLOAD_LINK_DAYS = 30;
+
     public function customerName(): string
     {
         return trim($this->customer_first_name.' '.$this->customer_last_name);
+    }
+
+    /**
+     * URL de téléchargement signée et datée. Régénérée à chaque affichage :
+     * la page de remerciement et le renvoi d'email produisent toujours un
+     * lien frais, un lien expiré ne condamne donc jamais un achat.
+     */
+    public function downloadUrl(): string
+    {
+        return URL::temporarySignedRoute(
+            'book.download',
+            now()->addDays(self::DOWNLOAD_LINK_DAYS),
+            ['order' => $this->token],
+        );
     }
 
     public function isPaid(): bool

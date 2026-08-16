@@ -49,8 +49,14 @@
                         de téléchargement. Vous pouvez aussi le récupérer tout de suite.
                     </p>
 
+                    @if (session('status'))
+                        <p class="bg-cream-100 text-ink-soft mt-6 rounded-2xl px-5 py-3 text-sm" role="status">
+                            {{ session('status') }}
+                        </p>
+                    @endif
+
                     @if ($hasFile)
-                        <a href="{{ route('book.download', $order->token) }}"
+                        <a href="{{ $order->downloadUrl() }}"
                            class="group mt-8 inline-flex items-center justify-center gap-2 rounded-full bg-teal-700 px-7 py-3.5 text-sm font-medium text-white shadow-lg shadow-teal-700/20 transition hover:bg-teal-800">
                             Télécharger le livre
                             <span class="transition group-hover:translate-y-0.5" aria-hidden="true">↓</span>

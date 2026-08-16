@@ -2,8 +2,10 @@
 
 namespace App\Listeners;
 
+use App\Models\Appointment;
 use App\Models\BookOrder;
 use App\Models\Enrollment;
+use App\Services\BookingPaymentService;
 use App\Services\BookPaymentService;
 use App\Services\CoursePaymentService;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -25,6 +27,7 @@ class HandleStripeChargeRefunded implements ShouldQueue
     public function __construct(
         private CoursePaymentService $coursePayments,
         private BookPaymentService $bookPayments,
+        private BookingPaymentService $bookingPayments,
     ) {}
 
     /**
@@ -60,11 +63,19 @@ class HandleStripeChargeRefunded implements ShouldQueue
         if ($order !== null) {
             $this->bookPayments->refund($order);
         }
+
+        $appointment = Appointment::query()
+            ->where('stripe_payment_intent_id', $paymentIntentId)
+            ->first();
+
+        if ($appointment !== null) {
+            $this->bookingPayments->refund($appointment);
+        }
     }
 
     /**
      * Toutes les tentatives ont échoué : un remboursement Stripe existe sans
-     * que l'accès à la formation ait été révoqué côté application.
+     * que l'accès correspondant ait été révoqué côté application.
      */
     public function failed(WebhookReceived $event, Throwable $exception): void
     {

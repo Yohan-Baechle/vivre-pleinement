@@ -3,12 +3,14 @@
 namespace App\Filament\Admin\Resources\Appointments\Tables;
 
 use App\Enums\AppointmentStatus;
+use App\Enums\PaymentStatus;
 use App\Mail\AppointmentNoShow;
 use App\Mail\AppointmentRescheduled;
 use App\Models\Appointment;
 use App\Models\AppointmentService;
 use App\Services\AppointmentLifecycleService;
 use App\Services\AppointmentSlotService;
+use App\Services\BookingPaymentService;
 use Carbon\CarbonImmutable;
 use Filament\Actions\Action;
 use Filament\Actions\ActionGroup;
@@ -148,6 +150,20 @@ class AppointmentsTable
                             Mail::to($record->customer_email)->send(new AppointmentNoShow($record));
 
                             Notification::make()->success()->title('Client marqué absent')->send();
+                        }),
+
+                    Action::make('markRefunded')
+                        ->label('Marquer remboursé')
+                        ->icon('heroicon-o-arrow-uturn-left')
+                        ->color('danger')
+                        ->visible(fn (Appointment $record) => $record->payment_status === PaymentStatus::Paid)
+                        ->requiresConfirmation()
+                        ->modalHeading('Marquer comme remboursé')
+                        ->modalDescription('Le rendez-vous reste au planning : seul son paiement passe en remboursé. Le remboursement lui-même doit être émis depuis le dashboard Stripe (il déclenche aussi cette mise à jour automatiquement via le webhook charge.refunded). Pour libérer le créneau, annulez le rendez-vous.')
+                        ->action(function (Appointment $record): void {
+                            app(BookingPaymentService::class)->refund($record);
+
+                            Notification::make()->success()->title('Paiement marqué remboursé')->send();
                         }),
 
                     EditAction::make(),
