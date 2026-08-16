@@ -98,7 +98,11 @@
     background-color: #ffffff;
 }
 
-.fi-section {
+/* Seules les sections en carte reçoivent un cadre. Les widgets de
+   statistiques et les regroupements de titre posent une section « non
+   contenue » : leur border dessinait une boîte autour de « Vue d'ensemble »,
+   « Formations » ou « État des vidéos », en plus du cadre de chaque tuile. */
+.fi-section:not(.fi-section-not-contained) {
     border: 1px solid var(--color-cream-200);
 }
 
@@ -154,7 +158,7 @@
     background-color: var(--color-teal-900);
 }
 
-.dark .fi-section {
+.dark .fi-section:not(.fi-section-not-contained) {
     background-color: #103039;
     border-color: rgb(255 255 255 / 0.06);
 }
