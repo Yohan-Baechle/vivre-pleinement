@@ -148,6 +148,31 @@ class BookingPaymentService
         ]);
     }
 
+    /**
+     * Enregistre qu'un rendez-vous payé a été remboursé (webhook
+     * charge.refunded ou action admin). Idempotent : un rendez-vous déjà
+     * remboursé ou jamais payé ne bouge pas.
+     *
+     * Le statut du rendez-vous lui-même n'est pas touché : rembourser n'est
+     * pas annuler. Une séance honorée puis remboursée par geste commercial
+     * doit rester au planning, et libérer le créneau enverrait des emails
+     * d'annulation que personne n'a demandés. L'annulation reste une action
+     * explicite.
+     */
+    public function refund(Appointment $appointment): void
+    {
+        if ($appointment->payment_status !== PaymentStatus::Paid) {
+            return;
+        }
+
+        $appointment->update(['payment_status' => PaymentStatus::Refunded]);
+
+        Log::info('Rendez-vous remboursé.', [
+            'appointment_id' => $appointment->id,
+            'reference' => $appointment->reference,
+        ]);
+    }
+
     private function refundAndApologise(Appointment $appointment, ?string $paymentIntentId): void
     {
         $refunded = $paymentIntentId !== null && $this->intents->refundQuietly($paymentIntentId);

@@ -17,11 +17,11 @@ function attachDownloadable(BookOrder $order): void
         ->toMediaCollection('download');
 }
 
-it('sert le fichier à une commande payée', function () {
+it('sert le fichier à une commande payée via un lien signé', function () {
     $order = BookOrder::factory()->paid()->create();
     attachDownloadable($order);
 
-    $this->get(route('book.download', $order->token))
+    $this->get($order->downloadUrl())
         ->assertOk()
         ->assertDownload('livre.pdf');
 });
@@ -30,33 +30,54 @@ it('refuse le téléchargement à une commande non payée', function () {
     $order = BookOrder::factory()->create();
     attachDownloadable($order);
 
-    $this->get(route('book.download', $order->token))->assertForbidden();
+    $this->get($order->downloadUrl())->assertForbidden();
 });
 
 it('coupe le téléchargement après un remboursement', function () {
     $order = BookOrder::factory()->refunded()->create();
     attachDownloadable($order);
 
-    $this->get(route('book.download', $order->token))->assertForbidden();
+    $this->get($order->downloadUrl())->assertForbidden();
 });
 
 it('répond 404 tant qu\'aucun fichier n\'est rattaché au produit', function () {
     $order = BookOrder::factory()->paid()->create();
 
-    $this->get(route('book.download', $order->token))->assertNotFound();
+    $this->get($order->downloadUrl())->assertNotFound();
+});
+
+it('renvoie vers la commande plutôt qu\'une erreur quand le lien a expiré', function () {
+    $order = BookOrder::factory()->paid()->create();
+    attachDownloadable($order);
+
+    $url = $order->downloadUrl();
+
+    $this->travel(BookOrder::DOWNLOAD_LINK_DAYS + 1)->days();
+
+    $this->get($url)
+        ->assertRedirect(route('book.success', $order->token))
+        ->assertSessionHas('status');
+});
+
+it('refuse un lien de téléchargement non signé', function () {
+    $order = BookOrder::factory()->paid()->create();
+    attachDownloadable($order);
+
+    $this->get(route('book.download', $order->token))
+        ->assertRedirect(route('book.success', $order->token));
 });
 
 it('refuse un token inconnu', function () {
     $this->get('/livre/telecharger/'.str_repeat('a', 48))->assertNotFound();
 });
 
-it('affiche le lien de téléchargement sur la page de remerciement', function () {
+it('affiche un lien de téléchargement frais sur la page de remerciement', function () {
     $order = BookOrder::factory()->paid()->create();
     attachDownloadable($order);
 
     $this->get(route('book.success', $order->token))
         ->assertOk()
-        ->assertSee(route('book.download', $order->token));
+        ->assertSee('signature=', false);
 });
 
 it('fait patienter la page de remerciement tant que le webhook n\'a pas répondu', function () {

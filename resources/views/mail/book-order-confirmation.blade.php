@@ -10,10 +10,11 @@ Votre paiement a bien été reçu. Merci de votre confiance.
 **Montant :** {{ \Illuminate\Support\Number::currency($order->amount_cents / 100, in: 'EUR', locale: 'fr') }}
 
 @if ($order->product->getFirstMedia('download'))
-Le lien ci-dessous est le vôtre : gardez-le, il reste valable et vous pouvez
-télécharger le livre autant de fois que nécessaire.
+Le lien ci-dessous vous est personnel et reste valable
+{{ \App\Models\BookOrder::DOWNLOAD_LINK_DAYS }} jours. Passé ce délai, il vous
+en proposera automatiquement un nouveau : gardez simplement cet email.
 
-<x-mail::button :url="route('book.download', $order->token)">
+<x-mail::button :url="$order->downloadUrl()">
 Télécharger le livre
 </x-mail::button>
 @else
