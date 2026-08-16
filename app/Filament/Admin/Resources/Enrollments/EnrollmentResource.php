@@ -3,10 +3,12 @@
 namespace App\Filament\Admin\Resources\Enrollments;
 
 use App\Filament\Admin\Resources\Enrollments\Pages\ListEnrollments;
+use App\Filament\Admin\Resources\Enrollments\Schemas\EnrollmentInfolist;
 use App\Filament\Admin\Resources\Enrollments\Tables\EnrollmentsTable;
 use App\Models\Enrollment;
 use BackedEnum;
 use Filament\Resources\Resource;
+use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
 use UnitEnum;
@@ -23,9 +25,14 @@ class EnrollmentResource extends Resource
 
     protected static ?string $pluralModelLabel = 'Ventes';
 
-    protected static ?int $navigationSort = 3;
+    protected static ?int $navigationSort = 40;
 
-    protected static string|UnitEnum|null $navigationGroup = 'Formations';
+    protected static string|UnitEnum|null $navigationGroup = 'Boutique';
+
+    public static function infolist(Schema $schema): Schema
+    {
+        return EnrollmentInfolist::configure($schema);
+    }
 
     public static function table(Table $table): Table
     {

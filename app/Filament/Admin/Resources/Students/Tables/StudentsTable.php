@@ -12,6 +12,9 @@ class StudentsTable
     {
         return $table
             ->defaultSort('created_at', 'desc')
+            ->emptyStateHeading('Aucun élève inscrit')
+            ->emptyStateDescription('Les comptes créés lors de l\'achat d\'une '
+                .'formation apparaissent ici.')
             ->columns([
                 TextColumn::make('name')
                     ->label('Nom')

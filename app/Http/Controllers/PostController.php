@@ -57,15 +57,32 @@ class PostController extends Controller
     {
         $post = Post::query()
             ->published()
-            ->with([
-                'categories',
-                'tags',
-                'media',
-                'comments' => fn ($query) => $query->where('status', CommentStatus::Approved)->whereNull('parent_id')->orderBy('posted_at'),
-                'comments.replies' => fn ($query) => $query->where('status', CommentStatus::Approved)->orderBy('posted_at'),
-            ])
             ->where('slug', $slug)
             ->firstOrFail();
+
+        return $this->renderPost($post);
+    }
+
+    /**
+     * Aperçu d'un article non publié, réservé à l'administration : l'URL est
+     * signée et expire, et la page est marquée noindex pour ne jamais entrer
+     * dans l'index de Google.
+     */
+    public function preview(Post $post): Response
+    {
+        return response($this->renderPost($post)->render())
+            ->header('X-Robots-Tag', 'noindex, nofollow');
+    }
+
+    private function renderPost(Post $post): View
+    {
+        $post->load([
+            'categories',
+            'tags',
+            'media',
+            'comments' => fn ($query) => $query->where('status', CommentStatus::Approved)->whereNull('parent_id')->orderBy('posted_at'),
+            'comments.replies' => fn ($query) => $query->where('status', CommentStatus::Approved)->orderBy('posted_at'),
+        ]);
 
         return view('blog.show', [
             'post' => $post,

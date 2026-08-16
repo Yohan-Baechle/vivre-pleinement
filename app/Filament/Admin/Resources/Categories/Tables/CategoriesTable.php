@@ -3,6 +3,7 @@
 namespace App\Filament\Admin\Resources\Categories\Tables;
 
 use Filament\Actions\BulkActionGroup;
+use Filament\Actions\CreateAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Tables\Columns\TextColumn;
@@ -13,6 +14,12 @@ class CategoriesTable
     public static function configure(Table $table): Table
     {
         return $table
+            ->emptyStateHeading('Aucune catégorie')
+            ->emptyStateDescription('Les catégories regroupent les articles '
+                .'par thème sur le blog.')
+            ->emptyStateActions([
+                CreateAction::make()->label('Créer une catégorie'),
+            ])
             ->columns([
                 TextColumn::make('name')
                     ->label('Nom')
@@ -20,6 +27,7 @@ class CategoriesTable
                     ->sortable(),
 
                 TextColumn::make('slug')
+                    ->label('Adresse')
                     ->color('gray')
                     ->toggleable(),
 

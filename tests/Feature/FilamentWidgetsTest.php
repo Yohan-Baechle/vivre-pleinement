@@ -60,23 +60,26 @@ it('shows the actual active enrollment count on the course sales stats widget', 
     Livewire::test(CourseSalesStats::class)->assertOk();
 });
 
-it('caches the appointment/comment/video/course navigation badges', function () {
+it('caches the appointment/comment/video navigation badges', function () {
     Appointment::factory()->create(['status' => AppointmentStatus::Pending]);
     Comment::factory()->create(['status' => CommentStatus::Pending]);
     Video::factory()->create(['is_missing' => true]);
-    Course::factory()->create(['status' => CourseStatus::Draft]);
 
     expect(AppointmentResource::getNavigationBadge())->toBe('1')
         ->and(CommentResource::getNavigationBadge())->toBe('1')
-        ->and(VideoResource::getNavigationBadge())->toBe('1')
-        ->and(CourseResource::getNavigationBadge())->toBe('1');
+        ->and(VideoResource::getNavigationBadge())->toBe('1');
 
     expect(Cache::has('filament.badge.appointments.pending'))->toBeTrue()
         ->and(Cache::has('filament.badge.comments.pending'))->toBeTrue()
-        ->and(Cache::has('filament.badge.videos.missing'))->toBeTrue()
-        ->and(Cache::has('filament.badge.courses.draft'))->toBeTrue();
+        ->and(Cache::has('filament.badge.videos.missing'))->toBeTrue();
 
     Appointment::factory()->create(['status' => AppointmentStatus::Pending]);
 
     expect(AppointmentResource::getNavigationBadge())->toBe('1');
+});
+
+it('keeps the courses navigation free of a permanent draft badge', function () {
+    Course::factory()->create(['status' => CourseStatus::Draft]);
+
+    expect(CourseResource::getNavigationBadge())->toBeNull();
 });

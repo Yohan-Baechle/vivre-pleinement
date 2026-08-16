@@ -20,6 +20,9 @@ class AvailabilitiesTable
     {
         return $table
             ->defaultSort(null)
+            ->emptyStateHeading('Aucune plage horaire')
+            ->emptyStateDescription('Définissez vos horaires depuis la page '
+                .'« Horaires de la semaine ».')
             ->modifyQueryUsing(fn (Builder $query) => $query
                 ->orderByRaw(Weekdays::sortExpression())
                 ->orderBy('start_time'))

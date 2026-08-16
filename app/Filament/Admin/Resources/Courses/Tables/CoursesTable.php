@@ -5,6 +5,7 @@ namespace App\Filament\Admin\Resources\Courses\Tables;
 use App\Enums\CourseStatus;
 use App\Enums\EnrollmentStatus;
 use Filament\Actions\BulkActionGroup;
+use Filament\Actions\CreateAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ForceDeleteBulkAction;
@@ -20,6 +21,12 @@ class CoursesTable
     public static function configure(Table $table): Table
     {
         return $table
+            ->emptyStateHeading('Aucune formation')
+            ->emptyStateDescription('Créez votre première formation : modules, '
+                .'leçons et page de vente se règlent ensuite depuis sa fiche.')
+            ->emptyStateActions([
+                CreateAction::make()->label('Créer une formation'),
+            ])
             ->defaultSort('position')
             ->reorderable('position')
             ->columns([

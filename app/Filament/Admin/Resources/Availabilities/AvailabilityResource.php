@@ -29,7 +29,7 @@ class AvailabilityResource extends Resource
 
     protected static string|UnitEnum|null $navigationGroup = 'Rendez-vous';
 
-    protected static ?int $navigationSort = 20;
+    protected static ?int $navigationSort = 30;
 
     /**
      * La saisie courante passe par la page « Horaires de la semaine ». Ce

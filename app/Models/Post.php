@@ -17,6 +17,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\URL;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
 
@@ -38,6 +39,19 @@ use Spatie\MediaLibrary\InteractsWithMedia;
 #[ObservedBy([PostObserver::class])]
 class Post extends Model implements HasMedia
 {
+    /**
+     * Directive robots d'une page indexable : le « max-snippet » hérité de
+     * WordPress autorise les extraits longs et les grandes images, ce qui est
+     * précisément ce qu'on veut sur un article.
+     */
+    public const ROBOTS_INDEXED = 'index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1';
+
+    /**
+     * Directive robots d'une page retirée de l'index : les liens restent
+     * suivis pour ne pas casser le maillage interne.
+     */
+    public const ROBOTS_HIDDEN = 'noindex, follow';
+
     /**
      * Borne haute de l'import WordPress : un updated_at antérieur correspond
      * à la migration, pas à une vraie édition.
@@ -109,6 +123,19 @@ class Post extends Model implements HasMedia
     public function videos(): HasMany
     {
         return $this->hasMany(Video::class, 'related_post_id');
+    }
+
+    /**
+     * URL d'aperçu signée, valable deux heures, pour relire un brouillon dans
+     * sa mise en page réelle sans avoir à le publier.
+     */
+    public function previewUrl(): string
+    {
+        return URL::temporarySignedRoute(
+            'blog.preview',
+            now()->addHours(2),
+            ['post' => $this->getRouteKey()],
+        );
     }
 
     /**

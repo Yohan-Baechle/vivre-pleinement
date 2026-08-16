@@ -20,11 +20,11 @@ class ContactSettings extends Page
 {
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedIdentification;
 
-    protected static ?string $navigationLabel = 'Coordonnées';
+    protected static ?string $navigationLabel = 'Coordonnées & réseaux';
 
     protected static ?string $title = 'Coordonnées & réseaux sociaux';
 
-    protected static string|UnitEnum|null $navigationGroup = 'Site';
+    protected static string|UnitEnum|null $navigationGroup = 'Réglages du site';
 
     protected static ?int $navigationSort = 10;
 

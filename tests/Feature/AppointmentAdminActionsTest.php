@@ -7,6 +7,7 @@ use App\Mail\AppointmentNoShow;
 use App\Mail\AppointmentRescheduled;
 use App\Models\Appointment;
 use App\Models\AppointmentService;
+use App\Models\Availability;
 use App\Models\User;
 use Carbon\CarbonImmutable;
 use Filament\Actions\Testing\TestAction;
@@ -27,6 +28,14 @@ function adminAppointment(?CarbonImmutable $start = null): Appointment
 {
     $start ??= CarbonImmutable::now()->addDays(4)->setTime(10, 0);
     $service = AppointmentService::factory()->create(['duration_minutes' => 30]);
+
+    foreach (range(0, 6) as $dayOfWeek) {
+        Availability::factory()->create([
+            'day_of_week' => $dayOfWeek,
+            'start_time' => '08:00',
+            'end_time' => '20:00',
+        ]);
+    }
 
     return Appointment::factory()->create([
         'appointment_service_id' => $service->id,
@@ -56,7 +65,8 @@ it('moves an appointment and notifies the client when an admin reschedules', fun
 
     Livewire::test(ListAppointments::class)
         ->callAction(TestAction::make('reschedule')->table($appointment), data: [
-            'starts_at' => $newStart->format('Y-m-d H:i:s'),
+            'date' => $newStart->toDateString(),
+            'starts_at' => $newStart->toDateTimeString(),
         ])
         ->assertHasNoActionErrors();
 
@@ -97,9 +107,24 @@ it('refuses to reschedule onto an occupied slot', function () {
 
     Livewire::test(ListAppointments::class)
         ->callAction(TestAction::make('reschedule')->table($appointment), data: [
-            'starts_at' => $occupiedStart->format('Y-m-d H:i:s'),
+            'date' => $occupiedStart->toDateString(),
+            'starts_at' => $occupiedStart->toDateTimeString(),
         ]);
 
     expect($appointment->fresh()->starts_at->equalTo($occupiedStart))->toBeFalse();
+    Mail::assertNotQueued(AppointmentRescheduled::class);
+});
+
+it('never offers a slot outside the opening hours when rescheduling', function () {
+    $appointment = adminAppointment();
+    $night = CarbonImmutable::now()->addDays(6)->setTime(3, 0);
+
+    Livewire::test(ListAppointments::class)
+        ->callAction(TestAction::make('reschedule')->table($appointment), data: [
+            'date' => $night->toDateString(),
+            'starts_at' => $night->toDateTimeString(),
+        ]);
+
+    expect($appointment->fresh()->starts_at->equalTo($night))->toBeFalse();
     Mail::assertNotQueued(AppointmentRescheduled::class);
 });

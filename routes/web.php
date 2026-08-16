@@ -187,7 +187,8 @@ Route::prefix('blog')->name('blog.')->group(function () {
         Route::get('rss', 'rss')->name('rss');
         Route::get('categorie/{slug}', 'byCategory')->name('category');
         Route::get('tag/{slug}', 'byTag')->name('tag');
-        Route::get('{slug}', 'show')->name('show')->where('slug', '(?!(?:rss|categorie|tag)$).+');
+        Route::get('apercu/{post}', 'preview')->middleware('signed')->name('preview');
+        Route::get('{slug}', 'show')->name('show')->where('slug', '(?!(?:rss|categorie|tag|apercu)$).+');
     });
 
     Route::post('{slug}/commentaire', [CommentController::class, 'store'])

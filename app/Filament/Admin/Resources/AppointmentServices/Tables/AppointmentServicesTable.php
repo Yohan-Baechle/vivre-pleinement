@@ -3,6 +3,7 @@
 namespace App\Filament\Admin\Resources\AppointmentServices\Tables;
 
 use Filament\Actions\BulkActionGroup;
+use Filament\Actions\CreateAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ForceDeleteBulkAction;
@@ -18,6 +19,13 @@ class AppointmentServicesTable
     {
         return $table
             ->defaultSort('sort_order')
+            ->reorderable('sort_order')
+            ->emptyStateHeading('Aucune prestation')
+            ->emptyStateDescription('Une prestation décrit ce que le client '
+                .'réserve : sa durée, son prix et son délai de réservation.')
+            ->emptyStateActions([
+                CreateAction::make()->label('Créer une prestation'),
+            ])
             ->columns([
                 TextColumn::make('name')
                     ->label('Nom')
@@ -34,8 +42,13 @@ class AppointmentServicesTable
                     ->money('EUR', divideBy: 100)
                     ->sortable(),
 
+                TextColumn::make('appointments_count')
+                    ->label('Rendez-vous')
+                    ->counts('appointments')
+                    ->sortable(),
+
                 IconColumn::make('requires_confirmation')
-                    ->label('Validation')
+                    ->label('Demande ma validation')
                     ->boolean(),
 
                 IconColumn::make('is_active')
