@@ -12,7 +12,9 @@
 <section class="relative overflow-hidden bg-white py-20 sm:py-24 lg:py-32">
     <div class="site-container">
         <div class="group relative overflow-hidden rounded-4xl bg-linear-to-br from-teal-700 to-teal-800 shadow-2xl shadow-teal-700/20">
-            @include('home.partials.book-pages')
+            {{-- Halo sous la couverture : la section a déjà son sujet visuel,
+                 elle manquait de profondeur, pas d'un motif de plus. --}}
+            <div class="pointer-events-none absolute inset-0 [background:radial-gradient(60%_70%_at_28%_45%,rgba(255,255,255,0.16),transparent_70%)]" aria-hidden="true"></div>
 
             <div class="relative grid grid-cols-1 items-center gap-10 px-8 py-12 sm:px-10 sm:py-16 lg:grid-cols-5 lg:gap-12 lg:px-14 lg:py-20">
                 <div class="flex justify-center lg:col-span-2">
