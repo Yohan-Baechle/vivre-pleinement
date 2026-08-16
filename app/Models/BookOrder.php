@@ -59,7 +59,7 @@ class BookOrder extends Model
 
     /**
      * Référence lisible, communiquée au client. Ne sert jamais de clé d'accès
-     * à une URL publique — c'est le rôle de `generateToken()`.
+     * à une URL publique : c'est le rôle de `generateToken()`.
      */
     public static function generateReference(): string
     {

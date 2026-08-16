@@ -37,7 +37,7 @@
                         Paiement reçu !
                     </h1>
                     <p class="text-ink-soft mt-4 text-sm sm:text-base">
-                        Votre paiement a bien été pris en compte. Votre commande se finalise à l'instant —
+                        Votre paiement a bien été pris en compte. Votre commande se finalise à l'instant :
                         vous allez recevoir votre lien de téléchargement par email dans quelques secondes.
                     </p>
                 @else
