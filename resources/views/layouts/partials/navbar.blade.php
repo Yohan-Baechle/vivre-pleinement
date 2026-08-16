@@ -1,19 +1,37 @@
 @php
-    $links = [
-        ['label' => 'À propos',     'href' => route('about'),            'active' => request()->routeIs('about')],
-        ['label' => 'Formations',   'href' => route('courses.index'),    'active' => request()->routeIs('courses.*') || request()->routeIs('student.*')],
-        ['label' => 'Mon livre',    'href' => route('book.show'),        'active' => request()->routeIs('book.*')],
-        ['label' => 'Blog',         'href' => route('blog.index'),       'active' => request()->routeIs('blog.*')],
-        ['label' => 'Vidéos',       'href' => route('videos.index'),     'active' => request()->routeIs('videos.*')],
-        ['label' => 'Me contacter', 'href' => route('contact'),          'active' => request()->routeIs('contact*')],
+    /**
+     * Le menu distingue deux intentions : ce qu'on peut acheter et ce qu'on
+     * peut consulter librement. Les offres passent en premier et portent une
+     * couleur plus soutenue, pour qu'un article gratuit n'ait pas le même
+     * poids visuel qu'une formation payante.
+     */
+    $offerLinks = [
+        ['label' => 'Accompagnement', 'href' => route('booking.index'),  'active' => request()->routeIs('booking.*')],
+        ['label' => 'Formations',     'href' => route('courses.index'),  'active' => request()->routeIs('courses.*') || request()->routeIs('student.*')],
+        ['label' => 'Le livre',       'href' => route('book.show'),      'active' => request()->routeIs('book.*')],
     ];
 
-    $deskLink = fn (bool $active) => implode(' ', [
+    $discoverLinks = [
+        ['label' => 'Blog',     'href' => route('blog.index'),   'active' => request()->routeIs('blog.*')],
+        ['label' => 'Vidéos',   'href' => route('videos.index'), 'active' => request()->routeIs('videos.*')],
+        ['label' => 'À propos', 'href' => route('about'),        'active' => request()->routeIs('about')],
+    ];
+
+    $mobileSections = [
+        'Travailler ensemble' => $offerLinks,
+        'Ressources' => $discoverLinks,
+    ];
+
+    /**
+     * Une seule classe de couleur est émise par lien : Tailwind ne départage
+     * pas deux utilitaires de même spécificité selon l'ordre dans l'attribut.
+     */
+    $deskLink = fn (bool $active, bool $primary = false) => implode(' ', [
         'relative py-1 transition-colors hover:text-teal-700',
         'after:absolute after:inset-x-0 after:-bottom-0.5 after:h-0.5 after:origin-left after:rounded-full after:bg-teal-700 after:transition-transform after:duration-300',
         $active
             ? 'text-teal-700 after:scale-x-100'
-            : 'after:scale-x-0 hover:after:scale-x-100',
+            : ($primary ? 'text-ink' : 'text-ink-soft').' after:scale-x-0 hover:after:scale-x-100',
     ]);
 @endphp
 
@@ -26,8 +44,18 @@
             </a>
 
             {{-- Navigation desktop --}}
-            <ul class="text-ink-soft hidden items-center gap-8 text-sm font-medium md:pointer-events-auto md:flex">
-                @foreach ($links as $link)
+            <ul class="hidden items-center gap-7 text-sm font-medium md:pointer-events-auto md:flex">
+                @foreach ($offerLinks as $link)
+                    <li>
+                        <a href="{{ $link['href'] }}" class="{{ $deskLink($link['active'], true) }}" @if($link['active']) aria-current="page" @endif>
+                            {{ $link['label'] }}
+                        </a>
+                    </li>
+                @endforeach
+
+                <li aria-hidden="true" class="bg-ink/15 h-4 w-px"></li>
+
+                @foreach ($discoverLinks as $link)
                     <li>
                         <a href="{{ $link['href'] }}" class="{{ $deskLink($link['active']) }}" @if($link['active']) aria-current="page" @endif>
                             {{ $link['label'] }}
@@ -93,7 +121,7 @@
                     </a>
                 @endauth
 
-                <a href="{{ route('booking.index') }}" @class([
+                <a href="{{ route('booking.index') }}#reserver" @class([
                     'inline-flex items-center gap-2 rounded-full bg-teal-700 px-4 py-2 text-xs font-medium text-white shadow transition hover:bg-teal-800 sm:px-5 sm:text-sm',
                     'bg-teal-800' => request()->routeIs('booking.*'),
                 ])>
@@ -114,15 +142,20 @@
 
         {{-- Navigation mobile --}}
         <ul class="border-ink/5 text-ink-soft flex flex-col border-t p-2 text-sm font-medium md:hidden">
-            @foreach ($links as $link)
+            @foreach ($mobileSections as $sectionLabel => $sectionLinks)
                 <li>
-                    <a href="{{ $link['href'] }}" @class([
-                        'block rounded-2xl px-4 py-3 transition hover:bg-teal-50 hover:text-teal-700',
-                        'text-teal-700' => $link['active'],
-                    ]) @if($link['active']) aria-current="page" @endif>
-                        {{ $link['label'] }}
-                    </a>
+                    <p class="text-ink-muted px-4 pt-2 pb-1 text-xs font-semibold tracking-wider uppercase">{{ $sectionLabel }}</p>
                 </li>
+                @foreach ($sectionLinks as $link)
+                    <li>
+                        <a href="{{ $link['href'] }}" @class([
+                            'block rounded-2xl px-4 py-3 transition hover:bg-teal-50 hover:text-teal-700',
+                            'text-teal-700' => $link['active'],
+                        ]) @if($link['active']) aria-current="page" @endif>
+                            {{ $link['label'] }}
+                        </a>
+                    </li>
+                @endforeach
             @endforeach
 
             <li class="border-ink/5 mt-1 border-t pt-1">
