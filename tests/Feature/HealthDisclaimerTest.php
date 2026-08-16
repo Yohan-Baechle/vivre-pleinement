@@ -31,3 +31,20 @@ it('shows the health disclaimer and crisis numbers on video pages', function () 
         ->assertSee('3114')
         ->assertSee('prévention du suicide');
 });
+
+it('shows the health disclaimer on the pages presenting the practice', function (string $route) {
+    $this->get(route($route))
+        ->assertOk()
+        ->assertSee('3114')
+        ->assertSee('prévention du suicide')
+        ->assertSee('data-nosnippet', false);
+})->with([
+    'à propos' => 'about',
+    'thérapie ACT' => 'therapie-act',
+]);
+
+it('points the crisis line to its official source', function () {
+    $this->get(route('about'))
+        ->assertOk()
+        ->assertSee('https://3114.fr', false);
+});

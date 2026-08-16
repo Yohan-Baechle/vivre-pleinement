@@ -36,4 +36,23 @@ class SubmissionThrottle
     {
         RateLimiter::hit($key, self::DECAY_SECONDS);
     }
+
+    /**
+     * Consomme une tentative si le plafond n'est pas atteint.
+     *
+     * Renvoie `null` quand l'envoi est autorisé, sinon le nombre de secondes à
+     * attendre. Regroupe le trio vérifier/mesurer/consommer que chaque
+     * formulaire public répétait à l'identique : oublier le `hit()` après un
+     * contrôle réussi désarmait silencieusement la limitation.
+     */
+    public static function attempt(string $key): ?int
+    {
+        if (self::exceeded($key)) {
+            return self::availableIn($key);
+        }
+
+        self::hit($key);
+
+        return null;
+    }
 }

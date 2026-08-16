@@ -120,6 +120,8 @@
                         </div>
                     </div>
 
+                    <x-health-disclaimer class="mt-12" />
+
                     {{-- CTA --}}
                     <div class="mt-12 rounded-3xl bg-teal-700 p-8 text-center shadow-lg shadow-teal-700/20 sm:p-10">
                         <h2 class="font-serif text-2xl font-medium text-white sm:text-3xl">Et si on en parlait&nbsp;?</h2>

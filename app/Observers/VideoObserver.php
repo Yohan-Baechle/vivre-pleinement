@@ -2,6 +2,7 @@
 
 namespace App\Observers;
 
+use App\Http\Controllers\SitemapController;
 use App\Models\Video;
 use App\Support\IndexNow;
 use App\Support\VideoArticleMatcher;
@@ -36,7 +37,7 @@ class VideoObserver
     private function flushCaches(): void
     {
         Cache::forget('sitemap.urls');
-        Cache::forget('sitemap.videos');
+        Cache::forget(SitemapController::VIDEOS_CACHE_KEY);
 
         VideoArticleMatcher::flush();
     }

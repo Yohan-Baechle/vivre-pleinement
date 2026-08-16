@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Http;
 uses(LazilyRefreshDatabase::class);
 
 it('pings the IndexNow API when a key is configured', function () {
+    $this->withoutDefer();
     config(['services.indexnow.key' => 'test-key-123']);
     Http::fake();
 
@@ -21,6 +22,7 @@ it('pings the IndexNow API when a key is configured', function () {
 });
 
 it('stays silent without a configured key', function () {
+    $this->withoutDefer();
     config(['services.indexnow.key' => null]);
     Http::fake();
 
@@ -30,6 +32,7 @@ it('stays silent without a configured key', function () {
 });
 
 it('pings automatically when a published post is saved', function () {
+    $this->withoutDefer();
     config(['services.indexnow.key' => 'test-key-123']);
     Http::fake();
 
@@ -39,10 +42,25 @@ it('pings automatically when a published post is saved', function () {
 });
 
 it('does not ping for drafts', function () {
+    $this->withoutDefer();
     config(['services.indexnow.key' => 'test-key-123']);
     Http::fake();
 
     Post::factory()->create(['status' => 'draft', 'published_at' => null]);
+
+    Http::assertNothingSent();
+});
+
+/**
+ * Le ping part d'un observer, donc de chaque sauvegarde dans l'admin : il ne
+ * doit jamais s'ajouter au temps de réponse. Sans withoutDefer(), rien ne doit
+ * partir pendant la sauvegarde elle-même.
+ */
+it('defers the ping instead of blocking the save', function () {
+    config(['services.indexnow.key' => 'test-key-123']);
+    Http::fake();
+
+    Post::factory()->create(['status' => 'published', 'published_at' => now()->subDay()]);
 
     Http::assertNothingSent();
 });

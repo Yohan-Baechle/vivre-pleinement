@@ -17,9 +17,9 @@ class VideoController extends Controller
 
     /**
      * Page liste des vidéos. Le listing interactif (recherche, filtres,
-     * pagination) est géré par le composant Livewire VideoSearch ; le contrôleur
-     * ne fournit que les métadonnées SEO (titre, catégories) et $topVideos pour
-     * le JSON-LD ItemList de la page canonique uniquement.
+     * pagination) est géré par le composant Livewire VideoSearch ; le
+     * contrôleur ne fournit que les métadonnées SEO (titre, catégories) et
+     * $topVideos pour le JSON-LD ItemList de la page canonique uniquement.
      */
     public function index(VideoIndexFormRequest $request): View
     {
@@ -48,7 +48,7 @@ class VideoController extends Controller
     {
         $video = Video::query()
             ->published()
-            ->with(['categories', 'relatedPost' => fn ($q) => $q->published()->with('media')])
+            ->with(['categories', 'relatedPost' => fn ($query) => $query->published()->with('media')])
             ->where('slug', $slug)
             ->firstOrFail();
 

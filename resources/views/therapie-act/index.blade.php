@@ -193,7 +193,9 @@
 
     <div class="bg-cream-50 py-12 sm:py-16">
         <div class="site-container">
-            <x-content-cta class="mx-auto max-w-4xl" />
+            <x-health-disclaimer class="mx-auto max-w-4xl" />
+
+            <x-content-cta class="mx-auto mt-10 max-w-4xl" />
         </div>
     </div>
 

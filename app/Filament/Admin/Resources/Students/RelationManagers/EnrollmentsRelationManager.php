@@ -31,15 +31,7 @@ class EnrollmentsRelationManager extends RelationManager
                     ->dateTime('d/m/Y')
                     ->placeholder('–'),
             ])
-            ->filters([
-                //
-            ])
-            ->headerActions([
-                //
-            ])
-            ->recordActions([
-                //
-            ]);
+            ->filters([]);
     }
 
     public function isReadOnly(): bool

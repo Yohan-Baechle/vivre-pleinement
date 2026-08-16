@@ -28,8 +28,8 @@ class LessonPlayer extends Component
     }
 
     /**
-     * Marque la leçon courante comme terminée pour l'élève connecté.
-     * Idempotent grâce à updateOrCreate sur la contrainte unique (student, lesson).
+     * Marque la leçon courante comme terminée pour l'élève connecté. Idempotent
+     * grâce à updateOrCreate sur la contrainte unique (student, lesson).
      */
     public function markComplete(): void
     {
@@ -51,6 +51,7 @@ class LessonPlayer extends Component
         $student = auth('student')->user();
 
         abort_if($student === null, 403);
+        abort_unless($student->hasAccessTo($this->course) || $this->lesson->is_free_preview, 403);
 
         $student->lessonProgress()
             ->where('lesson_id', $this->lesson->id)

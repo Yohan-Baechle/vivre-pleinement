@@ -5,12 +5,16 @@ namespace App\Support;
 use Illuminate\Support\Str;
 
 /**
- * Parse un HTML d'article, ajoute des `id` aux <h2>/<h3> et extrait le sommaire.
+ * Parse un HTML d'article, ajoute des `id` aux <h2>/<h3> et extrait le
+ * sommaire.
  */
 class Toc
 {
     /**
-     * @return array{html: string, items: array<int, array{level: int, id: string, text: string}>}
+     * @return array{
+     *     html: string,
+     *     items: array<int, array{level: int, id: string, text: string}>,
+     * }
      */
     public static function build(?string $html): array
     {

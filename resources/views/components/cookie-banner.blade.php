@@ -67,14 +67,3 @@
         </div>
     </div>
 </div>
-
-<script>
-    window.addEventListener('DOMContentLoaded', () => {
-        document.querySelectorAll('[data-cookie-open]').forEach(el => {
-            el.addEventListener('click', (e) => {
-                e.preventDefault();
-                window.dispatchEvent(new CustomEvent('cookies:reopen'));
-            });
-        });
-    });
-</script>

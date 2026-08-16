@@ -15,7 +15,8 @@ class AppointmentCancelled extends Mailable implements ShouldQueue
     use Queueable, SerializesModels;
 
     /**
-     * @param  bool  $forAdmin  Indique si cette copie est destinée à Laura (plutôt qu'au client).
+     * @param  bool  $forAdmin  Indique si cette copie est destinée à Laura
+     *                          plutôt qu'au client.
      */
     public function __construct(
         public Appointment $appointment,

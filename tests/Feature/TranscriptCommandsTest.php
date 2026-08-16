@@ -29,7 +29,7 @@ it('exports a raw transcript split into word-bounded chunks', function () {
     $payload = json_decode(File::get($path), true);
 
     expect($payload['videos'])->toHaveCount(1)
-        ->and($payload['videos'][0]['chunks'])->toHaveCount(3); // 2500 / 1000 = 3
+        ->and($payload['videos'][0]['chunks'])->toHaveCount(3);
 });
 
 it('skips videos without a transcript on export', function () {

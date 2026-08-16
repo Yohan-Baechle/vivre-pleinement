@@ -12,7 +12,6 @@ use Stripe\PaymentIntent;
 uses(LazilyRefreshDatabase::class);
 
 beforeEach(function () {
-    // Évite tout appel réseau vers Stripe : on simule un PaymentIntent.
     $intent = PaymentIntent::constructFrom(['id' => 'pi_test', 'client_secret' => 'pi_secret_test']);
 
     $this->mock(CoursePaymentService::class)

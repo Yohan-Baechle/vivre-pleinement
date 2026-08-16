@@ -17,15 +17,11 @@ class HandleStripePaymentSucceeded implements ShouldQueue
      * Un paiement réel a déjà été capté par Stripe : on retente plusieurs fois
      * avant d'abandonner, pour ne pas laisser un client payé sans rendez-vous
      * confirmé ni accès à sa formation à cause d'une erreur transitoire.
-     *
-     * @var int
      */
-    public $tries = 5;
+    public int $tries = 5;
 
-    /**
-     * @var array<int, int>
-     */
-    public $backoff = [30, 60, 300, 900];
+    /** @var list<int> */
+    public array $backoff = [30, 60, 300, 900];
 
     public function __construct(
         private BookingPaymentService $bookingPayments,
@@ -34,7 +30,8 @@ class HandleStripePaymentSucceeded implements ShouldQueue
 
     /**
      * Route le webhook payment_intent.succeeded vers le bon domaine selon les
-     * métadonnées : un rendez-vous (appointment_id) ou une formation (enrollment_id).
+     * métadonnées : un rendez-vous (appointment_id) ou une formation
+     * (enrollment_id).
      */
     public function handle(WebhookReceived $event): void
     {

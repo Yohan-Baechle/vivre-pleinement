@@ -68,7 +68,6 @@ it('marks a past confirmed appointment as no-show and emails the client', functi
     $past = CarbonImmutable::now()->subDay()->setTime(10, 0);
     $appointment = adminAppointment($past);
 
-    // Les RDV passés sont masqués par le filtre « À venir » actif par défaut.
     Livewire::test(ListAppointments::class)
         ->removeTableFilter('upcoming')
         ->callAction(TestAction::make('noShow')->table($appointment))

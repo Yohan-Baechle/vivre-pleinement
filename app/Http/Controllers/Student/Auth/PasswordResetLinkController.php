@@ -15,14 +15,17 @@ class PasswordResetLinkController extends Controller
         return view('student.auth.forgot-password');
     }
 
+    /**
+     * Envoie le lien de réinitialisation.
+     *
+     * La réponse est volontairement identique que l'adresse existe ou non : un
+     * message d'erreur différencié transformerait ce formulaire en oracle
+     * permettant d'énumérer les comptes élèves.
+     */
     public function store(StudentPasswordResetLinkFormRequest $request): RedirectResponse
     {
-        $status = Password::broker('students')->sendResetLink(
-            $request->only('email')
-        );
+        Password::broker('students')->sendResetLink($request->only('email'));
 
-        return $status === Password::ResetLinkSent
-            ? back()->with('status', __($status))
-            : back()->withInput($request->only('email'))->withErrors(['email' => __($status)]);
+        return back()->with('status', __(Password::ResetLinkSent));
     }
 }

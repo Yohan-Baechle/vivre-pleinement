@@ -2,11 +2,17 @@
 
 namespace App\Http\Requests\Concerns;
 
+use App\Support\SubmissionStamp;
 use Illuminate\Validation\ValidationException;
 
 /**
- * Honeypot temporel : rejette les formulaires soumis trop vite pour être humains.
- * Le champ `ts` porte l'horodatage d'affichage du formulaire.
+ * Honeypot temporel : rejette les formulaires soumis trop vite pour être
+ * humains.
+ *
+ * Le champ `ts` porte l'horodatage d'affichage du formulaire, chiffré par
+ * l'application. En clair, il était recopiable par n'importe quel script — il
+ * suffisait de poster `ts = time() - 10` — et ne filtrait donc que les robots
+ * qui rejouaient le formulaire sans le relire.
  */
 trait ChecksSubmissionDelay
 {
@@ -17,9 +23,9 @@ trait ChecksSubmissionDelay
      */
     public function passedValidation(): void
     {
-        $elapsed = time() - (int) $this->input('ts');
+        $issuedAt = SubmissionStamp::read($this->input('ts'));
 
-        if ($elapsed < self::MIN_DELAY_SECONDS) {
+        if ($issuedAt === null || (time() - $issuedAt) < self::MIN_DELAY_SECONDS) {
             throw ValidationException::withMessages([
                 'ts' => 'Envoi trop rapide, veuillez réessayer.',
             ]);

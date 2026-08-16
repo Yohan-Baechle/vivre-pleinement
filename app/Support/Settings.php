@@ -10,7 +10,8 @@ class Settings
     private const CACHE_KEY = 'settings.all';
 
     /**
-     * All settings as a key => value map, cached forever (invalidated on write).
+     * Tous les réglages sous forme de tableau clé => valeur, mis en cache
+     * sans expiration (invalidé à chaque écriture).
      *
      * @return array<string, string|null>
      */

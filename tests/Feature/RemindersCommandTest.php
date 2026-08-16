@@ -64,7 +64,6 @@ it('is idempotent — a second run sends nothing new', function () {
     Mail::assertQueued(AppointmentReminder::class, 1);
 
     $this->artisan('appointments:send-reminders');
-    // Toujours 1 au total : le 2e run n'envoie rien.
     Mail::assertQueued(AppointmentReminder::class, 1);
 });
 
@@ -99,7 +98,6 @@ it('follow-up run is idempotent — a second run sends nothing new', function ()
     Mail::assertQueued(AppointmentFollowUp::class, 1);
 
     $this->artisan('appointments:send-reminders');
-    // Toujours 1 au total : le 2e run n'envoie rien.
     Mail::assertQueued(AppointmentFollowUp::class, 1);
 });
 
@@ -139,7 +137,6 @@ it('stale checkout sweep is idempotent — a second run sends nothing new', func
     Mail::assertQueued(AppointmentCheckoutExpired::class, 1);
 
     $this->artisan('appointments:send-reminders');
-    // Toujours 1 au total : le 2e run n'envoie rien.
     Mail::assertQueued(AppointmentCheckoutExpired::class, 1);
 });
 

@@ -72,9 +72,9 @@ class BookingCalendar extends Component
     }
 
     /**
-     * Ouvre le calendrier directement sur le premier mois ayant au moins un créneau,
-     * pour que le visiteur ne tombe jamais sur une grille vide. Borné par l'horizon
-     * de réservation.
+     * Ouvre le calendrier directement sur le premier mois ayant au moins un
+     * créneau, pour que le visiteur ne tombe jamais sur une grille vide. Borné
+     * par l'horizon de réservation.
      */
     private function jumpToFirstAvailableMonth(AppointmentService $service): void
     {
@@ -180,6 +180,10 @@ class BookingCalendar extends Component
             return $this->reschedule();
         }
 
+        if ($this->isRateLimited()) {
+            return null;
+        }
+
         $this->validate([
             'firstName' => ['required', 'string', 'max:80'],
             'lastName' => ['nullable', 'string', 'max:80'],
@@ -239,7 +243,7 @@ class BookingCalendar extends Component
         Mail::to(SiteContact::notifyEmail())
             ->send(new AppointmentNotification($appointment));
 
-        return redirect()->route('booking.confirmation', $appointment->reference);
+        return redirect()->route('booking.confirmation', $appointment->token);
     }
 
     private function reschedule(): mixed
@@ -281,16 +285,13 @@ class BookingCalendar extends Component
     }
 
     /**
-     * Applique la limitation de tentatives et revérifie que le créneau choisi est
-     * réellement libre. Renvoie l'instant de début, ou null après avoir posé une
-     * erreur (l'appelant doit alors interrompre).
+     * Applique la limitation de tentatives et revérifie que le créneau choisi
+     * est réellement libre. Renvoie l'instant de début, ou null après avoir
+     * posé une erreur (l'appelant doit alors interrompre).
      */
     private function guardedSlotStart(): ?CarbonImmutable
     {
-        $key = 'booking:'.request()->ip();
-        if (RateLimiter::tooManyAttempts($key, 5)) {
-            $this->addError('selectedSlot', 'Trop de tentatives. Réessayez dans quelques minutes.');
-
+        if ($this->isRateLimited()) {
             return null;
         }
 
@@ -303,9 +304,32 @@ class BookingCalendar extends Component
             return null;
         }
 
-        RateLimiter::hit($key, 600);
+        RateLimiter::hit($this->rateLimiterKey(), 600);
 
         return $start;
+    }
+
+    /**
+     * Vérifie le plafond de tentatives sans le consommer.
+     *
+     * Appelé avant `validate()` : la règle `email:rfc,dns` déclenche une
+     * résolution DNS sur un domaine choisi par le visiteur, qui ne doit pas
+     * pouvoir être répétée sans limite.
+     */
+    private function isRateLimited(): bool
+    {
+        if (! RateLimiter::tooManyAttempts($this->rateLimiterKey(), 5)) {
+            return false;
+        }
+
+        $this->addError('selectedSlot', 'Trop de tentatives. Réessayez dans quelques minutes.');
+
+        return true;
+    }
+
+    private function rateLimiterKey(): string
+    {
+        return 'booking:'.request()->ip();
     }
 
     private function resetSelection(): void

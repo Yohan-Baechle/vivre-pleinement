@@ -40,7 +40,8 @@ class AuditInternalLinking extends Command
     }
 
     /**
-     * Articles publiés sans aucune catégorie : ni similaires pertinents, ni pilier.
+     * Articles publiés sans aucune catégorie : ni similaires pertinents, ni
+     * pilier.
      *
      * @return Collection<int, Post>
      */

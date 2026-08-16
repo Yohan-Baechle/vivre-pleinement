@@ -24,7 +24,7 @@ function validContactPayload(array $overrides = []): array
         'message' => 'Bonjour, j\'aimerais en savoir plus sur votre accompagnement.',
         'consent' => '1',
         'website' => '',
-        'ts' => time() - 5,
+        'ts' => submissionStamp(),
     ], $overrides);
 }
 
@@ -65,7 +65,7 @@ it('rejette une soumission dont le honeypot est rempli', function () {
 });
 
 it('rejette une soumission trop rapide (honeypot temporel)', function () {
-    $this->post(route('contact.send'), validContactPayload(['ts' => time()]))
+    $this->post(route('contact.send'), validContactPayload(['ts' => submissionStamp(0)]))
         ->assertSessionHasErrors();
 
     Mail::assertNothingQueued();

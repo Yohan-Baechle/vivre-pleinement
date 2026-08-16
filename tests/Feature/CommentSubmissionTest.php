@@ -26,7 +26,7 @@ function validCommentPayload(array $overrides = []): array
         'content' => 'Merci pour cet article, il m\'a beaucoup aidé.',
         'consent' => '1',
         'website' => '',
-        'ts' => time() - 5,
+        'ts' => submissionStamp(),
     ], $overrides);
 }
 
@@ -74,7 +74,7 @@ it('rejects a submission caught by the honeypot', function () {
 it('rejects a submission sent too fast', function () {
     $post = Post::factory()->create(['status' => 'published', 'comments_enabled' => true]);
 
-    $this->post(route('blog.comments.store', $post->slug), validCommentPayload(['ts' => time()]))
+    $this->post(route('blog.comments.store', $post->slug), validCommentPayload(['ts' => submissionStamp(0)]))
         ->assertSessionHasErrors('ts');
 
     expect(Comment::count())->toBe(0);

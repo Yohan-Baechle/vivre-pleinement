@@ -49,7 +49,8 @@ class ApplySeoTitles extends Command
     }
 
     /**
-     * Titres SERP par slug : casse normale, mot-clé en tête, sans emoji, ≤ 60 caractères.
+     * Titres SERP par slug : casse normale, mot-clé en tête, sans emoji, ≤ 60
+     * caractères.
      *
      * @return array<string, string>
      */

@@ -10,12 +10,15 @@
     'showErrorRing' => true,
     'showErrorMessage' => true,
     'errorClass' => 'ring-rose-400',
+    'bag' => 'default',
 ])
 
 @php
     $fieldClasses = 'mt-2 w-full rounded-2xl border-0 bg-cream-50 px-4 py-3 text-sm text-ink ring-1 ring-ink/10 transition placeholder:text-ink-muted focus:bg-white focus:ring-2 focus:ring-teal-500 focus:outline-hidden';
 
-    $inputClasses = $fieldClasses.($showErrorRing && $errors->has($name) ? ' '.$errorClass : '');
+    $bagErrors = $errors->getBag($bag);
+
+    $inputClasses = $fieldClasses.($showErrorRing && $bagErrors->has($name) ? ' '.$errorClass : '');
 @endphp
 
 <div>
@@ -31,8 +34,8 @@
         @if ($placeholder) placeholder="{{ $placeholder }}" @endif
         class="{{ $inputClasses }}"
     >
-    @if ($showErrorMessage)
-        @error($name)<p class="mt-1 text-xs text-rose-700">{{ $message }}</p>@enderror
+    @if ($showErrorMessage && $bagErrors->has($name))
+        <p class="mt-1 text-xs text-rose-700">{{ $bagErrors->first($name) }}</p>
     @endif
     {{ $slot }}
 </div>

@@ -11,10 +11,7 @@ use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
 class AppServiceProvider extends ServiceProvider
 {
-    public function register(): void
-    {
-        //
-    }
+    public function register(): void {}
 
     public function boot(): void
     {

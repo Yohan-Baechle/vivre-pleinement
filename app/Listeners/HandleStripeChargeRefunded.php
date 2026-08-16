@@ -12,14 +12,13 @@ use Throwable;
 class HandleStripeChargeRefunded implements ShouldQueue
 {
     /**
-     * @var int
+     * Un remboursement Stripe existe déjà : on retente plusieurs fois pour
+     * ne pas laisser un accès actif alors que l'élève a été remboursé.
      */
-    public $tries = 5;
+    public int $tries = 5;
 
-    /**
-     * @var array<int, int>
-     */
-    public $backoff = [30, 60, 300, 900];
+    /** @var list<int> */
+    public array $backoff = [30, 60, 300, 900];
 
     public function __construct(
         private CoursePaymentService $coursePayments,

@@ -11,8 +11,9 @@ use Symfony\Component\HttpFoundation\Response;
 class EnsureEnrolled
 {
     /**
-     * Autorise l'accès si l'élève possède une inscription active à la formation,
-     * ou si la leçon ciblée est un aperçu gratuit. Sinon, renvoie vers la page de vente.
+     * Autorise l'accès si l'élève possède une inscription active à la
+     * formation, ou si la leçon ciblée est un aperçu gratuit. Sinon, renvoie
+     * vers la page de vente.
      */
     public function handle(Request $request, Closure $next): Response
     {

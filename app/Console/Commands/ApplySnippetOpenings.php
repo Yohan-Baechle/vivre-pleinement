@@ -48,7 +48,13 @@ class ApplySnippetOpenings extends Command
     }
 
     /**
-     * @return array<string, array{marker: string, opening_html: string, seo_title: string, seo_description: string, faq: list<array{question: string, answer: string}>}>
+     * @return array<string, array{
+     *     marker: string,
+     *     opening_html: string,
+     *     seo_title: string,
+     *     seo_description: string,
+     *     faq: list<array{question: string, answer: string}>,
+     * }>
      */
     private function openings(): array
     {
