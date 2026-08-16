@@ -2,7 +2,9 @@
 
 namespace App\Listeners;
 
+use App\Models\BookOrder;
 use App\Models\Enrollment;
+use App\Services\BookPaymentService;
 use App\Services\CoursePaymentService;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Support\Facades\Log;
@@ -22,12 +24,13 @@ class HandleStripeChargeRefunded implements ShouldQueue
 
     public function __construct(
         private CoursePaymentService $coursePayments,
+        private BookPaymentService $bookPayments,
     ) {}
 
     /**
-     * Révoque l'accès à une formation lorsqu'un remboursement est émis depuis
-     * Stripe (dashboard ou API) : l'inscription liée au PaymentIntent remboursé
-     * passe au statut Refunded.
+     * Révoque l'accès lorsqu'un remboursement est émis depuis Stripe
+     * (dashboard ou API) : l'inscription ou la commande liée au PaymentIntent
+     * remboursé passe au statut Refunded.
      */
     public function handle(WebhookReceived $event): void
     {
@@ -48,6 +51,14 @@ class HandleStripeChargeRefunded implements ShouldQueue
 
         if ($enrollment !== null) {
             $this->coursePayments->refund($enrollment);
+        }
+
+        $order = BookOrder::query()
+            ->where('stripe_payment_intent_id', $paymentIntentId)
+            ->first();
+
+        if ($order !== null) {
+            $this->bookPayments->refund($order);
         }
     }
 

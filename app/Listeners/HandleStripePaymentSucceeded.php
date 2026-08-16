@@ -3,8 +3,10 @@
 namespace App\Listeners;
 
 use App\Models\Appointment;
+use App\Models\BookOrder;
 use App\Models\Enrollment;
 use App\Services\BookingPaymentService;
+use App\Services\BookPaymentService;
 use App\Services\CoursePaymentService;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Support\Facades\Log;
@@ -26,12 +28,13 @@ class HandleStripePaymentSucceeded implements ShouldQueue
     public function __construct(
         private BookingPaymentService $bookingPayments,
         private CoursePaymentService $coursePayments,
+        private BookPaymentService $bookPayments,
     ) {}
 
     /**
      * Route le webhook payment_intent.succeeded vers le bon domaine selon les
-     * métadonnées : un rendez-vous (appointment_id) ou une formation
-     * (enrollment_id).
+     * métadonnées : un rendez-vous (appointment_id), une formation
+     * (enrollment_id) ou une commande du livre (book_order_id).
      */
     public function handle(WebhookReceived $event): void
     {
@@ -51,6 +54,12 @@ class HandleStripePaymentSucceeded implements ShouldQueue
 
         if (isset($metadata['enrollment_id'])) {
             $this->fulfillEnrollment($metadata['enrollment_id'], $paymentIntentId, $intent);
+
+            return;
+        }
+
+        if (isset($metadata['book_order_id'])) {
+            $this->fulfillBookOrder($metadata['book_order_id'], $paymentIntentId, $intent);
         }
     }
 
@@ -73,6 +82,23 @@ class HandleStripePaymentSucceeded implements ShouldQueue
         if ($enrollment !== null) {
             $this->coursePayments->fulfill(
                 $enrollment,
+                $paymentIntentId,
+                is_int($intent['amount_received'] ?? null) ? $intent['amount_received'] : null,
+                is_string($intent['currency'] ?? null) ? $intent['currency'] : null,
+            );
+        }
+    }
+
+    /**
+     * @param  array<string, mixed>  $intent
+     */
+    private function fulfillBookOrder(mixed $bookOrderId, ?string $paymentIntentId, array $intent): void
+    {
+        $order = BookOrder::query()->find($bookOrderId);
+
+        if ($order !== null) {
+            $this->bookPayments->fulfill(
+                $order,
                 $paymentIntentId,
                 is_int($intent['amount_received'] ?? null) ? $intent['amount_received'] : null,
                 is_string($intent['currency'] ?? null) ? $intent['currency'] : null,

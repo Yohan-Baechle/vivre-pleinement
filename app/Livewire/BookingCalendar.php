@@ -10,6 +10,7 @@ use App\Mail\AppointmentNotification;
 use App\Mail\AppointmentRescheduled;
 use App\Models\Appointment;
 use App\Models\AppointmentService;
+use App\Models\BookOrder;
 use App\Services\AppointmentSlotService;
 use App\Support\Settings;
 use App\Support\SiteContact;
@@ -54,13 +55,34 @@ class BookingCalendar extends Component
     #[Locked]
     public ?string $rescheduleToken = null;
 
-    public function mount(AppointmentService $service, ?string $rescheduleToken = null): void
-    {
+    /**
+     * Commande du livre dont l'heure de coaching est offerte. Verrouillé :
+     * c'est ce jeton qui autorise un rendez-vous sans paiement.
+     */
+    #[Locked]
+    public ?string $bookOrderToken = null;
+
+    public function mount(
+        AppointmentService $service,
+        ?string $rescheduleToken = null,
+        ?string $bookOrderToken = null,
+    ): void {
         $this->serviceId = $service->id;
         $this->rescheduleToken = $rescheduleToken;
+        $this->bookOrderToken = $bookOrderToken;
         $now = CarbonImmutable::now();
         $this->year = $now->year;
         $this->month = $now->month;
+
+        if ($bookOrderToken !== null) {
+            $order = $this->bookOrder();
+
+            if ($order !== null) {
+                $this->firstName = $order->customer_first_name;
+                $this->lastName = $order->customer_last_name;
+                $this->email = $order->customer_email;
+            }
+        }
 
         $this->jumpToFirstAvailableMonth($service);
     }
@@ -69,6 +91,25 @@ class BookingCalendar extends Component
     public function isRescheduling(): bool
     {
         return $this->rescheduleToken !== null;
+    }
+
+    /**
+     * Commande encore éligible à sa séance offerte. Rechargée à chaque appel :
+     * une commande remboursée ou déjà consommée entre-temps ne doit plus
+     * ouvrir de rendez-vous gratuit.
+     */
+    public function bookOrder(): ?BookOrder
+    {
+        if ($this->bookOrderToken === null) {
+            return null;
+        }
+
+        $order = BookOrder::query()
+            ->with('product')
+            ->where('token', $this->bookOrderToken)
+            ->first();
+
+        return $order?->canBookCoaching() ? $order : null;
     }
 
     /**
@@ -211,7 +252,14 @@ class BookingCalendar extends Component
         }
 
         $service = $this->service;
-        $isPaid = $service->price_cents > 0;
+
+        /**
+         * L'heure de coaching d'une commande livre est déjà réglée : le
+         * rendez-vous est créé à 0 € et ne repasse pas par le paiement.
+         */
+        $bookOrder = $this->bookOrder();
+        $isPaid = $bookOrder === null && $service->price_cents > 0;
+        $priceCents = $bookOrder !== null ? 0 : $service->price_cents;
 
         $appointment = $this->slotService()->reserve($service, $start, [
             'reference' => Appointment::generateReference(),
@@ -224,7 +272,7 @@ class BookingCalendar extends Component
             'notes' => $this->notes ?: null,
             'meeting_url' => Settings::get('meet_url') ?: null,
             'status' => ($isPaid || $service->requires_confirmation) ? AppointmentStatus::Pending : AppointmentStatus::Confirmed,
-            'price_cents' => $service->price_cents,
+            'price_cents' => $priceCents,
             'payment_status' => $isPaid ? PaymentStatus::Unpaid : PaymentStatus::NotRequired,
         ]);
 
@@ -233,6 +281,14 @@ class BookingCalendar extends Component
             $this->addError('selectedSlot', 'Ce créneau vient d\'être réservé. Merci d\'en choisir un autre.');
 
             return null;
+        }
+
+        /**
+         * Rattachement immédiat : c'est cette colonne qui rend le lien de
+         * réservation envoyé par email valable une seule fois.
+         */
+        if ($bookOrder !== null) {
+            $bookOrder->update(['coaching_appointment_id' => $appointment->id]);
         }
 
         if ($isPaid) {

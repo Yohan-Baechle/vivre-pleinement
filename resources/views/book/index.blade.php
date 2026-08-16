@@ -11,8 +11,16 @@
 @push('head')
     @php
         $bookUrl = route('book.show');
-        $offerSolo = 37;
-        $offerCoaching = 70;
+
+        /**
+         * Les prix affichés viennent du catalogue : les modifier en admin doit
+         * suffire, sans quoi la page annoncerait un montant et Stripe en
+         * débiterait un autre.
+         */
+        $offerSolo = ($offers['livre'] ?? null)?->price ?? 37;
+        $offerCoaching = ($offers['livre-coaching'] ?? null)?->price ?? 70;
+
+        $offerPrice = fn (float $amount): string => rtrim(rtrim(number_format($amount, 2, ',', "\u{202f}"), '0'), ',').'&nbsp;€';
 
         $productLd = [
             '@context' => 'https://schema.org',
