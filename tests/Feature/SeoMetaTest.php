@@ -6,7 +6,10 @@ use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
 
 uses(LazilyRefreshDatabase::class);
 
-/** Compte les balises <meta name="description"> et renvoie le content de la première. */
+/**
+ * Compte les balises <meta name="description"> et renvoie le content de la
+ * première.
+ */
 function metaDescription(string $html): array
 {
     $count = substr_count($html, '<meta name="description"');
@@ -118,6 +121,51 @@ it('emits exactly one canonical on a category page, without query strings', func
 
     expect(substr_count($html, 'rel="canonical"'))->toBe(1)
         ->and($html)->toContain('<link rel="canonical" href="'.route('blog.category', $category->slug).'"');
+});
+
+it('emits exactly one noindex meta robots tag on paginated and filtered listings', function (string $url) {
+    $category = Category::query()->firstOrCreate(
+        ['slug' => 'phobies'],
+        ['name' => 'Phobies', 'description' => 'Catégorie de test.'],
+    );
+
+    Post::factory()->count(10)->create(['status' => 'published'])
+        ->each(fn (Post $post) => $post->categories()->attach($category));
+
+    $html = $this->get($url)->assertOk()->getContent();
+
+    expect(substr_count($html, '<meta name="robots"'))->toBe(1, "Meta robots en double sur {$url}")
+        ->and($html)->toContain('noindex, follow');
+})->with([
+    '/blog?page=2',
+    '/blog?category=phobies',
+    '/blog/categorie/phobies?page=2',
+    '/videos?page=2',
+]);
+
+it('keeps the default indexable meta robots on first listing pages', function () {
+    Post::factory()->create(['status' => 'published']);
+
+    foreach (['/blog', '/videos'] as $url) {
+        $html = $this->get($url)->assertOk()->getContent();
+
+        expect(substr_count($html, '<meta name="robots"'))->toBe(1)
+            ->and($html)->toContain('index, follow')
+            ->and($html)->not->toContain('noindex');
+    }
+});
+
+it('renders a single meta robots tag on a post with a custom seo_robots', function () {
+    Post::factory()->create([
+        'slug' => 'article-noindex',
+        'status' => 'published',
+        'seo_robots' => 'noindex, follow',
+    ]);
+
+    $html = $this->get('/blog/article-noindex')->assertOk()->getContent();
+
+    expect(substr_count($html, '<meta name="robots"'))->toBe(1)
+        ->and($html)->toContain('noindex, follow');
 });
 
 it('ignores a stale migrated seo_canonical and points to the new blog URL', function () {

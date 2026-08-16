@@ -47,14 +47,15 @@ class ExportTranscripts extends Command
 
         file_put_contents($path, json_encode($payload, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES));
 
-        $totalChunks = collect($payload['videos'])->sum(fn ($v) => count($v['chunks']));
+        $totalChunks = collect($payload['videos'])->sum(fn (array $video) => count($video['chunks']));
         $this->info("{$videos->count()} transcription(s) exportée(s) en {$totalChunks} morceau(x) vers {$path}");
 
         return self::SUCCESS;
     }
 
     /**
-     * Découpe un texte en morceaux d'environ $chunkWords mots, sans couper un mot.
+     * Découpe un texte en morceaux d'environ $chunkWords mots, sans couper un
+     * mot.
      *
      * @return list<string>
      */

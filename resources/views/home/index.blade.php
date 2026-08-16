@@ -8,15 +8,17 @@
         $jsonLd = [
             '@context' => 'https://schema.org',
             '@graph' => [
+                \App\Support\AuthorEntity::person(),
                 [
-                    '@type' => 'Person',
-                    '@id' => $home.'#laura',
-                    'name' => 'Laura Baechlé',
-                    'jobTitle' => 'Praticienne ACT en accompagnement des troubles anxieux',
+                    '@type' => 'Organization',
+                    '@id' => $home.'#organization',
+                    'name' => 'Vivre Pleinement',
                     'url' => $home,
-                    'image' => $img,
-                    'description' => "Praticienne ACT spécialisée dans l'accompagnement des personnes souffrant de troubles anxieux : anxiété généralisée (TAG), phobies, TOC, burnout.",
-                    'knowsAbout' => ['Troubles anxieux', 'Anxiété généralisée', 'TAG', 'Phobies', 'TOC', 'Burnout', 'Thérapie ACT', 'Gestion du stress', 'Bien-être mental'],
+                    'logo' => [
+                        '@type' => 'ImageObject',
+                        'url' => asset('images/logo@4x.webp'),
+                    ],
+                    'founder' => ['@id' => $home.'#laura'],
                 ],
                 [
                     '@type' => 'WebSite',
@@ -24,8 +26,16 @@
                     'url' => $home,
                     'name' => 'Vivre Pleinement',
                     'description' => 'Se libérer des troubles anxieux : outils, ressources et accompagnement par Laura Baechlé.',
-                    'publisher' => ['@id' => $home.'#laura'],
+                    'publisher' => ['@id' => $home.'#organization'],
                     'inLanguage' => 'fr-FR',
+                    'potentialAction' => [
+                        '@type' => 'SearchAction',
+                        'target' => [
+                            '@type' => 'EntryPoint',
+                            'urlTemplate' => route('blog.index').'?q={search_term_string}',
+                        ],
+                        'query-input' => 'required name=search_term_string',
+                    ],
                 ],
                 [
                     '@type' => 'WebPage',
@@ -120,7 +130,7 @@
                 @else
                     <form action="{{ route('newsletter.store') }}" method="POST" class="space-y-3 lg:col-span-3" novalidate data-newsletter-form>
                         @csrf
-                        <input type="hidden" name="ts" value="{{ time() }}">
+                        <input type="hidden" name="ts" value="{{ \App\Support\SubmissionStamp::issue() }}">
 
                         {{-- Honeypot anti-spam --}}
                         <div aria-hidden="true" class="absolute -left-[9999px] top-auto size-px overflow-hidden">

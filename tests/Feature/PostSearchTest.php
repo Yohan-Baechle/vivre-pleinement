@@ -84,7 +84,6 @@ it('clears all filters at once', function () {
 it('escapes wildcard characters in the search term', function () {
     Post::factory()->create(['title' => 'Article normal']);
 
-    // Un terme "%" ne doit pas tout matcher comme un joker SQL.
     Livewire::test(PostSearch::class)
         ->set('search', '%')
         ->assertViewHas('posts', fn ($p) => $p->total() === 0);

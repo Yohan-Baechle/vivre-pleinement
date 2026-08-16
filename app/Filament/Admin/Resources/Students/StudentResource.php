@@ -25,9 +25,9 @@ class StudentResource extends Resource
 
     protected static ?string $pluralModelLabel = 'Élèves';
 
-    protected static ?int $navigationSort = 2;
+    protected static ?int $navigationSort = 30;
 
-    protected static string|UnitEnum|null $navigationGroup = 'Formations';
+    protected static string|UnitEnum|null $navigationGroup = 'Boutique';
 
     protected static ?string $recordTitleAttribute = 'name';
 

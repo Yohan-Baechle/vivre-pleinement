@@ -21,7 +21,7 @@ function validNewsletterPayload(array $overrides = []): array
         'first_name' => 'Camille',
         'email' => 'camille@gmail.com',
         'website' => '',
-        'ts' => time() - 5,
+        'ts' => submissionStamp(),
     ], $overrides);
 }
 
@@ -98,7 +98,7 @@ it('rejects a submission caught by the honeypot', function () {
 it('rejects a submission sent too fast', function () {
     Http::fake();
 
-    $this->post(route('newsletter.store'), validNewsletterPayload(['ts' => time()]))
+    $this->post(route('newsletter.store'), validNewsletterPayload(['ts' => submissionStamp(0)]))
         ->assertSessionHasErrors('ts');
 
     Http::assertNothingSent();

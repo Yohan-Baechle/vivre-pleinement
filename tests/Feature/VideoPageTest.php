@@ -12,7 +12,6 @@ it('renders a long video page with its related videos', function () {
     $video = Video::factory()->create(['slug' => 'video-principale', 'duration_seconds' => 600]);
     $video->categories()->attach($category);
 
-    // Vidéos similaires : leur relation categories est accédée par la video-card.
     Video::factory()->count(3)->create(['duration_seconds' => 600])
         ->each(fn ($v) => $v->categories()->attach($category));
 
@@ -46,12 +45,11 @@ it('exposes correct SEO metadata on the video page', function () {
 
     $html = $this->get('/videos/video-seo')->assertOk()->getContent();
 
-    // VideoObject : publisher = Organization, author = Person (et non plus publisher Person).
     expect($html)
-        ->toContain('"publisher":{"@type":"Organization","name":"Vivre Pleinement"')
-        ->toContain('"author":{"@type":"Person","name":"Laura Baechlé"');
+        ->toContain('"publisher":{"@type":"Organization","@id":"'.url('/').'#organization","name":"Vivre Pleinement"')
+        ->toContain('"author":{"@type":"Person","@id":"'.url('/').'#laura","name":"Laura Baechlé"')
+        ->toContain('"logo":{"@type":"ImageObject"');
 
-    // Une seule balise twitter:card (player cassée supprimée), et meta robots aux aperçus larges.
     expect(substr_count($html, 'name="twitter:card"'))->toBe(1);
     expect($html)->toContain('max-video-preview:-1');
 });

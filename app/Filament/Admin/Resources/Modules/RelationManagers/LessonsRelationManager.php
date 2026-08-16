@@ -100,7 +100,7 @@ class LessonsRelationManager extends RelationManager
             ->columns([
                 TextColumn::make('position')
                     ->label('#')
-                    ->state(fn ($record, $livewire) => $livewire->getTableRecords()->search(fn ($r) => $r->is($record)) + 1)
+                    ->state(fn ($record, $livewire) => $livewire->getTableRecords()->search(fn ($row) => $row->is($record)) + 1)
                     ->badge()
                     ->color('gray'),
                 TextColumn::make('title')

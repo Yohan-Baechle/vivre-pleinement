@@ -10,12 +10,12 @@
 
 @push('head')
     @php
-        $offers = $services->map(fn ($s) => [
+        $offers = $services->map(fn ($service) => [
             '@type' => 'Offer',
-            'name' => $s->name,
-            'price' => number_format($s->price, 2, '.', ''),
-            'priceCurrency' => $s->currency,
-            'url' => route('booking.show', $s->slug),
+            'name' => $service->name,
+            'price' => number_format($service->price, 2, '.', ''),
+            'priceCurrency' => $service->currency,
+            'url' => route('booking.show', $service->slug),
             'availability' => 'https://schema.org/InStock',
         ])->all();
         $bookingLd = [
@@ -38,14 +38,13 @@
             'offers' => $offers,
         ];
 
-        $bookingFaq = \App\Support\BookingFaq::all();
         $faqLd = [
             '@context' => 'https://schema.org',
             '@type' => 'FAQPage',
             '@id' => route('booking.index').'#faq',
             'url' => route('booking.index'),
             'inLanguage' => 'fr-FR',
-            'mainEntity' => collect($bookingFaq)->map(fn ($item) => [
+            'mainEntity' => collect($faq)->map(fn ($item) => [
                 '@type' => 'Question',
                 'name' => $item['q'],
                 'acceptedAnswer' => ['@type' => 'Answer', 'text' => $item['a']],
@@ -80,6 +79,12 @@
                 <p class="text-ink font-serif mt-5 text-xl font-medium sm:text-2xl">
                     Par téléphone ou en visio
                 </p>
+                @if ($primaryService)
+                    <p class="mt-4 inline-flex flex-wrap items-baseline justify-center gap-x-2 rounded-full bg-white/80 px-5 py-2 ring-1 ring-teal-200">
+                        <span class="text-ink font-serif text-lg font-medium">{{ $primaryService->isFree() ? 'Gratuit' : Number::currency($primaryService->price, in: 'EUR', locale: 'fr') }}</span>
+                        <span class="text-ink-soft text-sm">· séance de {{ $primaryService->duration_minutes }} min</span>
+                    </p>
+                @endif
                 <p class="text-ink-soft mx-auto mt-5 max-w-2xl text-base sm:text-lg">
                     Afin d'obtenir un accompagnement individuel, personnalisé et unique pour vous libérer de
                     vos troubles anxieux
@@ -115,7 +120,7 @@
                             @foreach ($upcomingSlots as $slot)
                                 <a href="#reserver"
                                     class="ring-teal-200 inline-flex flex-col items-center rounded-2xl bg-teal-50 px-4 py-2.5 text-center ring-1 transition hover:bg-teal-100">
-                                    <span class="text-ink text-sm font-medium capitalize">{{ $slot['start']->locale('fr')->isoFormat('ddd D MMM') }}</span>
+                                    <span class="text-ink text-sm font-medium capitalize">{{ $slot['start']->isoFormat('ddd D MMM') }}</span>
                                     <span class="text-teal-700 text-sm font-semibold">{{ $slot['label'] }}</span>
                                 </a>
                             @endforeach
@@ -284,17 +289,17 @@
                     'author' => 'Olivia',
                     'context' => 'Gestion émotionnelle',
                 ],
-            ] as $t)
+            ] as $testimonial)
                 <figure class="ring-ink/5 flex flex-col rounded-3xl bg-cream-50 p-7 shadow-xs ring-1">
                     <svg class="size-8 text-teal-200" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
                         <path d="M9.5 4.5C6 4.5 3 7.5 3 11v9h6v-9H6c0-2 1.5-4 3.5-4v-2.5zm9 0c-3.5 0-6.5 3-6.5 6.5v9h6v-9h-3c0-2 1.5-4 3.5-4v-2.5z"/>
                     </svg>
                     <blockquote class="text-ink-soft mt-4 flex-1 text-sm leading-relaxed">
-                        {{ $t['text'] }}
+                        {{ $testimonial['text'] }}
                     </blockquote>
                     <figcaption class="border-ink/10 mt-6 border-t pt-4">
-                        <p class="text-ink font-serif text-base font-medium">{{ $t['author'] }}</p>
-                        <p class="text-ink-muted text-xs">{{ $t['context'] }}</p>
+                        <p class="text-ink font-serif text-base font-medium">{{ $testimonial['author'] }}</p>
+                        <p class="text-ink-muted text-xs">{{ $testimonial['context'] }}</p>
                     </figcaption>
                 </figure>
             @endforeach
@@ -354,7 +359,7 @@
         bg="bg-white"
     >
         <div class="mx-auto max-w-3xl space-y-4">
-            @foreach (\App\Support\BookingFaq::all() as $item)
+            @foreach ($faq as $item)
                 <x-accordion-item :question="$item['q']" :open="$loop->first">
                     {{ $item['a'] }}
                 </x-accordion-item>

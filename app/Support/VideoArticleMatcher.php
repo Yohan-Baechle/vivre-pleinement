@@ -56,8 +56,6 @@ class VideoArticleMatcher
         'reconnaitre', 'reconnaître', 'meilleur', 'moyen', 'cle', 'clé', 'differences',
         'video', 'vidéo', 'chaine', 'chaîne', 'troubles', 'trouble', 'anxieux',
         'anxiete', 'anxiété', 'angoisse', 'angoisses', 'mon', 'suis', 'devenue', 'fait',
-        // Termes trop génériques pour porter du sens thématique : ils
-        // apparaissent dans des titres de sujets très différents.
         'vie', 'vivre', 'quotidien', 'heureux', 'bonheur', 'bien-etre', 'serenite',
         'sereinement', 'paix', 'point', 'points', 'vue', 'vues', 'differents',
         'personnelles', 'personnel', 'soi', 'meme', 'même', 'autres', 'gens',

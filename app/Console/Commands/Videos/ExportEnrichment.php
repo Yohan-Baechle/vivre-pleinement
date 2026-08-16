@@ -49,7 +49,6 @@ class ExportEnrichment extends Command
                 'duration_seconds' => $v->duration_seconds,
                 'youtube_description' => $v->description,
                 'current_category_slugs' => $v->categories->pluck('slug')->all(),
-                // À remplir :
                 'category_slugs' => $v->categories->pluck('slug')->all(),
                 'intro' => '',
                 'summary' => '',

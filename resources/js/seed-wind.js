@@ -10,6 +10,10 @@
  * data-seed-spin  : rotation max en deg
  * data-seed-depth : facteur de vitesse verticale (profondeur)
  *
+ * La progression passe par une courbe ease-in-out pour atténuer les extrêmes.
+ * L'échelle va de 1.25 à l'entrée à ~0.55 en sortie, et la dérive latérale
+ * suit une cloche (maximale au milieu du parcours).
+ *
  * Désactivé si l'utilisateur préfère réduire les animations.
  */
 (() => {
@@ -25,7 +29,6 @@
         depth: parseFloat(el.dataset.seedDepth) || 1,
     }));
 
-    // Courbe douce (ease-in-out) pour atténuer les extrêmes.
     const ease = (t) => t * t * (3 - 2 * t);
 
     let ticking = false;
@@ -36,21 +39,16 @@
             const rect = el.getBoundingClientRect();
             const center = rect.top + rect.height / 2;
 
-            // p : 0 quand le centre est en bas du viewport, 1 quand il sort en haut.
             let p = 1 - center / vh;
             if (p < 0) p = 0;
             else if (p > 1) p = 1;
 
-            const e = ease(p);
+            const eased = ease(p);
 
-            // Montée amplifiée (vent qui aspire vers le haut).
-            const ty = -e * 90 * depth;
-            // Dézoom : grosse à l'entrée (1.25), petite en sortie (~0.55).
-            const scale = 1.25 - e * 0.7;
-            // Dérive latérale en cloche (max au milieu du parcours).
+            const ty = -eased * 90 * depth;
+            const scale = 1.25 - eased * 0.7;
             const tx = drift * Math.sin(p * Math.PI);
-            // Rotation progressive.
-            const rot = spin * e;
+            const rot = spin * eased;
 
             el.style.transform =
                 `translate3d(${tx.toFixed(1)}px, ${ty.toFixed(1)}px, 0) rotate(${rot.toFixed(1)}deg) scale(${scale.toFixed(3)})`;

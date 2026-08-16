@@ -12,17 +12,18 @@ use Illuminate\Support\Facades\URL;
 class VerifyEmailController extends Controller
 {
     /**
-     * Valide le lien signé et marque l'adresse e-mail de l'élève comme vérifiée.
+     * Valide le lien signé et marque l'adresse e-mail de l'élève comme
+     * vérifiée.
      */
     public function __invoke(Request $request, string $id, string $hash): RedirectResponse
     {
-        $student = Student::findOrFail($id);
-
         if (! URL::hasValidSignature($request)) {
             abort(403);
         }
 
-        if (! hash_equals($hash, sha1($student->getEmailForVerification()))) {
+        $student = Student::find($id);
+
+        if ($student === null || ! hash_equals($hash, sha1($student->getEmailForVerification()))) {
             abort(403);
         }
 

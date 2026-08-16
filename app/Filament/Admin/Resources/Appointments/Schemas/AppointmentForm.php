@@ -8,14 +8,17 @@ use App\Models\Appointment;
 use App\Models\AppointmentService;
 use App\Services\AppointmentSlotService;
 use Carbon\Carbon;
+use Carbon\CarbonImmutable;
 use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Schemas\Components\Section;
+use Filament\Schemas\Components\Text;
 use Filament\Schemas\Components\Utilities\Get;
 use Filament\Schemas\Components\Utilities\Set;
 use Filament\Schemas\Schema;
+use Filament\Support\Icons\Heroicon;
 
 class AppointmentForm
 {
@@ -23,6 +26,7 @@ class AppointmentForm
     {
         return $schema->components([
             Section::make('Rendez-vous')
+                ->icon(Heroicon::OutlinedCalendarDays)
                 ->columns(2)
                 ->schema([
                     Select::make('appointment_service_id')
@@ -54,6 +58,7 @@ class AppointmentForm
                         ->displayFormat('d/m/Y H:i')
                         ->required()
                         ->after('starts_at')
+                        ->live(onBlur: true)
                         ->helperText('Calculée automatiquement selon la prestation. Ajustez si besoin.')
                         ->rule(function (Get $get, ?Appointment $record) {
                             return function (string $attribute, $value, \Closure $fail) use ($get, $record) {
@@ -91,6 +96,12 @@ class AppointmentForm
                         ->required()
                         ->native(false),
 
+                    Text::make(fn (Get $get): ?string => self::openingHoursWarning($get))
+                        ->color('warning')
+                        ->icon(Heroicon::OutlinedExclamationTriangle)
+                        ->visible(fn (Get $get) => self::openingHoursWarning($get) !== null)
+                        ->columnSpanFull(),
+
                     TextInput::make('meeting_url')
                         ->label('Lien visio personnalisé')
                         ->url()
@@ -100,6 +111,7 @@ class AppointmentForm
                 ]),
 
             Section::make('Client')
+                ->icon(Heroicon::OutlinedUser)
                 ->columns(2)
                 ->schema([
                     TextInput::make('customer_first_name')
@@ -127,7 +139,43 @@ class AppointmentForm
     }
 
     /**
-     * Renseigne l'heure de fin à partir de la durée (et du tampon) de la prestation choisie.
+     * Avertit quand le créneau saisi sort des horaires d'ouverture ou tombe
+     * un jour bloqué. Volontairement non bloquant : un rendez-vous pris par
+     * téléphone en dehors des heures reste légitime, mais il ne doit pas
+     * partir sans que l'admin l'ait vu.
+     */
+    private static function openingHoursWarning(Get $get): ?string
+    {
+        $serviceId = $get('appointment_service_id');
+        $startsAt = $get('starts_at');
+        $endsAt = $get('ends_at');
+
+        if (blank($serviceId) || blank($startsAt) || blank($endsAt)) {
+            return null;
+        }
+
+        $service = AppointmentService::find($serviceId);
+
+        if (! $service) {
+            return null;
+        }
+
+        $within = app(AppointmentSlotService::class)->isWithinOpeningHours(
+            $service,
+            CarbonImmutable::parse($startsAt),
+            CarbonImmutable::parse($endsAt),
+        );
+
+        return $within
+            ? null
+            : 'Ce créneau sort de vos horaires d\'ouverture, ou tombe sur un '
+                .'jour bloqué. Le rendez-vous sera quand même créé et le '
+                .'client recevra sa confirmation.';
+    }
+
+    /**
+     * Renseigne l'heure de fin à partir de la durée (et du tampon) de la
+     * prestation choisie.
      */
     protected static function computeEnd(mixed $serviceId, ?string $startsAt, Set $set): void
     {

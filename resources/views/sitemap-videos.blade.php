@@ -8,7 +8,6 @@
                 <video:thumbnail_loc>{{ $video->thumbnail() }}</video:thumbnail_loc>
                 <video:title>{{ $video->title }}</video:title>
                 <video:description>{{ \Illuminate\Support\Str::limit($video->seo_description ?: $video->summary ?: ($video->description ?? $video->title), 2048) }}</video:description>
-                <video:content_loc>{{ $video->youtubeUrl() }}</video:content_loc>
                 <video:player_loc>{{ $video->embedUrl() }}</video:player_loc>
                 @if ($video->duration_seconds)
                     <video:duration>{{ $video->duration_seconds }}</video:duration>

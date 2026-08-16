@@ -55,7 +55,12 @@ class ApplySeoOptimizations extends Command
     }
 
     /**
-     * @return array<string, array{seo_title: string, seo_description: string, intro_html: string, tags: list<string>}>
+     * @return array<string, array{
+     *     seo_title: string,
+     *     seo_description: string,
+     *     intro_html: string,
+     *     tags: list<string>,
+     * }>
      */
     private function optimizations(): array
     {

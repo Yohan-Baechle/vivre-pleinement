@@ -12,7 +12,7 @@
 
     <form method="POST" action="{{ route('blog.comments.store', $post->slug) }}#commentaires" class="mt-6 space-y-5" novalidate>
         @csrf
-        <input type="hidden" name="ts" value="{{ time() }}">
+        <input type="hidden" name="ts" value="{{ \App\Support\SubmissionStamp::issue() }}">
 
         {{-- Honeypot anti-spam --}}
         <div aria-hidden="true" class="absolute -left-[9999px] top-auto size-px overflow-hidden">

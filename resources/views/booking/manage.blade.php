@@ -34,7 +34,7 @@
                     </div>
                     <div class="flex justify-between gap-4">
                         <dt class="text-ink-muted">Date</dt>
-                        <dd class="text-ink @if ($cancelled) @endif font-medium line-through">{{ $appointment->starts_at->locale('fr')->isoFormat('dddd D MMMM YYYY') }}</dd>
+                        <dd class="text-ink @if ($cancelled) @endif font-medium line-through">{{ $appointment->starts_at->isoFormat('dddd D MMMM YYYY') }}</dd>
                     </div>
                     <div class="flex justify-between gap-4">
                         <dt class="text-ink-muted">Heure</dt>

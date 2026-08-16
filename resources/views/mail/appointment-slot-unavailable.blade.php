@@ -4,7 +4,7 @@
 Bonjour {{ $appointment->customer_first_name }},
 
 Malheureusement, le créneau que vous aviez choisi pour **{{ $appointment->service->name }}**
-({{ $appointment->starts_at->locale('fr')->isoFormat('dddd D MMMM') }} à {{ $appointment->starts_at->format('H\hi') }})
+({{ $appointment->starts_at->isoFormat('dddd D MMMM') }} à {{ $appointment->starts_at->format('H\hi') }})
 vient d'être réservé par quelqu'un d'autre au même moment.
 
 @if ($refunded)

@@ -15,6 +15,9 @@
 
 @section('title', $video->title.' · Vidéo Vivre Pleinement')
 @section('canonical', route('videos.show', $video->slug))
+@if ($video->seo_robots)
+    @section('robots', $video->seo_robots)
+@endif
 @section('description', $metaDescription)
 @section('og_type', 'video.other')
 @section('og_title', $video->title)
@@ -38,15 +41,13 @@
                 'interactionType' => ['@type' => 'WatchAction'],
                 'userInteractionCount' => $video->view_count,
             ] : null,
-            'author' => [
-                '@type' => 'Person',
-                'name' => 'Laura Baechlé',
-                'url' => url('/'),
-            ],
+            'author' => \App\Support\AuthorEntity::person(),
             'publisher' => [
                 '@type' => 'Organization',
+                '@id' => url('/').'#organization',
                 'name' => 'Vivre Pleinement',
                 'url' => url('/'),
+                'logo' => ['@type' => 'ImageObject', 'url' => asset('images/logo@4x.webp')],
             ],
             'inLanguage' => 'fr-FR',
         ];
@@ -56,16 +57,16 @@
         }
 
         if (! empty($chapters)) {
-            $videoLd['hasPart'] = array_map(fn ($c) => array_filter([
+            $videoLd['hasPart'] = array_map(fn ($chapter) => array_filter([
                 '@type' => 'Clip',
-                'name' => $c['name'],
-                'startOffset' => $c['startOffset'],
-                'endOffset' => $c['endOffset'],
-                'url' => $c['url'],
-            ], fn ($v) => $v !== null), $chapters);
+                'name' => $chapter['name'],
+                'startOffset' => $chapter['startOffset'],
+                'endOffset' => $chapter['endOffset'],
+                'url' => $chapter['url'],
+            ], fn ($value) => $value !== null), $chapters);
         }
 
-        $videoLd = array_filter($videoLd, fn ($v) => $v !== null && $v !== '');
+        $videoLd = array_filter($videoLd, fn ($value) => $value !== null && $value !== '');
     @endphp
     <script type="application/ld+json">{!! json_encode($videoLd, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG) !!}</script>
 @endpush
@@ -99,7 +100,7 @@
 
                     <div class="text-ink-muted mt-5 flex flex-wrap items-center gap-x-4 gap-y-2 text-sm">
                         <time datetime="{{ $video->published_at?->toIso8601String() }}">
-                            {{ $video->published_at?->locale('fr')->isoFormat('D MMMM YYYY') }}
+                            {{ $video->published_at?->isoFormat('D MMMM YYYY') }}
                         </time>
                         @if ($duration = $video->durationFormatted())
                             <span aria-hidden="true">·</span>
@@ -247,6 +248,10 @@
                 </a>
             </section>
         @endif
+
+        <x-health-disclaimer class="mx-auto max-w-5xl px-4 pt-10 sm:px-6 lg:px-10" />
+
+        <x-content-cta :category="$category" class="mx-auto max-w-5xl px-4 pt-10 sm:px-6 lg:px-10" />
 
         <div class="pb-12 sm:pb-16"></div>
     </article>

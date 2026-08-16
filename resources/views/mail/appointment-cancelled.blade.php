@@ -13,7 +13,7 @@ Votre rendez-vous a bien été annulé. Voici les détails de ce qui était pré
 @endif
 
 **Prestation :** {{ $appointment->service->name }}\
-**Date :** {{ $appointment->starts_at->locale('fr')->isoFormat('dddd D MMMM YYYY') }} à {{ $appointment->starts_at->format('H\hi') }}\
+**Date :** {{ $appointment->starts_at->isoFormat('dddd D MMMM YYYY') }} à {{ $appointment->starts_at->format('H\hi') }}\
 **Référence :** {{ $appointment->reference }}
 
 @unless ($forAdmin)

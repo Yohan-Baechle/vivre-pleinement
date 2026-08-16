@@ -66,11 +66,9 @@ it('shows a topically relevant video block on the article page via fallback', fu
     $post = Post::factory()->create(['slug' => 'article-cat', 'title' => 'Vaincre la cardiophobie au quotidien']);
     $post->categories()->attach($category);
 
-    // Même catégorie mais titre proche : doit être choisie.
     $relevant = Video::factory()->create(['slug' => 'video-cardio', 'title' => 'La cardiophobie expliquée', 'duration_seconds' => 600, 'view_count' => 10]);
     $relevant->categories()->attach($category);
 
-    // Même catégorie, très populaire, mais hors-sujet : ne doit PAS être choisie.
     $popular = Video::factory()->create(['slug' => 'video-popular', 'title' => 'Les antidépresseurs', 'duration_seconds' => 600, 'view_count' => 99999]);
     $popular->categories()->attach($category);
 

@@ -86,7 +86,8 @@ class Student extends Authenticatable implements MustVerifyEmail
     }
 
     /**
-     * Utilise le broker et la route de réinitialisation propres à l'espace élève.
+     * Utilise le broker et la route de réinitialisation propres à l'espace
+     * élève.
      */
     public function sendPasswordResetNotification($token): void
     {
@@ -94,7 +95,8 @@ class Student extends Authenticatable implements MustVerifyEmail
     }
 
     /**
-     * Utilise la notification et la route de vérification propres à l'espace élève.
+     * Utilise la notification et la route de vérification propres à l'espace
+     * élève.
      */
     public function sendEmailVerificationNotification(): void
     {

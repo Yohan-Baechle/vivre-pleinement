@@ -1,8 +1,44 @@
 @extends('layouts.site')
 
-@section('title', ($course->seo_title ?: $course->title).' · Formation')
+@section('title', $course->seo_title ?: $course->title.' · Formation')
 @section('description', $course->seo_description ?: $course->subtitle)
 @section('canonical', route('courses.show', $course))
+
+@push('head')
+    @php
+        $cover = $course->getFirstMediaUrl('cover');
+        $courseLd = array_filter([
+            '@context' => 'https://schema.org',
+            '@type' => 'Course',
+            'name' => $course->title,
+            'description' => $course->seo_description ?: $course->subtitle ?: str(strip_tags($course->description ?? ''))->limit(300)->toString(),
+            'url' => route('courses.show', $course),
+            'image' => $cover ?: null,
+            'inLanguage' => 'fr-FR',
+            'provider' => [
+                '@type' => 'Organization',
+                'name' => 'Vivre Pleinement',
+                'url' => url('/'),
+            ],
+            'offers' => [
+                '@type' => 'Offer',
+                'price' => number_format($course->price, 2, '.', ''),
+                'priceCurrency' => $course->currency,
+                'availability' => 'https://schema.org/InStock',
+                'url' => route('courses.show', $course),
+                'category' => 'Paid',
+            ],
+            'hasCourseInstance' => [
+                '@type' => 'CourseInstance',
+                'courseMode' => 'Online',
+                'courseWorkload' => $course->duration_minutes ? 'PT'.$course->duration_minutes.'M' : null,
+            ],
+        ], fn ($value) => $value !== null && $value !== '');
+
+        $courseLd['hasCourseInstance'] = array_filter($courseLd['hasCourseInstance']);
+    @endphp
+    <script type="application/ld+json">{!! json_encode($courseLd, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG) !!}</script>
+@endpush
 
 @php
     use Illuminate\Support\Number;
@@ -146,7 +182,29 @@
                 </aside>
             </div>
         </div>
+
+        <div class="h-20 lg:hidden" aria-hidden="true"></div>
     </main>
+
+    {{-- Barre d'achat mobile : prix et CTA visibles sans scroller (la carte d'achat n'apparaît qu'en bas de page sur petit écran) --}}
+    <div class="border-ink/10 fixed inset-x-0 bottom-0 z-40 border-t bg-white/95 px-4 py-3 backdrop-blur-sm lg:hidden" data-nosnippet>
+        <div class="mx-auto flex max-w-lg items-center justify-between gap-4">
+            <div class="min-w-0">
+                <p class="text-ink font-serif text-xl leading-none font-medium">{{ Number::currency($course->price, in: 'EUR', locale: 'fr') }}</p>
+                <p class="text-ink-muted mt-1 text-xs">Paiement unique · accès à vie</p>
+            </div>
+            @if ($hasAccess)
+                <x-button :href="route('student.course', $course)" size="sm" arrow>Accéder</x-button>
+            @elseif (auth('student')->check())
+                <form method="POST" action="{{ route('courses.checkout.start', $course) }}">
+                    @csrf
+                    <x-button type="submit" size="sm" arrow>Acheter la formation</x-button>
+                </form>
+            @else
+                <x-button :href="route('student.register', ['course' => $course->slug])" size="sm" arrow>Acheter la formation</x-button>
+            @endif
+        </div>
+    </div>
 
     @include('home.sections.footer')
 @endsection

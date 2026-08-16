@@ -26,7 +26,8 @@ class DateOverride extends Model
     }
 
     /**
-     * Indique si cette exception bloque la journée entière (aucune plage horaire définie).
+     * Indique si cette exception bloque la journée entière (aucune plage
+     * horaire définie).
      */
     public function isFullDay(): bool
     {

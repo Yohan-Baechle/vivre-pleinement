@@ -35,8 +35,8 @@ class YoutubeSync
      * Synchronise les vidéos longues de la chaîne configurée.
      *
      * Les Shorts (durée <= 60s) sont ignorés : ils ne sont jamais stockés. Le
-     * paramètre $maxResults borne le nombre d'éléments parcourus dans la playlist
-     * d'uploads (garde-fou), pas le nombre de vidéos conservées.
+     * paramètre $maxResults borne le nombre d'éléments parcourus dans la
+     * playlist d'uploads (garde-fou), pas le nombre de vidéos conservées.
      *
      * @return array{created: int, updated: int, missing: int, total: int}
      */
@@ -138,7 +138,8 @@ class YoutubeSync
     }
 
     /**
-     * Marque comme "missing" les vidéos en base qui ne sont plus retournées par l'API.
+     * Marque comme "missing" les vidéos en base qui ne sont plus retournées par
+     * l'API.
      */
     private function markMissingVideos(Collection $fetchedIds): int
     {
@@ -272,11 +273,15 @@ class YoutubeSync
 
     private function client(): PendingRequest
     {
-        return Http::timeout(15)->retry(2, 250)->acceptJson()->throw();
+        return Http::connectTimeout(5)->timeout(15)->retry(2, 250)->acceptJson()->throw();
     }
 
     /**
-     * @param  array<string, array{url: string, width: int, height: int}>  $thumbnails
+     * @param  array<string, array{
+     *     url: string,
+     *     width: int,
+     *     height: int,
+     * }>  $thumbnails
      */
     private function bestThumbnail(array $thumbnails): ?string
     {

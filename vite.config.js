@@ -11,10 +11,14 @@ export default defineConfig({
             fonts: [
                 bunny('Instrument Sans', {
                     weights: [400, 500, 600],
+                    subsets: ['latin'],
+                    preload: [{ weight: 400 }, { weight: 500 }],
                 }),
                 bunny('Crimson Pro', {
                     weights: [400, 500, 600],
                     styles: ['normal', 'italic'],
+                    subsets: ['latin'],
+                    preload: [{ weight: 500 }, { weight: 400, style: 'italic' }],
                 }),
             ],
         }),

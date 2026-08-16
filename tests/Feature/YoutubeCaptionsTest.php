@@ -75,9 +75,7 @@ it('fetches, cleans and stores a transcript from the srt subtitles', function ()
         ->and($video->transcript)->toContain('<p>')
         ->and($video->transcript)->toContain('Bonjour à tous')
         ->and($video->transcript)->toContain('anxiété')
-        // L'annotation non verbale est retirée.
         ->and($video->transcript)->not->toContain('Musique')
-        // La répétition consécutive est dédupliquée.
         ->and(substr_count($video->transcript, 'Aujourd'))->toBe(1);
 });
 

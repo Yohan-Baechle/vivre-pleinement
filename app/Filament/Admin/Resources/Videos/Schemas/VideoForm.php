@@ -19,15 +19,21 @@ use Filament\Schemas\Components\Section;
 use Filament\Schemas\Components\Tabs;
 use Filament\Schemas\Components\Tabs\Tab;
 use Filament\Schemas\Schema;
+use Filament\Support\Enums\IconSize;
 use Filament\Support\Icons\Heroicon;
 use Illuminate\Support\HtmlString;
+use Illuminate\View\ComponentAttributeBag;
+
+use function Filament\Support\generate_icon_html;
 
 class VideoForm
 {
     public static function configure(Schema $schema): Schema
     {
         return $schema->components([
-            Section::make('⚠️ Vidéo manquante sur YouTube')
+            Section::make('Vidéo manquante sur YouTube')
+                ->icon(Heroicon::OutlinedExclamationTriangle)
+                ->iconColor('danger')
                 ->description('Cette vidéo a disparu de la chaîne YouTube (supprimée ou passée en privée). Elle est automatiquement masquée du site public.')
                 ->visible(fn ($record) => $record?->is_missing === true)
                 ->extraAttributes(['class' => 'border-warning-300 bg-warning-50 ring-warning-300'])
@@ -115,6 +121,12 @@ class VideoForm
                                 ->label('Meta description (SEO)')
                                 ->helperText('Affichée dans les résultats Google. 150-160 caractères idéalement. Si vide, fallback sur le résumé puis la description YouTube tronquée.')
                                 ->maxLength(320)
+                                ->columnSpanFull(),
+
+                            TextInput::make('seo_robots')
+                                ->label('Robots')
+                                ->placeholder('index, follow')
+                                ->helperText('Vide = index, follow par défaut. Mettre « noindex, follow » pour exclure la page de Google.')
                                 ->columnSpanFull(),
 
                             Textarea::make('summary')
@@ -214,7 +226,7 @@ class VideoForm
 
                             Placeholder::make('youtube_published_at_display')
                                 ->label('Publiée sur YouTube le')
-                                ->content(fn ($record) => $record?->youtube_published_at?->locale('fr')->isoFormat('D MMMM YYYY [à] HH:mm') ?? '–'),
+                                ->content(fn ($record) => $record?->youtube_published_at?->isoFormat('D MMMM YYYY [à] HH:mm') ?? '–'),
 
                             Placeholder::make('synced_at_display')
                                 ->label('Dernière synchronisation')
@@ -283,9 +295,14 @@ class VideoForm
     private static function editorialChecklist(?Video $record): string
     {
         $row = function (bool $done, string $label): string {
-            $icon = $done
-                ? '<span class="text-success-600">✓</span>'
-                : '<span class="text-danger-500">○</span>';
+            $icon = generate_icon_html(
+                $done ? Heroicon::CheckCircle : Heroicon::OutlinedMinusCircle,
+                attributes: (new ComponentAttributeBag)->class([
+                    $done ? 'text-success-600' : 'text-danger-500',
+                ]),
+                size: IconSize::Small,
+            )?->toHtml() ?? '';
+
             $class = $done ? 'text-gray-600' : 'font-medium text-gray-900';
 
             return '<li class="flex items-center gap-2 '.$class.'">'.$icon.' '.$label.'</li>';

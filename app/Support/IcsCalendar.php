@@ -51,7 +51,8 @@ class IcsCalendar
     }
 
     /**
-     * Replie une ligne de contenu à 75 octets par ligne (les continuations débutent par une espace).
+     * Replie une ligne de contenu à 75 octets par ligne (les continuations
+     * débutent par une espace).
      */
     private static function foldLine(string $line): string
     {

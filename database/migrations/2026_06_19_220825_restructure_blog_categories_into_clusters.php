@@ -16,7 +16,11 @@ return new class extends Migration
     /**
      * Cluster => [nom, pilier (slug), liste des slugs d'articles].
      *
-     * @var array<string, array{name: string, pillar: string, posts: list<string>}>
+     * @var array<string, array{
+     *     name: string,
+     *     pillar: string,
+     *     posts: list<string>,
+     * }>
      */
     private const CLUSTERS = [
         'blessures-emotionnelles-et-traumatismes' => [
@@ -173,8 +177,5 @@ return new class extends Migration
      * cluster + catégories génériques) ne peut être reconstruite de façon
      * fiable. Restaurer depuis une sauvegarde si besoin.
      */
-    public function down(): void
-    {
-        //
-    }
+    public function down(): void {}
 };

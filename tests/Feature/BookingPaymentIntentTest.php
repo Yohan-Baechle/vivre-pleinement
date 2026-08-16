@@ -3,6 +3,7 @@
 use App\Models\Appointment;
 use App\Models\AppointmentService;
 use App\Services\BookingPaymentService;
+use App\Services\StripePaymentIntents;
 use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
 use Stripe\PaymentIntent;
 
@@ -32,51 +33,43 @@ function fakeBookingIntent(string $id, string $status, int $amount): PaymentInte
 it('réutilise le PaymentIntent déjà créé au lieu d\'en générer un second', function () {
     $appointment = appointmentWithIntent('pi_existing');
 
-    $service = $this->partialMock(BookingPaymentService::class, function ($mock) {
-        $mock->shouldReceive('retrieveIntent')
+    $this->mock(StripePaymentIntents::class, function ($mock) {
+        $mock->shouldReceive('reusable')
             ->once()
-            ->with('pi_existing')
+            ->with('pi_existing', 7000)
             ->andReturn(fakeBookingIntent('pi_existing', 'requires_payment_method', 7000));
-        $mock->shouldNotReceive('createIntent');
+        $mock->shouldNotReceive('create');
     });
 
-    $intent = $service->createPaymentIntent($appointment);
+    $intent = app(BookingPaymentService::class)->createPaymentIntent($appointment);
 
     expect($intent->id)->toBe('pi_existing');
 });
 
-it('réaligne le montant de l\'intent existant lorsque le prix a changé', function () {
+it('transmet le prix courant du rendez-vous au calcul de réutilisation', function () {
     $appointment = appointmentWithIntent('pi_existing', priceCents: 9900);
 
-    $service = $this->partialMock(BookingPaymentService::class, function ($mock) {
-        $mock->shouldReceive('retrieveIntent')
-            ->once()
-            ->andReturn(fakeBookingIntent('pi_existing', 'requires_payment_method', 7000));
-        $mock->shouldReceive('updateIntentAmount')
+    $this->mock(StripePaymentIntents::class, function ($mock) {
+        $mock->shouldReceive('reusable')
             ->once()
             ->with('pi_existing', 9900)
             ->andReturn(fakeBookingIntent('pi_existing', 'requires_payment_method', 9900));
-        $mock->shouldNotReceive('createIntent');
     });
 
-    $intent = $service->createPaymentIntent($appointment);
-
-    expect($intent->amount)->toBe(9900);
+    expect(app(BookingPaymentService::class)->createPaymentIntent($appointment)->amount)->toBe(9900);
 });
 
-it('crée un nouvel intent de rendez-vous lorsque l\'ancien est déjà finalisé', function () {
+it('crée un nouvel intent de rendez-vous lorsqu\'aucun n\'est réutilisable', function () {
     $appointment = appointmentWithIntent('pi_finalise');
 
-    $service = $this->partialMock(BookingPaymentService::class, function ($mock) {
-        $mock->shouldReceive('retrieveIntent')
-            ->once()
-            ->andReturn(fakeBookingIntent('pi_finalise', 'succeeded', 7000));
-        $mock->shouldReceive('createIntent')
+    $this->mock(StripePaymentIntents::class, function ($mock) {
+        $mock->shouldReceive('reusable')->once()->andReturn(null);
+        $mock->shouldReceive('create')
             ->once()
             ->andReturn(fakeBookingIntent('pi_nouveau', 'requires_payment_method', 7000));
     });
 
-    $intent = $service->createPaymentIntent($appointment);
+    $intent = app(BookingPaymentService::class)->createPaymentIntent($appointment);
 
     expect($intent->id)->toBe('pi_nouveau')
         ->and($appointment->fresh()->stripe_payment_intent_id)->toBe('pi_nouveau');
@@ -85,14 +78,14 @@ it('crée un nouvel intent de rendez-vous lorsque l\'ancien est déjà finalisé
 it('crée un intent de rendez-vous et le mémorise au premier passage', function () {
     $appointment = appointmentWithIntent(null);
 
-    $service = $this->partialMock(BookingPaymentService::class, function ($mock) {
-        $mock->shouldNotReceive('retrieveIntent');
-        $mock->shouldReceive('createIntent')
+    $this->mock(StripePaymentIntents::class, function ($mock) {
+        $mock->shouldReceive('reusable')->once()->with(null, 7000)->andReturn(null);
+        $mock->shouldReceive('create')
             ->once()
             ->andReturn(fakeBookingIntent('pi_premier', 'requires_payment_method', 7000));
     });
 
-    $service->createPaymentIntent($appointment);
+    app(BookingPaymentService::class)->createPaymentIntent($appointment);
 
     expect($appointment->fresh()->stripe_payment_intent_id)->toBe('pi_premier');
 });

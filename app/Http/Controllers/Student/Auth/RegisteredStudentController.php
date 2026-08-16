@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Student\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\RegisterStudentFormRequest;
+use App\Models\Course;
 use App\Models\Student;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\RedirectResponse;
@@ -33,13 +34,16 @@ class RegisteredStudentController extends Controller
 
     /**
      * Redirige vers la page de vente de la formation visée si elle est connue,
-     * sinon vers le tableau de bord élève.
+     * sinon vers le tableau de bord élève. Le slug reçu du formulaire n'est
+     * suivi que s'il correspond à une formation publiée : sans cette
+     * vérification, n'importe quelle valeur atterrirait dans l'URL de
+     * redirection.
      */
     private function intendedUrl(Request $request): string
     {
-        $courseSlug = $request->input('course');
+        $courseSlug = $request->string('course')->trim()->value();
 
-        if (is_string($courseSlug) && $courseSlug !== '') {
+        if ($courseSlug !== '' && Course::query()->published()->where('slug', $courseSlug)->exists()) {
             return route('courses.show', $courseSlug);
         }
 

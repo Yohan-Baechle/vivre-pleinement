@@ -23,6 +23,31 @@ it('affiche la page de vente d\'une formation publiée', function () {
         ->assertSee('Apaiser son anxiété');
 });
 
+it('rend le seo_title tel quel, sans suffixe « · Formation » dupliqué', function () {
+    $course = Course::factory()->create([
+        'slug' => 'apaiser-anxiete',
+        'title' => 'Apaiser son anxiété au quotidien',
+        'seo_title' => 'Formation : apaiser son anxiété au quotidien',
+    ]);
+
+    $this->get(route('courses.show', $course))
+        ->assertOk()
+        ->assertSee('<title>Formation : apaiser son anxiété au quotidien</title>', false)
+        ->assertDontSee('au quotidien · Formation', false);
+});
+
+it('suffixe le titre avec « · Formation » quand seo_title est vide', function () {
+    $course = Course::factory()->create([
+        'slug' => 'sans-seo-title',
+        'title' => 'Une formation test',
+        'seo_title' => null,
+    ]);
+
+    $this->get(route('courses.show', $course))
+        ->assertOk()
+        ->assertSee('<title>Une formation test · Formation</title>', false);
+});
+
 it('renvoie 404 pour une formation en brouillon', function () {
     $course = Course::factory()->draft()->create();
 

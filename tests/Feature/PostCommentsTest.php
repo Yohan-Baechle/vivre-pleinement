@@ -43,7 +43,7 @@ it('displays the author replies nested under their parent comment', function () 
     $this->get(route('blog.show', $post->slug))
         ->assertOk()
         ->assertSee('Merci pour votre message, ravie que cela vous aide.')
-        ->assertSee('Auteure'); // badge identifié par l'e-mail de l'auteure
+        ->assertSee('Auteure');
 });
 
 it('does not show the author badge for a visitor sharing the author first name', function () {
@@ -70,7 +70,6 @@ it('counts replies in the comment total', function () {
         'status' => CommentStatus::Approved,
     ]);
 
-    // 1 racine + 2 réponses = 3
     $this->get(route('blog.show', $post->slug))
         ->assertOk()
         ->assertSee('3 commentaires');

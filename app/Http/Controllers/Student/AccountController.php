@@ -8,7 +8,7 @@ use App\Http\Requests\UpdateStudentProfileFormRequest;
 use App\Models\Student;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Arr;
 use Illuminate\View\View;
 
 class AccountController extends Controller
@@ -21,8 +21,8 @@ class AccountController extends Controller
     }
 
     /**
-     * Met à jour le nom et l'e-mail. Un changement d'e-mail repasse le compte en
-     * « non vérifié » et renvoie un lien de confirmation.
+     * Met à jour le nom et l'e-mail. Un changement d'e-mail repasse le compte
+     * en « non vérifié » et renvoie un lien de confirmation.
      */
     public function updateProfile(UpdateStudentProfileFormRequest $request): RedirectResponse
     {
@@ -33,7 +33,7 @@ class AccountController extends Controller
 
         $emailChanged = $validated['email'] !== $student->email;
 
-        $student->fill($validated);
+        $student->fill(Arr::only($validated, ['name', 'email']));
 
         if ($emailChanged) {
             $student->email_verified_at = null;
@@ -52,16 +52,15 @@ class AccountController extends Controller
 
     /**
      * Change le mot de passe après vérification du mot de passe actuel.
+     * Le hachage est assuré par le cast `hashed` du modèle Student.
      */
     public function updatePassword(UpdateStudentPasswordFormRequest $request): RedirectResponse
     {
         /** @var Student $student */
         $student = $request->user('student');
 
-        $validated = $request->validated();
-
         $student->update([
-            'password' => Hash::make($validated['password']),
+            'password' => $request->validated('password'),
         ]);
 
         return back()->with('status', 'password-updated');
