@@ -39,7 +39,11 @@ class AppointmentSlotService
     /**
      * Liste les créneaux réservables pour une date donnée.
      *
-     * @return Collection<int, array{start: CarbonImmutable, end: CarbonImmutable, label: string}>
+     * @return Collection<int, array{
+     *     start: CarbonImmutable,
+     *     end: CarbonImmutable,
+     *     label: string,
+     * }>
      */
     public function slotsForDate(AppointmentService $service, CarbonImmutable $date): Collection
     {
@@ -49,10 +53,15 @@ class AppointmentSlotService
     }
 
     /**
-     * Renvoie les prochains créneaux réservables, tous jours confondus, à partir
-     * d'aujourd'hui et jusqu'à la limite de réservation anticipée du service.
+     * Renvoie les prochains créneaux réservables, tous jours confondus, à
+     * partir d'aujourd'hui et jusqu'à la limite de réservation anticipée du
+     * service.
      *
-     * @return Collection<int, array{start: CarbonImmutable, end: CarbonImmutable, label: string}>
+     * @return Collection<int, array{
+     *     start: CarbonImmutable,
+     *     end: CarbonImmutable,
+     *     label: string,
+     * }>
      */
     public function nextAvailableSlots(AppointmentService $service, int $limit = 3): Collection
     {
@@ -112,14 +121,20 @@ class AppointmentSlotService
 
     /**
      * Calcule les créneaux d'une date à partir d'un contexte préchargé, sans
-     * toucher à la base.
+     * toucher à la base. Deux plages de disponibilité qui se chevauchent ne
+     * doivent produire qu'un seul créneau par horaire de début, sans quoi le
+     * client voit le même horaire proposé plusieurs fois.
      *
      * @param  array{
      *     availabilities: Collection<int, Availability>,
      *     overridesByDate: Collection<string, Collection<int, DateOverride>>,
      *     bookedByDate: Collection<string, Collection<int, Appointment>>
      * }  $context
-     * @return Collection<int, array{start: CarbonImmutable, end: CarbonImmutable, label: string}>
+     * @return Collection<int, array{
+     *     start: CarbonImmutable,
+     *     end: CarbonImmutable,
+     *     label: string,
+     * }>
      */
     private function slotsForDateInContext(AppointmentService $service, CarbonImmutable $date, array $context): Collection
     {
@@ -165,6 +180,7 @@ class AppointmentSlotService
 
                 return false;
             })
+            ->unique(fn (array $slot) => $slot['start']->getTimestamp())
             ->sortBy(fn (array $slot) => $slot['start']->getTimestamp())
             ->values()
             ->map(fn (array $slot) => [
@@ -175,7 +191,8 @@ class AppointmentSlotService
     }
 
     /**
-     * Vérifie côté serveur qu'un début de créneau précis est réellement réservable.
+     * Vérifie côté serveur qu'un début de créneau précis est réellement
+     * réservable.
      */
     public function isSlotBookable(AppointmentService $service, CarbonImmutable $start): bool
     {
@@ -184,8 +201,8 @@ class AppointmentSlotService
     }
 
     /**
-     * Indique si un autre rendez-vous bloquant chevauche la plage horaire de celui-ci.
-     * Sert à détecter un créneau pris pendant le tunnel de paiement.
+     * Indique si un autre rendez-vous bloquant chevauche la plage horaire de
+     * celui-ci. Sert à détecter un créneau pris pendant le tunnel de paiement.
      */
     public function hasConflictingAppointment(Appointment $appointment): bool
     {
@@ -240,7 +257,8 @@ class AppointmentSlotService
     }
 
     /**
-     * Déplace de façon atomique un rendez-vous existant vers un nouveau créneau.
+     * Déplace de façon atomique un rendez-vous existant vers un nouveau
+     * créneau.
      */
     public function move(Appointment $appointment, CarbonImmutable $start): bool
     {
@@ -278,7 +296,8 @@ class AppointmentSlotService
     }
 
     /**
-     * Découpe une fenêtre de disponibilité en créneaux consécutifs selon la durée du service.
+     * Découpe une fenêtre de disponibilité en créneaux consécutifs selon la
+     * durée du service.
      *
      * @return array<int, array{start: CarbonImmutable, end: CarbonImmutable}>
      */

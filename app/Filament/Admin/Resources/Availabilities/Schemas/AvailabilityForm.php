@@ -2,8 +2,8 @@
 
 namespace App\Filament\Admin\Resources\Availabilities\Schemas;
 
-use App\Filament\Admin\Resources\Availabilities\AvailabilityResource;
 use App\Models\AppointmentService;
+use App\Support\Weekdays;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TimePicker;
 use Filament\Forms\Components\Toggle;
@@ -25,7 +25,7 @@ class AvailabilityForm
 
                 Select::make('day_of_week')
                     ->label('Jour')
-                    ->options(AvailabilityResource::weekdays())
+                    ->options(Weekdays::labels())
                     ->required()
                     ->native(false),
 
