@@ -33,7 +33,7 @@
                     <p class="text-ink font-serif text-xl font-medium">{{ Number::currency($appointment->price_cents / 100, in: 'EUR', locale: 'fr') }}</p>
                 </div>
                 <p class="text-ink-soft mt-1 text-sm">
-                    {{ $start->locale('fr')->isoFormat('dddd D MMMM YYYY à H\hi') }} · {{ $appointment->service->duration_minutes }} min · en visioconférence
+                    {{ $start->isoFormat('dddd D MMMM YYYY à H\hi') }} · {{ $appointment->service->duration_minutes }} min · en visioconférence
                 </p>
             </div>
 
@@ -45,7 +45,7 @@
                   data-stripe-key="{{ $stripeKey }}"
                   data-client-secret="{{ $clientSecret }}"
                   data-amount-label="{{ $amountLabel }}"
-                  data-return-url="{{ route('booking.confirmation', $appointment->reference) }}">
+                  data-return-url="{{ route('booking.confirmation', $appointment->token) }}">
 
                 <div id="payment-skeleton" class="space-y-4" aria-hidden="true">
                     <div class="bg-cream-100 h-11 animate-pulse rounded-2xl"></div>

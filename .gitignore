@@ -40,3 +40,4 @@ Thumbs.db
 # Backups manuels du seed et exports SEO de travail
 /database/seed.sql.bak-*
 /seo/
+/vivre-pleinement.fr-audit/

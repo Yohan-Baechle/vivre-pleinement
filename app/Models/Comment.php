@@ -46,7 +46,8 @@ class Comment extends Model
     }
 
     /**
-     * Indique si le commentaire émane de l'auteure du site (par adresse e-mail).
+     * Indique si le commentaire émane de l'auteure du site (par adresse
+     * e-mail).
      */
     public function isFromAuthor(): bool
     {

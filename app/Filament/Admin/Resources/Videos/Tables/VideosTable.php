@@ -12,6 +12,7 @@ use Filament\Actions\EditAction;
 use Filament\Actions\ForceDeleteBulkAction;
 use Filament\Actions\RestoreBulkAction;
 use Filament\Notifications\Notification;
+use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Columns\TextColumn;
@@ -28,6 +29,12 @@ class VideosTable
     public static function configure(Table $table): Table
     {
         return $table
+            ->persistFiltersInSession()
+            ->persistSortInSession()
+            ->emptyStateIcon(Heroicon::OutlinedPlayCircle)
+            ->emptyStateHeading('Aucune vidéo synchronisée')
+            ->emptyStateDescription('Lancez « Synchroniser depuis YouTube » '
+                .'pour importer les vidéos de la chaîne.')
             ->columns([
                 ImageColumn::make('thumbnail_url')
                     ->label('')
@@ -42,15 +49,20 @@ class VideosTable
                     ->sortable()
                     ->limit(60)
                     ->wrap()
-                    ->description(fn (Video $record) => 'YouTube ID : '.$record->youtube_id),
+                    ->tooltip(fn (Video $record) => 'Identifiant YouTube : '.$record->youtube_id),
 
                 TextColumn::make('status')
                     ->label('Statut')
                     ->badge()
                     ->formatStateUsing(fn (Video $record) => match (true) {
-                        $record->is_missing => '⚠️ Manquante',
+                        $record->is_missing => 'Manquante',
                         $record->isShort() => 'Short',
                         default => $record->status->getLabel(),
+                    })
+                    ->icon(fn (Video $record) => match (true) {
+                        $record->is_missing => Heroicon::ExclamationTriangle,
+                        $record->isShort() => Heroicon::Bolt,
+                        default => null,
                     })
                     ->color(fn (Video $record) => match (true) {
                         $record->is_missing => 'danger',
@@ -74,10 +86,15 @@ class VideosTable
                     ->label('Éditorial')
                     ->badge()
                     ->getStateUsing(fn (Video $record) => match (true) {
-                        $record->isEnriched() && $record->hasTranscript() => '✓ Complet',
+                        $record->isEnriched() && $record->hasTranscript() => 'Complet',
                         $record->isEnriched() => 'Sans transcription',
                         $record->hasTranscript() => 'À enrichir',
-                        default => '⚠️ À traiter',
+                        default => 'À traiter',
+                    })
+                    ->icon(fn (Video $record) => match (true) {
+                        $record->isEnriched() && $record->hasTranscript() => Heroicon::CheckCircle,
+                        $record->isEnriched() || $record->hasTranscript() => Heroicon::PencilSquare,
+                        default => Heroicon::ExclamationTriangle,
                     })
                     ->color(fn (Video $record) => match (true) {
                         $record->isEnriched() && $record->hasTranscript() => 'success',

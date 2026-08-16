@@ -8,9 +8,6 @@ use Illuminate\Support\Facades\Hash;
 uses(LazilyRefreshDatabase::class);
 
 it('creates the admin user from configured credentials, not raw env() at runtime', function () {
-    // Simule ce que fournit config/admin.php une fois passé par config:cache :
-    // le seeder ne doit lire que config(), jamais env() directement (qui
-    // renverrait null en production une fois la config mise en cache).
     config([
         'admin.email' => 'admin-test@example.com',
         'admin.name' => 'Test Admin',
@@ -24,6 +21,19 @@ it('creates the admin user from configured credentials, not raw env() at runtime
     expect($user->name)->toBe('Test Admin')
         ->and(Hash::check('super-secret', $user->password))->toBeTrue();
 });
+
+it('refuses to seed an admin account without an explicit password', function () {
+    config(['admin.email' => 'admin-test@example.com', 'admin.password' => null]);
+
+    expect(fn () => (new AdminUserSeeder)->run())
+        ->toThrow(RuntimeException::class);
+
+    $this->assertDatabaseMissing('users', ['email' => 'admin-test@example.com']);
+});
+
+it('exposes no default password in the shipped configuration', function () {
+    expect(config('admin.password'))->toBeNull();
+})->skip(fn () => filled(env('ADMIN_PASSWORD')), 'ADMIN_PASSWORD est défini dans cet environnement.');
 
 it('is idempotent — running it twice updates rather than duplicates the admin user', function () {
     config([

@@ -12,7 +12,7 @@ use Illuminate\Database\Eloquent\Builder;
 
 class LatestPosts extends TableWidget
 {
-    protected static ?int $sort = 3;
+    protected static ?int $sort = 4;
 
     protected static ?string $heading = 'Derniers articles';
 

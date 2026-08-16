@@ -40,6 +40,10 @@
                         @endif
                     </x-form-field>
 
+                    <x-form-field name="current_password" label="Mot de passe actuel" type="password" autocomplete="current-password">
+                        <p class="text-ink-muted mt-2 text-xs">Requis uniquement si vous changez d'adresse e-mail.</p>
+                    </x-form-field>
+
                     <x-button type="submit">Enregistrer</x-button>
                 </form>
             </section>
@@ -53,11 +57,11 @@
                     @csrf
                     @method('PUT')
 
-                    <x-form-field name="current_password" label="Mot de passe actuel" type="password" autocomplete="current-password" />
+                    <x-form-field name="current_password" label="Mot de passe actuel" type="password" autocomplete="current-password" bag="updatePassword" />
 
-                    <x-form-field name="password" label="Nouveau mot de passe" type="password" autocomplete="new-password" />
+                    <x-form-field name="password" label="Nouveau mot de passe" type="password" autocomplete="new-password" bag="updatePassword" />
 
-                    <x-form-field name="password_confirmation" label="Confirmer le nouveau mot de passe" type="password" autocomplete="new-password" :show-error-ring="false" :show-error-message="false" />
+                    <x-form-field name="password_confirmation" label="Confirmer le nouveau mot de passe" type="password" autocomplete="new-password" bag="updatePassword" :show-error-ring="false" :show-error-message="false" />
 
                     <x-button type="submit">Modifier le mot de passe</x-button>
                 </form>
@@ -79,6 +83,7 @@
 
     {{-- Modale de confirmation de suppression --}}
     <dialog id="delete-account-dialog"
+            @if ($errors->deleteAccount->isNotEmpty()) data-reopen @endif
             class="bg-transparent backdrop:bg-ink/50 backdrop:backdrop-blur-sm m-auto w-full max-w-md p-4 open:flex">
         <div class="ring-ink/5 w-full rounded-3xl bg-white p-6 shadow-xl ring-1 sm:p-8">
             <div class="flex items-start gap-4">
@@ -101,6 +106,11 @@
                 <input type="text" id="delete-confirm" data-delete-confirm autocomplete="off" autocapitalize="characters"
                        class="mt-2 w-full rounded-2xl border-0 bg-cream-50 px-4 py-3 text-sm text-ink ring-1 ring-ink/10 transition placeholder:text-ink-muted focus:bg-white focus:ring-2 focus:ring-rose-400 focus:outline-hidden"
                        placeholder="SUPPRIMER">
+
+                <div class="mt-4">
+                    <x-form-field name="current_password" label="Votre mot de passe" type="password"
+                                  autocomplete="current-password" bag="deleteAccount" error-class="ring-rose-400" />
+                </div>
 
                 <div class="mt-6 flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
                     <button type="button" data-close-delete-dialog

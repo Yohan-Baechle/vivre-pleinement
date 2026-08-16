@@ -41,9 +41,13 @@ class CleanPostContent extends Command
     }
 
     /**
-     * Déroule les <span> sans attribut (résidus Gutenberg) en conservant leur texte,
-     * en répétant la passe pour gérer l'imbrication. Les <span ...> porteurs
-     * d'attributs sont laissés intacts.
+     * Déroule les <span> sans attribut (résidus Gutenberg) en conservant leur
+     * texte, en répétant la passe pour gérer l'imbrication. Les <span ...>
+     * porteurs d'attributs sont laissés intacts.
+     *
+     * Retire ensuite les résidus WordPress : appels au don Tipeee sous toutes
+     * leurs variantes (emojis devenus « ???? » à la migration inclus),
+     * commentaires de blocs Divi et paragraphes vides orphelins.
      */
     public static function clean(string $content): string
     {
@@ -51,9 +55,20 @@ class CleanPostContent extends Command
             $content = preg_replace('#<span>(.*?)</span>#is', '$1', $content, -1, $count);
         } while ($count > 0);
 
-        // Retire les paragraphes d'appel au don « Si vous aimez mon travail »
-        // (résidus WordPress/Tipeee), avec leurs éventuels sauts de ligne alentour.
-        $content = preg_replace('#\s*<p>[^<]*Si vous aimez mon travail.*?</p>#is', '', $content);
+        $donationPhrases = [
+            'Si vous aimez mon travail',
+            'Si vous appréciez mon travail',
+            'si mon travail vous aide',
+            'soutenir mon travail',
+            'Tipeee',
+        ];
+
+        foreach ($donationPhrases as $phrase) {
+            $content = preg_replace('#\s*<p>[^<]*'.preg_quote($phrase, '#').'.*?</p>#isu', '', $content);
+        }
+
+        $content = preg_replace('#<!--\s*/?divi:.*?-->#is', '', $content);
+        $content = preg_replace('#\s*<p>(?:\s|&nbsp;)*</p>#is', '', $content);
 
         return $content;
     }

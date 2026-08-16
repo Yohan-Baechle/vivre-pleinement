@@ -44,19 +44,17 @@ function serviceWithAvailability(int $dayOfWeek, string $start = '09:00', string
 }
 
 it('generates slots stepped by the service duration', function () {
-    $day = nextWeekday(3); // mercredi
+    $day = nextWeekday(3);
     $service = serviceWithAvailability($day->dayOfWeek, '09:00', '12:00');
 
     $slots = app(AppointmentSlotService::class)->slotsForDate($service, $day);
 
-    // 3h / 30 min = 6 créneaux : 09:00 … 11:30
     expect($slots)->toHaveCount(6)
         ->and($slots->first()['label'])->toBe('09:00')
         ->and($slots->last()['label'])->toBe('11:30');
 });
 
 it('excludes slots inside the minimum-notice window', function () {
-    // Disponibilité aujourd'hui, mais min_notice de 12h => créneaux du matin écartés.
     $today = CarbonImmutable::now();
     $service = serviceWithAvailability($today->dayOfWeek, '00:00', '23:30', ['min_notice_hours' => 12]);
 
@@ -157,4 +155,21 @@ it('finds the next available slots in three queries', function () {
     $this->expectsDatabaseQueryCount(3);
 
     app(AppointmentSlotService::class)->nextAvailableSlots($service);
+});
+
+it('never offers the same start time twice when windows overlap', function () {
+    $day = nextWeekday(3);
+    $service = serviceWithAvailability($day->dayOfWeek, '09:00', '12:00');
+
+    Availability::factory()->create([
+        'day_of_week' => $day->dayOfWeek,
+        'start_time' => '09:00',
+        'end_time' => '11:00',
+    ]);
+
+    $slots = app(AppointmentSlotService::class)->slotsForDate($service, $day);
+    $labels = $slots->pluck('label')->all();
+
+    expect($labels)->toBe(array_values(array_unique($labels)))
+        ->and($slots)->toHaveCount(6);
 });

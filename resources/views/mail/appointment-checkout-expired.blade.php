@@ -8,7 +8,7 @@ Vous aviez commencé à réserver un rendez-vous, mais le paiement n'a pas été
 Voici le rendez-vous qui était en cours de réservation :
 
 **Prestation :** {{ $appointment->service->name }}\
-**Créneau :** {{ $appointment->starts_at->locale('fr')->isoFormat('dddd D MMMM YYYY') }} à {{ $appointment->starts_at->format('H\hi') }}
+**Créneau :** {{ $appointment->starts_at->isoFormat('dddd D MMMM YYYY') }} à {{ $appointment->starts_at->format('H\hi') }}
 
 Aucun montant ne vous a été débité. Si vous le souhaitez toujours, vous pouvez reprendre votre réservation en quelques clics :
 

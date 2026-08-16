@@ -25,16 +25,17 @@ return [
         'name' => 'Laura Baechlé',
         'address' => '7 Rue du Moulin Saintin',
         'siret' => '90377213500013',
+        'vat' => 'TVA non applicable, article 293 B du CGI',
         'email' => 'jasiewicz.laura@gmail.com',
         'phone' => env('LEGAL_PHONE'),
         'publication_director' => 'Laura Baechlé',
     ],
 
     'host' => [
-        'name' => 'Hetzner Online GmbH',
-        'address' => 'Industriestr. 25, 91710 Gunzenhausen, Allemagne',
-        'website' => 'https://www.hetzner.com',
-        'phone' => '+49 9831 505-0',
+        'name' => 'OVH SAS',
+        'address' => '2 rue Kellermann, 59100 Roubaix, France',
+        'website' => 'https://www.ovhcloud.com',
+        'phone' => '1007',
     ],
 
     'webmaster' => [

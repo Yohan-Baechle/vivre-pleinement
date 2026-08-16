@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Student;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\DeleteStudentAccountFormRequest;
 use App\Support\CourseProgress;
 use App\Support\StudentAnonymizer;
 use Illuminate\Http\RedirectResponse;
@@ -33,8 +34,10 @@ class DashboardController extends Controller
     /**
      * Anonymise le compte élève (droit à l'effacement RGPD) tout en conservant
      * les inscriptions pour les obligations comptables. Voir StudentAnonymizer.
+     * Le mot de passe courant est revérifié par
+     * DeleteStudentAccountFormRequest.
      */
-    public function destroy(Request $request): RedirectResponse
+    public function destroy(DeleteStudentAccountFormRequest $request): RedirectResponse
     {
         $student = $request->user('student');
 

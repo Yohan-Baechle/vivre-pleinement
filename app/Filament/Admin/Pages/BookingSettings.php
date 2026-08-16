@@ -26,7 +26,7 @@ class BookingSettings extends Page
 
     protected static string|UnitEnum|null $navigationGroup = 'Rendez-vous';
 
-    protected static ?int $navigationSort = 30;
+    protected static ?int $navigationSort = 50;
 
     protected string $view = 'filament.admin.pages.booking-settings';
 
@@ -52,6 +52,7 @@ class BookingSettings extends Page
             ->statePath('data')
             ->components([
                 Section::make('Visioconférence')
+                    ->icon(Heroicon::OutlinedVideoCamera)
                     ->description('Le lien envoyé au client dans les emails et la page de confirmation.')
                     ->schema([
                         TextInput::make('meet_url')
@@ -62,6 +63,7 @@ class BookingSettings extends Page
                     ]),
 
                 Section::make('Notifications')
+                    ->icon(Heroicon::OutlinedEnvelope)
                     ->schema([
                         TextInput::make('notify_email')
                             ->label('Email de notification')
@@ -71,6 +73,7 @@ class BookingSettings extends Page
                     ]),
 
                 Section::make('Rappels automatiques')
+                    ->icon(Heroicon::OutlinedBellAlert)
                     ->description('Emails envoyés automatiquement aux clients avant et après leur rendez-vous.')
                     ->columns(1)
                     ->schema([

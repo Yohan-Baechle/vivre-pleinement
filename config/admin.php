@@ -9,8 +9,11 @@ return [
     |
     | Utilisé par AdminUserSeeder. Passer par config() plutôt que env() directement
     | dans le seeder : avec `config:cache` (standard en production), env() renvoie
-    | null pour toute clé non exposée par un fichier config, et le seeder retombait
-    | silencieusement sur son mot de passe par défaut.
+    | null pour toute clé non exposée par un fichier config.
+    |
+    | `password` n'a volontairement aucune valeur par défaut : le seeder utilise
+    | updateOrCreate, donc un défaut ferait retomber le compte admin sur un mot de
+    | passe connu à chaque `db:seed`. Sans ADMIN_PASSWORD, le seeder échoue.
     |
     */
 
@@ -18,6 +21,6 @@ return [
 
     'name' => env('ADMIN_NAME', 'Laura B.'),
 
-    'password' => env('ADMIN_PASSWORD', 'password'),
+    'password' => env('ADMIN_PASSWORD'),
 
 ];

@@ -29,7 +29,7 @@ class VideoResource extends Resource
 
     protected static ?string $pluralModelLabel = 'Vidéos';
 
-    protected static ?int $navigationSort = 2;
+    protected static ?int $navigationSort = 20;
 
     protected static string|UnitEnum|null $navigationGroup = 'Contenu';
 
@@ -65,7 +65,7 @@ class VideoResource extends Resource
     {
         return [
             'Statut' => $record->is_missing
-                ? '⚠️ Manquante sur YouTube'
+                ? 'Manquante sur YouTube'
                 : $record->status->getLabel(),
             'Publiée le' => $record->published_at?->format('d/m/Y') ?? '–',
         ];

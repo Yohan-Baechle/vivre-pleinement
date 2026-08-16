@@ -11,8 +11,34 @@
 @push('head')
     @php
         $bookUrl = route('book.show');
-        $offerSolo = 37;
-        $offerCoaching = 70;
+
+        /**
+         * Les prix affichés viennent du catalogue : les modifier en admin doit
+         * suffire, sans quoi la page annoncerait un montant et Stripe en
+         * débiterait un autre.
+         */
+        $offerSolo = ($offers['livre'] ?? null)?->price ?? 37;
+        $offerCoaching = ($offers['livre-coaching'] ?? null)?->price ?? 70;
+
+        $offerPrice = fn (float $amount): string => rtrim(rtrim(number_format($amount, 2, ',', "\u{202f}"), '0'), ',').'&nbsp;€';
+
+        /**
+         * Une offre dont le fichier manque n'est pas achetable : les boutons
+         * le disent, et les données structurées annoncent OutOfStock plutôt
+         * que d'envoyer Google promouvoir un produit indisponible.
+         */
+        $offerAvailable = fn (string $slug): bool => ($offers[$slug] ?? null)?->isDeliverable() ?? false;
+        $availability = fn (string $slug): string => $offerAvailable($slug)
+            ? 'https://schema.org/InStock'
+            : 'https://schema.org/OutOfStock';
+
+        /**
+         * Une offre indisponible renvoie vers la page du livre : son URL de
+         * commande répond 404, l'annoncer à Google n'aurait pas de sens.
+         */
+        $offerUrl = fn (string $slug): string => $offerAvailable($slug)
+            ? route('book.checkout', $slug)
+            : $bookUrl;
 
         $productLd = [
             '@context' => 'https://schema.org',
@@ -37,21 +63,33 @@
                     'name' => 'Le livre seul (PDF)',
                     'price' => (string) $offerSolo,
                     'priceCurrency' => 'EUR',
-                    'availability' => 'https://schema.org/InStock',
-                    'url' => route('book.checkout', 'livre'),
+                    'availability' => $availability('livre'),
+                    'url' => $offerUrl('livre'),
                 ],
                 [
                     '@type' => 'Offer',
                     'name' => 'Le livre + 1h de coaching',
                     'price' => (string) $offerCoaching,
                     'priceCurrency' => 'EUR',
-                    'availability' => 'https://schema.org/InStock',
-                    'url' => route('book.checkout', 'livre-coaching'),
+                    'availability' => $availability('livre-coaching'),
+                    'url' => $offerUrl('livre-coaching'),
                 ],
             ],
         ];
     @endphp
     <script type="application/ld+json">{!! json_encode($productLd, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG) !!}</script>
+
+    @php
+        $breadcrumbLd = [
+            '@context' => 'https://schema.org',
+            '@type' => 'BreadcrumbList',
+            'itemListElement' => [
+                ['@type' => 'ListItem', 'position' => 1, 'name' => 'Accueil', 'item' => route('home')],
+                ['@type' => 'ListItem', 'position' => 2, 'name' => 'Le livre'],
+            ],
+        ];
+    @endphp
+    <script type="application/ld+json">{!! json_encode($breadcrumbLd, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG) !!}</script>
 @endpush
 
 @section('body')

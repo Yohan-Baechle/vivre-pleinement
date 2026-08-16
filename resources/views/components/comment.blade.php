@@ -32,7 +32,7 @@
             @endif
 
             <time datetime="{{ $comment->posted_at?->toIso8601String() }}" class="text-ink-muted text-xs">
-                {{ $comment->posted_at?->locale('fr')->diffForHumans() }}
+                {{ $comment->posted_at?->diffForHumans() }}
             </time>
         </div>
 

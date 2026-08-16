@@ -19,7 +19,8 @@ class BrevoNewsletter
     /**
      * Crée un contact en double opt-in et l'associe à la liste vidéo.
      *
-     * @throws RuntimeException si la configuration est absente ou l'appel échoue
+     * @throws RuntimeException si la configuration est absente ou si
+     *                          l'appel échoue
      */
     public function subscribeToVideoList(string $email, string $firstName, string $redirectionUrl): void
     {
@@ -33,7 +34,7 @@ class BrevoNewsletter
             $response = Http::withHeaders([
                 'api-key' => $apiKey,
                 'accept' => 'application/json',
-            ])->timeout(5)->post(self::ENDPOINT, [
+            ])->connectTimeout(3)->timeout(5)->post(self::ENDPOINT, [
                 'email' => $email,
                 'attributes' => ['PRENOM' => $firstName],
                 'includeListIds' => [config('services.brevo.video_list_id')],

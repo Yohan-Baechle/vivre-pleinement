@@ -7,6 +7,7 @@ use App\Filament\Admin\Resources\Comments\Pages\CreateComment;
 use App\Filament\Admin\Resources\Comments\Pages\EditComment;
 use App\Filament\Admin\Resources\Comments\Pages\ListComments;
 use App\Filament\Admin\Resources\Comments\Schemas\CommentForm;
+use App\Filament\Admin\Resources\Comments\Schemas\CommentInfolist;
 use App\Filament\Admin\Resources\Comments\Tables\CommentsTable;
 use App\Models\Comment;
 use BackedEnum;
@@ -31,7 +32,7 @@ class CommentResource extends Resource
 
     protected static ?string $pluralModelLabel = 'Commentaires';
 
-    protected static ?int $navigationSort = 5;
+    protected static ?int $navigationSort = 30;
 
     protected static string|UnitEnum|null $navigationGroup = 'Contenu';
 
@@ -51,9 +52,19 @@ class CommentResource extends Resource
         return 'warning';
     }
 
+    public static function getGloballySearchableAttributes(): array
+    {
+        return ['author_name', 'author_email', 'content'];
+    }
+
     public static function form(Schema $schema): Schema
     {
         return CommentForm::configure($schema);
+    }
+
+    public static function infolist(Schema $schema): Schema
+    {
+        return CommentInfolist::configure($schema);
     }
 
     public static function table(Table $table): Table

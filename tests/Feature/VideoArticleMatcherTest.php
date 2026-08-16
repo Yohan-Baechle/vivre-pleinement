@@ -35,7 +35,6 @@ it('matches a video to a post sharing a specific keyword', function () {
 
 it('returns null when only generic words overlap', function () {
     $c = Category::factory()->create();
-    // Partagent seulement "vie" (mot vide) → pas assez pertinent.
     $post = categorizedPost($c, ['title' => 'Quel est le but de la vie']);
     categorizedVideo($c, ['title' => 'Vivre en accord avec ses valeurs pour une belle vie']);
 

@@ -2,6 +2,7 @@
 
 @php
     use App\Support\AffiliateLinks;
+    use App\Support\AuthorEntity;
     use App\Support\Toc;
 
     $toc = Toc::build($post->content);
@@ -17,11 +18,11 @@
 @section('canonical', route('blog.show', $post->slug))
 @section('description', $post->seo_description ?: $post->excerpt)
 
-@push('head')
-    @if ($post->seo_robots)
-        <meta name="robots" content="{{ $post->seo_robots }}">
-    @endif
+@if ($post->seo_robots)
+    @section('robots', $post->seo_robots)
+@endif
 
+@push('head')
     <meta property="og:type" content="article">
     <meta property="og:title" content="{{ $post->seo_title ?: $post->title }}">
     <meta property="og:description" content="{{ $post->seo_description ?: $post->excerpt }}">
@@ -30,11 +31,11 @@
         <meta property="og:image" content="{{ $cover }}">
     @endif
     <meta property="article:published_time" content="{{ $post->published_at?->toIso8601String() }}">
-    @foreach ($post->categories as $c)
-        <meta property="article:section" content="{{ $c->name }}">
+    @foreach ($post->categories as $category)
+        <meta property="article:section" content="{{ $category->name }}">
     @endforeach
-    @foreach ($post->tags as $t)
-        <meta property="article:tag" content="{{ $t->name }}">
+    @foreach ($post->tags as $tag)
+        <meta property="article:tag" content="{{ $tag->name }}">
     @endforeach
 
     @php
@@ -46,8 +47,14 @@
             'image' => $cover ? [$cover] : [],
             'datePublished' => $post->published_at?->toIso8601String(),
             'dateModified' => $post->lastModifiedAt()?->toIso8601String(),
-            'author' => ['@type' => 'Person', 'name' => 'Laura Baechlé', 'url' => url('/')],
-            'publisher' => ['@type' => 'Person', 'name' => 'Laura Baechlé', 'url' => url('/')],
+            'author' => AuthorEntity::person(),
+            'publisher' => [
+                '@type' => 'Organization',
+                '@id' => url('/').'#organization',
+                'name' => 'Vivre Pleinement',
+                'url' => url('/'),
+                'logo' => ['@type' => 'ImageObject', 'url' => asset('images/logo@4x.webp')],
+            ],
             'mainEntityOfPage' => ['@type' => 'WebPage', '@id' => route('blog.show', $post->slug)],
             'articleSection' => $post->categories->pluck('name')->all(),
             'keywords' => $post->tags->pluck('name')->all(),
@@ -55,6 +62,24 @@
         ];
     @endphp
     <script type="application/ld+json">{!! json_encode($articleLd, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG) !!}</script>
+
+    @if (! empty($post->faq))
+        @php
+            $faqLd = [
+                '@context' => 'https://schema.org',
+                '@type' => 'FAQPage',
+                'mainEntity' => collect($post->faq)->map(fn ($item) => [
+                    '@type' => 'Question',
+                    'name' => $item['question'],
+                    'acceptedAnswer' => [
+                        '@type' => 'Answer',
+                        'text' => strip_tags(html_entity_decode($item['answer'], ENT_QUOTES | ENT_HTML5)),
+                    ],
+                ])->all(),
+            ];
+        @endphp
+        <script type="application/ld+json">{!! json_encode($faqLd, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG) !!}</script>
+    @endif
 @endpush
 
 @section('body')
@@ -97,7 +122,7 @@
                         </div>
                         <span aria-hidden="true">·</span>
                         <time datetime="{{ $post->published_at?->toIso8601String() }}">
-                            {{ $post->published_at?->locale('fr')->isoFormat('D MMMM YYYY') }}
+                            {{ $post->published_at?->isoFormat('D MMMM YYYY') }}
                         </time>
                         <span aria-hidden="true">·</span>
                         <span>{{ $post->readingTimeMinutes() }} min de lecture</span>
@@ -212,13 +237,35 @@
                     </button>
                 </div>
             </div>
+
+            @if (! empty($post->faq))
+                <section class="mt-14" aria-labelledby="article-faq-heading">
+                    <p class="text-xs font-medium tracking-wider text-teal-700 uppercase">Questions fréquentes</p>
+                    <h2 id="article-faq-heading" class="text-ink mt-2 font-serif text-2xl font-medium tracking-tight sm:text-3xl">
+                        Vos questions sur le sujet
+                    </h2>
+                    <div class="mt-6 space-y-4">
+                        @foreach ($post->faq as $item)
+                            <x-accordion-item :question="$item['question']" :open="$loop->first">
+                                {!! $item['answer'] !!}
+                            </x-accordion-item>
+                        @endforeach
+                    </div>
+                </section>
+            @endif
+
+            <x-author-card class="mt-14" />
+
+            <x-health-disclaimer class="mt-6" />
+
+            <x-content-cta :category="$category" class="mt-12" />
         </div>
     </article>
 
     @php
         $commentsOpen = $post->commentsAreOpen();
         $rootCount = $post->comments->count();
-        $totalCount = $rootCount + $post->comments->sum(fn ($c) => $c->replies->count());
+        $totalCount = $rootCount + $post->comments->sum(fn ($comment) => $comment->replies->count());
     @endphp
 
     @if ($relatedVideo)

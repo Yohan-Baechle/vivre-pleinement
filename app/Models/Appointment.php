@@ -84,7 +84,8 @@ class Appointment extends Model
     }
 
     /**
-     * Rendez-vous qui occupent un créneau (pour détecter la double-réservation).
+     * Rendez-vous qui occupent un créneau (pour détecter la
+     * double-réservation).
      *
      * @param  Builder<Appointment>  $query
      */
@@ -93,18 +94,30 @@ class Appointment extends Model
         $query->whereIn('status', AppointmentStatus::blocking());
     }
 
+    /**
+     * Référence lisible affichée au client et reprise dans les e-mails.
+     *
+     * Purement descriptive : le `Str::upper` réduit l'alphabet de 62 à 36
+     * valeurs avec une distribution biaisée, elle ne doit donc jamais servir de
+     * clé d'accès à une URL publique — c'est le rôle de `generateToken()`.
+     */
     public static function generateReference(): string
     {
         return 'RDV-'.Str::upper(Str::random(8));
     }
 
+    /**
+     * Secret d'accès aux pages publiques du rendez-vous (confirmation, .ics,
+     * paiement, gestion). C'est la seule valeur qui autorise l'accès.
+     */
     public static function generateToken(): string
     {
         return Str::random(48);
     }
 
     /**
-     * Indique si le client peut encore gérer (annuler/reprogrammer) ce rendez-vous.
+     * Indique si le client peut encore gérer (annuler/reprogrammer) ce
+     * rendez-vous.
      */
     public function isManageable(): bool
     {

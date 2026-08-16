@@ -29,7 +29,7 @@ class DateOverrideResource extends Resource
 
     protected static string|UnitEnum|null $navigationGroup = 'Rendez-vous';
 
-    protected static ?int $navigationSort = 25;
+    protected static ?int $navigationSort = 40;
 
     public static function form(Schema $schema): Schema
     {

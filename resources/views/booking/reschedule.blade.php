@@ -21,7 +21,7 @@
                 </h1>
                 <p class="text-ink-soft mt-5 max-w-2xl text-base sm:text-lg">
                     {{ $appointment->service->name }} - actuellement prévu le
-                    {{ $appointment->starts_at->locale('fr')->isoFormat('dddd D MMMM à H\hi') }}.
+                    {{ $appointment->starts_at->isoFormat('dddd D MMMM à H\hi') }}.
                 </p>
             </div>
         </div>

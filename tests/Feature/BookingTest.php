@@ -22,11 +22,10 @@ function bookableService(array $attributes = []): AppointmentService
     $service = AppointmentService::factory()->create(array_merge([
         'duration_minutes' => 30,
         'min_notice_hours' => 12,
-        'price_cents' => 0, // gratuit par défaut : ces tests ne passent pas par Stripe
+        'price_cents' => 0,
         'is_active' => true,
     ], $attributes));
 
-    // Disponibilité tous les jours, large fenêtre, pour garantir un créneau futur.
     foreach (range(0, 6) as $dow) {
         Availability::factory()->dayOfWeek($dow)->create();
     }
@@ -36,7 +35,6 @@ function bookableService(array $attributes = []): AppointmentService
 
 function futureSlot(): CarbonImmutable
 {
-    // 3 jours plus tard à 10:00 : hors fenêtre de min-notice.
     return CarbonImmutable::now()->addDays(3)->setTime(10, 0);
 }
 
@@ -68,7 +66,6 @@ it('lists the next available slots across days', function () {
     $slots = app(AppointmentSlotService::class)->nextAvailableSlots($service, 3);
 
     expect($slots)->toHaveCount(3);
-    // Les créneaux sont triés chronologiquement.
     expect($slots[0]['start']->lessThanOrEqualTo($slots[1]['start']))->toBeTrue();
     expect($slots[1]['start']->lessThanOrEqualTo($slots[2]['start']))->toBeTrue();
 });
@@ -92,8 +89,6 @@ it('shows the service booking page', function () {
 });
 
 it('jumps to the first month that has availability', function () {
-    // Service disponible uniquement le dimanche : on garantit qu'au moins
-    // un mois affiché contient des dispos plutôt qu'une grille vide.
     $service = AppointmentService::factory()->create(['duration_minutes' => 30, 'min_notice_hours' => 12]);
     Availability::factory()->create(['day_of_week' => 0, 'start_time' => '09:00', 'end_time' => '12:00']);
 
@@ -173,7 +168,7 @@ it('serves an ics calendar file for the appointment', function () {
     $service = bookableService();
     $appointment = Appointment::factory()->create(['appointment_service_id' => $service->id]);
 
-    $this->get(route('booking.ics', $appointment->reference))
+    $this->get(route('booking.ics', $appointment->token))
         ->assertOk()
         ->assertHeader('content-type', 'text/calendar; charset=UTF-8')
         ->assertSee('BEGIN:VEVENT', escape: false)
@@ -213,7 +208,6 @@ it('rejects a non-date selectedSlot as a validation error instead of a 500', fun
 it('rejects an unavailable slot', function () {
     Mail::fake();
     $service = bookableService();
-    // Créneau dans le passé / hors fenêtre.
     $badSlot = CarbonImmutable::now()->subDay()->setTime(10, 0);
 
     Livewire::test(BookingCalendar::class, ['service' => $service])
@@ -233,7 +227,6 @@ it('rejects a slot that was just booked by someone else', function () {
     $service = bookableService();
     $slot = futureSlot();
 
-    // Quelqu'un a déjà pris ce créneau.
     Appointment::factory()->create([
         'appointment_service_id' => $service->id,
         'starts_at' => $slot,

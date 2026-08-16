@@ -16,7 +16,13 @@ class AffiliateLinks
      * Configuration par type d'affiliation, détecté sur le domaine du lien.
      * L'ordre compte : la première entrée dont un `host` matche est retenue.
      *
-     * @var array<string, array{hosts: array<string>, eyebrow: string, cta: string, icon: string, fallback: string}>
+     * @var array<string, array{
+     *     hosts: array<string>,
+     *     eyebrow: string,
+     *     cta: string,
+     *     icon: string,
+     *     fallback: string,
+     * }>
      */
     private const TYPES = [
         'book' => [
@@ -51,8 +57,8 @@ class AffiliateLinks
 
     /**
      * Transforme en un seul passage chaque `<a>…</a>` affilié en carte produit,
-     * qu'il enveloppe une image-bannière ou du texte. Le passage unique évite de
-     * re-traiter le bouton interne des cartes déjà générées.
+     * qu'il enveloppe une image-bannière ou du texte. Le passage unique évite
+     * de re-traiter le bouton interne des cartes déjà générées.
      */
     public static function enhance(string $html): string
     {
@@ -87,7 +93,8 @@ class AffiliateLinks
     }
 
     /**
-     * Renvoie la clé de type d'affiliation pour ce lien, ou null s'il n'est pas affilié.
+     * Renvoie la clé de type d'affiliation pour ce lien, ou null s'il n'est pas
+     * affilié.
      */
     private static function resolveType(?string $href): ?string
     {

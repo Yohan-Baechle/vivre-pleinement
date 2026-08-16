@@ -11,7 +11,7 @@ use Illuminate\Support\Number;
 
 class CourseSalesStats extends StatsOverviewWidget
 {
-    protected static ?int $sort = 4;
+    protected static ?int $sort = 2;
 
     protected ?string $heading = 'Formations';
 

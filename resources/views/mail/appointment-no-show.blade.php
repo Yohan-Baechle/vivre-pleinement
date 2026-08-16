@@ -3,7 +3,7 @@
 
 Bonjour {{ $appointment->customer_first_name }},
 
-Vous aviez rendez-vous le {{ $appointment->starts_at->locale('fr')->isoFormat('dddd D MMMM YYYY') }} à {{ $appointment->starts_at->format('H\hi') }}, mais nous n'avons pas pu nous retrouver à ce moment-là.
+Vous aviez rendez-vous le {{ $appointment->starts_at->isoFormat('dddd D MMMM YYYY') }} à {{ $appointment->starts_at->format('H\hi') }}, mais nous n'avons pas pu nous retrouver à ce moment-là.
 
 Ce n'est pas grave : un imprévu, un oubli, ça arrive à tout le monde. Si vous le souhaitez toujours, je serais ravie de convenir d'un nouveau créneau qui vous convient mieux.
 

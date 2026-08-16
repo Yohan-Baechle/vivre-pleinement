@@ -22,6 +22,12 @@ class NewPasswordController extends Controller
         ]);
     }
 
+    /**
+     * L'échec renvoie un message unique quelle qu'en soit la cause : distinguer
+     * « aucun compte pour cette adresse » de « lien expiré » transformerait ce
+     * formulaire en oracle d'énumération des comptes élèves, alors même que le
+     * formulaire de demande de lien s'en garde déjà.
+     */
     public function store(StudentNewPasswordFormRequest $request): RedirectResponse
     {
         $status = Password::broker('students')->reset(
@@ -38,6 +44,8 @@ class NewPasswordController extends Controller
 
         return $status === Password::PasswordReset
             ? redirect()->route('student.login')->with('status', __($status))
-            : back()->withInput($request->only('email'))->withErrors(['email' => __($status)]);
+            : back()->withInput($request->only('email'))->withErrors([
+                'email' => 'Ce lien de réinitialisation n\'est plus valide. Merci d\'en demander un nouveau.',
+            ]);
     }
 }

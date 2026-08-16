@@ -10,11 +10,6 @@ class NewsletterFormRequest extends FormRequest
 {
     use ChecksSubmissionDelay;
 
-    public function authorize(): bool
-    {
-        return true;
-    }
-
     /**
      * @return array<string, ValidationRule|array<mixed>|string>
      */
@@ -24,10 +19,13 @@ class NewsletterFormRequest extends FormRequest
             'first_name' => ['required', 'string', 'max:80'],
             'email' => ['required', 'email:rfc,dns', 'max:160'],
             'website' => ['nullable', 'prohibited'],
-            'ts' => ['required', 'integer'],
+            'ts' => ['required', 'string'],
         ];
     }
 
+    /**
+     * @return array<string, string>
+     */
     public function messages(): array
     {
         return [

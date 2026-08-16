@@ -11,11 +11,6 @@ class ContactFormRequest extends FormRequest
 {
     use ChecksSubmissionDelay;
 
-    public function authorize(): bool
-    {
-        return true;
-    }
-
     /**
      * @return array<string, ValidationRule|array<mixed>|string>
      */
@@ -30,10 +25,13 @@ class ContactFormRequest extends FormRequest
             'message' => ['required', 'string', 'min:20', 'max:5000'],
             'consent' => ['accepted'],
             'website' => ['nullable', 'prohibited'],
-            'ts' => ['required', 'integer'],
+            'ts' => ['required', 'string'],
         ];
     }
 
+    /**
+     * @return array<string, string>
+     */
     public function messages(): array
     {
         return [

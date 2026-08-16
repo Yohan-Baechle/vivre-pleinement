@@ -3,6 +3,7 @@
 namespace App\Filament\Admin\Resources\Courses\Schemas;
 
 use App\Enums\CourseStatus;
+use App\Support\VideoEmbed;
 use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\RichEditor;
@@ -12,6 +13,7 @@ use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Schemas\Components\Tabs;
 use Filament\Schemas\Components\Tabs\Tab;
+use Filament\Schemas\Components\Utilities\Set;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Illuminate\Support\Str;
@@ -111,19 +113,36 @@ class CourseForm
                                 ->helperText('Affichée sur le catalogue et la page de vente. Format recommandé : 16:9.')
                                 ->columnSpanFull(),
 
+                            TextInput::make('intro_video_id')
+                                ->label('Vidéo de présentation')
+                                ->placeholder('Collez le lien YouTube ou Vimeo')
+                                ->helperText('Collez l\'adresse de la vidéo telle '
+                                    .'qu\'elle apparaît dans votre navigateur : la '
+                                    .'plateforme et l\'identifiant sont reconnus '
+                                    .'automatiquement.')
+                                ->maxLength(255)
+                                ->live(onBlur: true)
+                                ->afterStateUpdated(function (?string $state, Set $set): void {
+                                    if (blank($state)) {
+                                        return;
+                                    }
+
+                                    $video = VideoEmbed::parse($state);
+
+                                    $set('intro_video_provider', $video['provider']);
+                                    $set('intro_video_id', $video['id']);
+                                })
+                                ->columnSpanFull(),
+
                             Select::make('intro_video_provider')
-                                ->label('Vidéo de présentation — plateforme')
+                                ->label('Plateforme reconnue')
                                 ->options([
                                     'youtube' => 'YouTube',
                                     'vimeo' => 'Vimeo',
                                 ])
                                 ->native(false)
-                                ->placeholder('Aucune'),
-
-                            TextInput::make('intro_video_id')
-                                ->label('Identifiant de la vidéo')
-                                ->helperText('Pour YouTube : l\'ID après ?v= (ex. dQw4w9WgXcQ). Pour Vimeo : l\'ID numérique.')
-                                ->maxLength(255),
+                                ->placeholder('Aucune vidéo')
+                                ->helperText('Rempli automatiquement à partir du lien.'),
                         ])
                         ->columns(2),
 

@@ -14,13 +14,11 @@ class NewsletterController extends Controller
 {
     public function store(NewsletterFormRequest $request): RedirectResponse|JsonResponse
     {
-        $key = 'newsletter:'.$request->ip();
-        if (SubmissionThrottle::exceeded($key)) {
-            $seconds = SubmissionThrottle::availableIn($key);
+        $retryAfter = SubmissionThrottle::attempt('newsletter:'.$request->ip());
 
-            return $this->failure($request, "Trop d'envois. Réessayez dans {$seconds}s.");
+        if ($retryAfter !== null) {
+            return $this->failure($request, "Trop d'envois. Réessayez dans {$retryAfter}s.");
         }
-        SubmissionThrottle::hit($key);
 
         $data = $request->validated();
 

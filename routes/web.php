@@ -29,24 +29,52 @@ Route::get('/', [HomeController::class, 'index'])->name('home');
 /**
  * Installation OAuth YouTube (sous-titres) — accessible uniquement si les
  * identifiants OAuth sont configurés ; sert une seule fois à l'autorisation.
+ *
+ * Réservé à un administrateur connecté : le flux consomme le client_id du site
+ * et sa page de retour affiche un refresh token en clair.
  */
-Route::get('/youtube/oauth/redirect', [YoutubeOAuthController::class, 'redirect'])->name('youtube.oauth.redirect');
-Route::get('/youtube/oauth/callback', [YoutubeOAuthController::class, 'callback'])->name('youtube.oauth.callback');
+Route::middleware('auth:web')->group(function () {
+    Route::get('/youtube/oauth/redirect', [YoutubeOAuthController::class, 'redirect'])->name('youtube.oauth.redirect');
+    Route::get('/youtube/oauth/callback', [YoutubeOAuthController::class, 'callback'])->name('youtube.oauth.callback');
+});
 
 Route::view('/a-propos', 'about.index')->name('about');
+Route::view('/therapie-act', 'therapie-act.index')->name('therapie-act');
 
+/**
+ * Les formulaires publics portent un plafond de requêtes au niveau de la route,
+ * en plus de la limitation applicative de SubmissionThrottle.
+ *
+ * SubmissionThrottle est consulté dans le contrôleur, donc après la validation
+ * : la règle `email:rfc,dns` déclenchait une résolution DNS sur un domaine
+ * choisi par l'appelant à chaque requête, sans plafond. Le middleware
+ * `throttle` s'exécute avant la FormRequest et referme ce coin ; réglé plus
+ * haut que SubmissionThrottle, il laisse le message d'erreur soigné arriver en
+ * premier pour un visiteur normal et ne coupe que les envois massifs.
+ */
 Route::get('/contact', [ContactController::class, 'show'])->name('contact');
-Route::post('/contact', [ContactController::class, 'send'])->name('contact.send');
+Route::post('/contact', [ContactController::class, 'send'])
+    ->middleware('throttle:20,10')
+    ->name('contact.send');
 Route::get('/contact/merci', [ContactController::class, 'thanks'])->name('contact.thanks');
 
-Route::post('/newsletter', [NewsletterController::class, 'store'])->name('newsletter.store');
+Route::post('/newsletter', [NewsletterController::class, 'store'])
+    ->middleware('throttle:20,10')
+    ->name('newsletter.store');
 Route::view('/inscription-confirmee', 'newsletter.confirmed')->name('newsletter.confirmed');
 
+/**
+ * Les pages liées à un rendez-vous sont toutes adressées par `token` (48
+ * caractères aléatoires) et jamais par `reference` : cette dernière est une
+ * référence lisible affichée au client, trop courte pour servir de clé d'accès
+ * à des données personnelles (nom, e-mail, téléphone, notes) sur une URL
+ * publique.
+ */
 Route::prefix('reservation')->name('booking.')->controller(BookingController::class)->group(function () {
     Route::get('/', 'index')->name('index');
-    Route::get('confirmation/{appointment:reference}', 'confirmation')->name('confirmation');
-    Route::get('confirmation/{appointment:reference}/agenda.ics', 'ics')->name('ics');
-    Route::get('paiement-annule/{appointment:reference}', 'paymentCancelled')->name('paymentCancelled');
+    Route::get('confirmation/{appointment:token}', 'confirmation')->name('confirmation');
+    Route::get('confirmation/{appointment:token}/agenda.ics', 'ics')->name('ics');
+    Route::get('paiement-annule/{appointment:token}', 'paymentCancelled')->name('paymentCancelled');
     Route::get('payer/{appointment:token}', 'pay')->name('pay');
     Route::get('gerer/{appointment:token}', 'manage')->name('manage');
     Route::post('gerer/{appointment:token}/annuler', 'cancel')->name('cancel');
@@ -69,7 +97,9 @@ Route::middleware('guest:student')->group(function () {
         ->middleware('throttle:6,1')
         ->name('student.register.store');
     Route::get('/espace-formation/connexion', [AuthenticatedSessionController::class, 'create'])->name('student.login');
-    Route::post('/espace-formation/connexion', [AuthenticatedSessionController::class, 'store'])->name('student.login.store');
+    Route::post('/espace-formation/connexion', [AuthenticatedSessionController::class, 'store'])
+        ->middleware('throttle:20,1')
+        ->name('student.login.store');
     Route::get('/espace-formation/mot-de-passe-oublie', [PasswordResetLinkController::class, 'create'])->name('student.password.request');
     Route::post('/espace-formation/mot-de-passe-oublie', [PasswordResetLinkController::class, 'store'])
         ->middleware('throttle:6,1')
@@ -136,10 +166,24 @@ Route::prefix('espace-formation')->name('student.')->middleware('auth:student')-
     });
 });
 
-Route::get('/livre', [BookController::class, 'show'])->name('book.show');
-Route::get('/livre/commande/{offer}', [BookController::class, 'checkout'])
-    ->name('book.checkout')
-    ->where('offer', 'livre|livre-coaching');
+/*
+ * Le tunnel d'achat du livre s'appuie sur le token de la commande, jamais sur
+ * son identifiant : ces URL sont publiques et donnent accès au fichier vendu
+ * comme aux coordonnées de l'acheteur.
+ */
+Route::controller(BookController::class)->group(function () {
+    Route::get('/livre', 'show')->name('book.show');
+    Route::get('/livre/commande/{offer}', 'checkout')
+        ->name('book.checkout')
+        ->where('offer', 'livre|livre-coaching');
+    Route::post('/livre/commande/{offer}', 'start')
+        ->name('book.start')
+        ->where('offer', 'livre|livre-coaching');
+    Route::get('/livre/paiement/{order:token}', 'pay')->name('book.pay');
+    Route::get('/livre/merci/{order:token}', 'success')->name('book.success');
+    Route::get('/livre/telecharger/{order:token}', 'download')->name('book.download');
+    Route::get('/livre/coaching/{order:token}', 'coaching')->name('book.coaching');
+});
 
 Route::prefix('videos')->name('videos.')->controller(VideoController::class)->group(function () {
     Route::get('/', 'index')->name('index');
@@ -157,13 +201,20 @@ Route::prefix('blog')->name('blog.')->group(function () {
         Route::get('rss', 'rss')->name('rss');
         Route::get('categorie/{slug}', 'byCategory')->name('category');
         Route::get('tag/{slug}', 'byTag')->name('tag');
-        Route::get('{slug}', 'show')->name('show')->where('slug', '(?!(?:rss|categorie|tag)$).+');
+        Route::get('apercu/{post}', 'preview')->middleware('signed')->name('preview');
+        Route::get('{slug}', 'show')->name('show')->where('slug', '(?!(?:rss|categorie|tag|apercu)$).+');
     });
 
     Route::post('{slug}/commentaire', [CommentController::class, 'store'])
+        ->middleware('throttle:20,10')
         ->name('comments.store')
         ->where('slug', '(?!(?:rss|categorie|tag)$).+');
 });
 
 Route::get('/sitemap.xml', [SitemapController::class, 'index'])->name('sitemap');
 Route::get('/sitemap-videos.xml', [SitemapController::class, 'videos'])->name('sitemap.videos');
+Route::get('/llms.txt', [SitemapController::class, 'llms'])->name('llms');
+
+if ($indexNowKey = config('services.indexnow.key')) {
+    Route::get("/{$indexNowKey}.txt", fn () => response($indexNowKey)->header('Content-Type', 'text/plain'));
+}
