@@ -13,8 +13,10 @@ use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
+use Filament\Navigation\NavigationGroup;
 use Filament\Panel;
 use Filament\PanelProvider;
+use Filament\Support\Icons\Heroicon;
 use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
 use Illuminate\Cookie\Middleware\EncryptCookies;
 use Illuminate\Foundation\Http\Middleware\PreventRequestForgery;
@@ -50,10 +52,14 @@ class AdminPanelProvider extends PanelProvider
             ->databaseNotifications()
             ->maxContentWidth('full')
             ->navigationGroups([
-                'Rendez-vous',
-                'Contenu',
-                'Boutique',
-                'Réglages du site',
+                NavigationGroup::make('Rendez-vous')
+                    ->icon(Heroicon::OutlinedCalendarDays),
+                NavigationGroup::make('Contenu')
+                    ->icon(Heroicon::OutlinedPencilSquare),
+                NavigationGroup::make('Boutique')
+                    ->icon(Heroicon::OutlinedShoppingBag),
+                NavigationGroup::make('Réglages du site')
+                    ->icon(Heroicon::OutlinedCog6Tooth),
             ])
             ->discoverResources(in: app_path('Filament/Admin/Resources'), for: 'App\Filament\Admin\Resources')
             ->discoverPages(in: app_path('Filament/Admin/Pages'), for: 'App\Filament\Admin\Pages')

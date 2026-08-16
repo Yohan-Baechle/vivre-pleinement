@@ -6,6 +6,7 @@ use App\Models\Appointment;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
+use Filament\Support\Icons\Heroicon;
 
 class AppointmentInfolist
 {
@@ -13,6 +14,7 @@ class AppointmentInfolist
     {
         return $schema->components([
             Section::make('Séance')
+                ->icon(Heroicon::OutlinedCalendarDays)
                 ->columns(3)
                 ->schema([
                     TextEntry::make('starts_at')
@@ -46,6 +48,7 @@ class AppointmentInfolist
                 ]),
 
             Section::make('Client')
+                ->icon(Heroicon::OutlinedUser)
                 ->columns(3)
                 ->schema([
                     TextEntry::make('customer_full_name')

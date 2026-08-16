@@ -7,6 +7,7 @@ use App\Support\Weekdays;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
+use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
@@ -20,6 +21,7 @@ class AvailabilitiesTable
     {
         return $table
             ->defaultSort(null)
+            ->emptyStateIcon(Heroicon::OutlinedClock)
             ->emptyStateHeading('Aucune plage horaire')
             ->emptyStateDescription('Définissez vos horaires depuis la page '
                 .'« Horaires de la semaine ».')

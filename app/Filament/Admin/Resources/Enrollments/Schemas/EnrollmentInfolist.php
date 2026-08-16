@@ -6,6 +6,7 @@ use App\Models\Enrollment;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
+use Filament\Support\Icons\Heroicon;
 
 class EnrollmentInfolist
 {
@@ -13,6 +14,7 @@ class EnrollmentInfolist
     {
         return $schema->components([
             Section::make('Vente')
+                ->icon(Heroicon::OutlinedBanknotes)
                 ->columns(3)
                 ->schema([
                     TextEntry::make('course.title')
@@ -41,6 +43,7 @@ class EnrollmentInfolist
                 ]),
 
             Section::make('Élève')
+                ->icon(Heroicon::OutlinedUser)
                 ->columns(2)
                 ->schema([
                     TextEntry::make('student.name')

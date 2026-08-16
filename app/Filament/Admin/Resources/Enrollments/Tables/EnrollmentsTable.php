@@ -10,6 +10,7 @@ use Carbon\CarbonImmutable;
 use Filament\Actions\Action;
 use Filament\Actions\ViewAction;
 use Filament\Notifications\Notification;
+use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Columns\Summarizers\Sum;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
@@ -24,6 +25,7 @@ class EnrollmentsTable
             ->defaultSort('created_at', 'desc')
             ->persistFiltersInSession()
             ->persistSortInSession()
+            ->emptyStateIcon(Heroicon::OutlinedBanknotes)
             ->emptyStateHeading('Aucune vente')
             ->emptyStateDescription('Les achats de formations apparaîtront '
                 .'ici, avec le lien vers le paiement Stripe correspondant.')

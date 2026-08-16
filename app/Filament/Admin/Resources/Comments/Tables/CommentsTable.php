@@ -14,6 +14,7 @@ use Filament\Actions\ForceDeleteBulkAction;
 use Filament\Actions\RestoreBulkAction;
 use Filament\Actions\ViewAction;
 use Filament\Notifications\Notification;
+use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TrashedFilter;
@@ -27,6 +28,7 @@ class CommentsTable
         return $table
             ->persistFiltersInSession()
             ->persistSortInSession()
+            ->emptyStateIcon(Heroicon::OutlinedChatBubbleLeftRight)
             ->emptyStateHeading('Aucun commentaire')
             ->emptyStateDescription('Les commentaires laissés sur le blog '
                 .'arrivent ici pour être approuvés avant publication.')
@@ -119,7 +121,7 @@ class CommentsTable
                                 ->success()
                                 ->title(trans_choice(
                                     '{1} :count commentaire publié'
-                                        .'|]1,*[ :count commentaires publiés',
+                                        .'|[2,*] :count commentaires publiés',
                                     $records->count(),
                                     ['count' => $records->count()],
                                 ))

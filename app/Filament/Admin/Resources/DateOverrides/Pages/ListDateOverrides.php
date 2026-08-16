@@ -149,7 +149,7 @@ class ListDateOverrides extends ListRecords
             ->title($created === 0
                 ? 'Cette période était déjà bloquée'
                 : trans_choice(
-                    '{1} :count journée bloquée|]1,*[ :count journées bloquées',
+                    '{1} :count journée bloquée|[2,*] :count journées bloquées',
                     $created,
                     ['count' => $created],
                 ))

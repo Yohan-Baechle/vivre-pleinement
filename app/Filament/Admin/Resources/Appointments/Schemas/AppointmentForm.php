@@ -26,6 +26,7 @@ class AppointmentForm
     {
         return $schema->components([
             Section::make('Rendez-vous')
+                ->icon(Heroicon::OutlinedCalendarDays)
                 ->columns(2)
                 ->schema([
                     Select::make('appointment_service_id')
@@ -110,6 +111,7 @@ class AppointmentForm
                 ]),
 
             Section::make('Client')
+                ->icon(Heroicon::OutlinedUser)
                 ->columns(2)
                 ->schema([
                     TextInput::make('customer_first_name')

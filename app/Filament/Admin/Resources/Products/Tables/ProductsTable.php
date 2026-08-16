@@ -10,6 +10,7 @@ use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ForceDeleteBulkAction;
 use Filament\Actions\RestoreBulkAction;
+use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\SpatieMediaLibraryImageColumn;
 use Filament\Tables\Columns\TextColumn;
@@ -22,6 +23,7 @@ class ProductsTable
     public static function configure(Table $table): Table
     {
         return $table
+            ->emptyStateIcon(Heroicon::OutlinedShoppingBag)
             ->emptyStateHeading('Aucun produit')
             ->emptyStateDescription('Un produit est un fichier vendu au '
                 .'téléchargement, hors formations.')

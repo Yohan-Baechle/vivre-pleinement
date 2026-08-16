@@ -3,6 +3,7 @@
 namespace App\Filament\Admin\Resources\Students\Tables;
 
 use Filament\Actions\ViewAction;
+use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 
@@ -12,6 +13,7 @@ class StudentsTable
     {
         return $table
             ->defaultSort('created_at', 'desc')
+            ->emptyStateIcon(Heroicon::OutlinedUsers)
             ->emptyStateHeading('Aucun élève inscrit')
             ->emptyStateDescription('Les comptes créés lors de l\'achat d\'une '
                 .'formation apparaissent ici.')
