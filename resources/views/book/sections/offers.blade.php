@@ -94,7 +94,25 @@
         </article>
     </div>
 
-    <p class="text-ink-muted mt-10 text-center text-xs sm:text-sm">
-        Paiement sécurisé par Stripe et PayPal · Aucun renouvellement, aucun abonnement caché
-    </p>
+    @php $anyAvailable = $offerAvailable('livre') || $offerAvailable('livre-coaching'); @endphp
+
+    @if ($anyAvailable)
+        <p class="text-ink-muted mt-10 text-center text-xs sm:text-sm">
+            Paiement sécurisé par Stripe et PayPal · Aucun renouvellement, aucun abonnement caché
+        </p>
+    @else
+        {{-- Rien n'est encore en vente : une seule invitation, et surtout pas
+             la mention « paiement sécurisé » qui laisserait croire le
+             contraire. --}}
+        <div class="mt-10 text-center">
+            <a href="{{ route('contact') }}"
+               class="group text-ink ring-ink/10 hover:bg-cream-50 inline-flex items-center gap-2 rounded-full bg-white px-7 py-3.5 text-sm font-medium ring-1 transition sm:text-base">
+                Être prévenu de la sortie
+                <span class="transition group-hover:translate-x-0.5" aria-hidden="true">→</span>
+            </a>
+            <p class="text-ink-muted mt-4 text-xs sm:text-sm">
+                Le livre est en cours de finalisation. Laissez-moi un mot, je vous préviens dès sa mise en ligne.
+            </p>
+        </div>
+    @endif
 </x-section>

@@ -6,9 +6,12 @@
 ])
 
 {{--
-    Appel à l'action d'une formule du livre. Quand le fichier vendu manque,
-    le bouton n'est pas simplement désactivé : il redirige vers le contact,
-    pour qu'un visiteur motivé ne se retrouve pas devant une impasse.
+    Appel à l'action d'une formule du livre.
+
+    Une offre indisponible affiche un état, pas un second bouton : répéter
+    « Être prévenu » sur chaque carte donnerait quatre appels à l'action
+    identiques sur la page. L'invitation à laisser ses coordonnées est
+    rendue une seule fois, sous la grille des offres.
 --}}
 @if ($available)
     <a href="{{ route('book.checkout', $slug) }}" class="group {{ $class }}">
@@ -16,12 +19,7 @@
         <span class="transition group-hover:translate-x-0.5" aria-hidden="true">→</span>
     </a>
 @else
-    <a href="{{ route('contact') }}"
-       class="group ring-ink/10 text-ink-soft hover:bg-cream-50 inline-flex w-full items-center justify-center gap-2 rounded-full bg-white px-7 py-3.5 text-sm font-medium ring-1 transition sm:text-base">
-        Être prévenu de la sortie
-        <span class="transition group-hover:translate-x-0.5" aria-hidden="true">→</span>
-    </a>
-    <p class="text-ink-muted mt-3 text-center text-xs">
-        Cette formule n'est pas encore disponible à l'achat.
-    </p>
+    <span class="{{ $class }} cursor-default opacity-55" aria-disabled="true">
+        Bientôt disponible
+    </span>
 @endif
