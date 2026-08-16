@@ -19,15 +19,13 @@ class ContactController extends Controller
 
     public function send(ContactFormRequest $request): RedirectResponse
     {
-        $key = 'contact:'.$request->ip();
-        if (SubmissionThrottle::exceeded($key)) {
-            $seconds = SubmissionThrottle::availableIn($key);
+        $retryAfter = SubmissionThrottle::attempt('contact:'.$request->ip());
 
+        if ($retryAfter !== null) {
             return back()
                 ->withInput($request->except(['website', 'consent', 'ts']))
-                ->withErrors(['message' => "Trop d'envois. Réessayez dans {$seconds}s."]);
+                ->withErrors(['message' => "Trop d'envois. Réessayez dans {$retryAfter}s."]);
         }
-        SubmissionThrottle::hit($key);
 
         $data = $request->validated();
 

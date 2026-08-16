@@ -9,9 +9,10 @@ use Illuminate\Support\Str;
 class StudentAnonymizer
 {
     /**
-     * Pseudonymise les données personnelles de l'élève (droit à l'effacement RGPD)
-     * tout en conservant les inscriptions pour les obligations comptables (facturation,
-     * conservation légale de 10 ans en France). La progression de leçons est supprimée.
+     * Pseudonymise les données personnelles de l'élève (droit à l'effacement
+     * RGPD) tout en conservant les inscriptions pour les obligations comptables
+     * (facturation, conservation légale de 10 ans en France). La progression de
+     * leçons est supprimée.
      */
     public static function anonymize(Student $student): void
     {

@@ -27,6 +27,5 @@ it('neutralizes a literal ]]> sequence inside RSS CDATA content', function () {
     $response->assertOk();
     $body = $response->getContent();
 
-    // Une fermeture CDATA littérale non neutralisée casserait le flux XML.
     expect(substr_count($body, ']]>'))->toBe(substr_count($body, '<![CDATA['));
 });

@@ -3,8 +3,8 @@
 namespace App\Support;
 
 /**
- * Entité schema.org de Laura, partagée entre la home, les articles et les vidéos
- * pour que les moteurs fusionnent les signaux auteur sur un @id unique.
+ * Entité schema.org de Laura, partagée entre la home, les articles et les
+ * vidéos pour que les moteurs fusionnent les signaux auteur sur un @id unique.
  */
 class AuthorEntity
 {

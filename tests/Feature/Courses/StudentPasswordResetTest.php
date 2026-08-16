@@ -33,6 +33,19 @@ it('ne révèle pas si un email est inconnu via une notification', function () {
     Notification::assertNothingSent();
 });
 
+it('répond la même chose pour une adresse connue et une adresse inconnue', function () {
+    Notification::fake();
+    Student::factory()->create(['email' => 'camille@example.com']);
+
+    $connue = $this->post(route('student.password.email'), ['email' => 'camille@example.com']);
+    $inconnue = $this->post(route('student.password.email'), ['email' => 'inconnu@example.com']);
+
+    $inconnue->assertSessionHasNoErrors()
+        ->assertSessionHas('status', session('status'));
+
+    expect($inconnue->getStatusCode())->toBe($connue->getStatusCode());
+});
+
 it('réinitialise le mot de passe avec un token valide et permet la connexion', function () {
     $student = Student::factory()->create(['email' => 'camille@example.com']);
     $token = Password::broker('students')->createToken($student);

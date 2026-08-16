@@ -18,9 +18,9 @@
 <div class="mx-auto max-w-2xl space-y-6">
     <p class="sr-only" aria-live="polite">
         @if ($this->selectedSlotStart)
-            Créneau sélectionné : {{ $this->selectedSlotStart->locale('fr')->isoFormat('dddd D MMMM') }} à {{ $this->selectedSlotStart->format('H\hi') }}.
+            Créneau sélectionné : {{ $this->selectedSlotStart->isoFormat('dddd D MMMM') }} à {{ $this->selectedSlotStart->format('H\hi') }}.
         @elseif ($this->selectedDateStart)
-            {{ count($this->slots) }} créneaux disponibles le {{ $this->selectedDateStart->locale('fr')->isoFormat('dddd D MMMM') }}.
+            {{ count($this->slots) }} créneaux disponibles le {{ $this->selectedDateStart->isoFormat('dddd D MMMM') }}.
         @else
             {{ $monthNames[$month] }} {{ $year }} : {{ $available->count() }} jours disponibles.
         @endif
@@ -74,7 +74,7 @@
                     $isAvailable = $available->contains($date);
                     $isSelected = $selectedDate === $date;
                     $isToday = $date === $today;
-                    $fullLabel = $dateObj->locale('fr')->isoFormat('dddd D MMMM YYYY');
+                    $fullLabel = $dateObj->isoFormat('dddd D MMMM YYYY');
                 @endphp
                 @if ($isAvailable)
                     <button type="button" wire:key="day-{{ $date }}" wire:click="selectDate('{{ $date }}')"
@@ -112,7 +112,7 @@
             <div class="border-ink/5 mt-8 border-t pt-6"
                  x-data x-init="$el.scrollIntoView({ behavior: 'smooth', block: 'nearest' })">
                 <p class="text-ink-muted text-xs font-medium tracking-wider uppercase">
-                    Créneaux le {{ $this->selectedDateStart?->locale('fr')->isoFormat('dddd D MMMM') }}
+                    Créneaux le {{ $this->selectedDateStart?->isoFormat('dddd D MMMM') }}
                     <span class="text-ink-muted/70 ml-1 tracking-normal normal-case">· {{ $service->duration_minutes }} min chacun</span>
                 </p>
                 @if (count($this->slots) > 0)
@@ -152,7 +152,7 @@
                     <div class="flex items-center gap-2">
                         <svg class="size-4 shrink-0 text-teal-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="3"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
                         <dt class="sr-only">Date et heure</dt>
-                        <dd>{{ $slotStart->locale('fr')->isoFormat('dddd D MMMM YYYY') }} à {{ $slotStart->format('H\hi') }}</dd>
+                        <dd>{{ $slotStart->isoFormat('dddd D MMMM YYYY') }} à {{ $slotStart->format('H\hi') }}</dd>
                     </div>
                     <div class="flex items-center gap-2">
                         <svg class="size-4 shrink-0 text-teal-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>

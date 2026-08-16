@@ -82,7 +82,7 @@
                     </div>
                     <div class="flex justify-between gap-4">
                         <dt class="text-ink-muted">Date</dt>
-                        <dd class="text-ink font-medium">{{ $appointment->starts_at->locale('fr')->isoFormat('dddd D MMMM YYYY') }}</dd>
+                        <dd class="text-ink font-medium">{{ $appointment->starts_at->isoFormat('dddd D MMMM YYYY') }}</dd>
                     </div>
                     <div class="flex justify-between gap-4">
                         <dt class="text-ink-muted">Heure</dt>
@@ -136,7 +136,7 @@
                     <svg class="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="3"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
                     Ajouter à Google Agenda
                 </a>
-                <a href="{{ route('booking.ics', $appointment->reference) }}"
+                <a href="{{ route('booking.ics', $appointment->token) }}"
                    class="text-ink ring-ink/10 hover:bg-cream-50 inline-flex items-center gap-2 rounded-full bg-white px-5 py-2.5 text-sm font-medium ring-1 transition">
                     <svg class="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
                     Télécharger (.ics)

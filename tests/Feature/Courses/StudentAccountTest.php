@@ -36,12 +36,16 @@ it('met à jour le nom sans toucher à la vérification e-mail', function () {
 it('repasse le compte en non vérifié et renvoie un lien quand l\'e-mail change', function () {
     Notification::fake();
 
-    $student = Student::factory()->create(['email' => 'avant@example.com']);
+    $student = Student::factory()->create([
+        'email' => 'avant@example.com',
+        'password' => Hash::make('motdepasse-actuel'),
+    ]);
 
     $this->actingAs($student, 'student')
         ->patch(route('student.account.profile'), [
             'name' => $student->name,
             'email' => 'apres@example.com',
+            'current_password' => 'motdepasse-actuel',
         ])
         ->assertSessionHas('status', 'profile-updated-email-verification');
 
@@ -62,6 +66,42 @@ it('refuse un e-mail déjà utilisé par un autre élève', function () {
             'email' => 'pris@example.com',
         ])
         ->assertSessionHasErrors('email');
+});
+
+it('refuse le changement d\'e-mail sans le mot de passe actuel', function () {
+    Notification::fake();
+
+    $student = Student::factory()->create([
+        'email' => 'avant@example.com',
+        'password' => Hash::make('motdepasse-actuel'),
+    ]);
+
+    $this->actingAs($student, 'student')
+        ->patch(route('student.account.profile'), [
+            'name' => $student->name,
+            'email' => 'apres@example.com',
+        ])
+        ->assertSessionHasErrors('current_password');
+
+    expect($student->fresh()->email)->toBe('avant@example.com');
+    Notification::assertNothingSent();
+});
+
+it('refuse le changement d\'e-mail avec un mot de passe actuel faux', function () {
+    $student = Student::factory()->create([
+        'email' => 'avant@example.com',
+        'password' => Hash::make('motdepasse-actuel'),
+    ]);
+
+    $this->actingAs($student, 'student')
+        ->patch(route('student.account.profile'), [
+            'name' => $student->name,
+            'email' => 'apres@example.com',
+            'current_password' => 'mauvais',
+        ])
+        ->assertSessionHasErrors('current_password');
+
+    expect($student->fresh()->email)->toBe('avant@example.com');
 });
 
 it('change le mot de passe avec le mot de passe actuel correct', function () {
@@ -87,7 +127,7 @@ it('rejette le changement de mot de passe si le mot de passe actuel est faux', f
             'password' => 'nouveau-motdepasse-solide',
             'password_confirmation' => 'nouveau-motdepasse-solide',
         ])
-        ->assertSessionHasErrors('current_password');
+        ->assertSessionHasErrors('current_password', errorBag: 'updatePassword');
 
     expect(Hash::check('motdepasse-actuel', $student->refresh()->password))->toBeTrue();
 });

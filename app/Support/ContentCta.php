@@ -18,7 +18,13 @@ class ContentCta
      * livre pour les TOC/pensées intrusives, formation phare sinon,
      * repli sur le livre quand aucune formation n'est publiée.
      *
-     * @return array{kind: string, title: string, description: string, url: string, label: string}
+     * @return array{
+     *     kind: string,
+     *     title: string,
+     *     description: string,
+     *     url: string,
+     *     label: string,
+     * }
      */
     public static function offerFor(?Category $category): array
     {

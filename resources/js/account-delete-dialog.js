@@ -37,4 +37,9 @@
     });
 
     dialog.addEventListener('close', reset);
+
+    if (dialog.hasAttribute('data-reopen')) {
+        dialog.showModal();
+        input?.focus();
+    }
 })();

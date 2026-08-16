@@ -220,7 +220,7 @@ class VideoForm
 
                             Placeholder::make('youtube_published_at_display')
                                 ->label('Publiée sur YouTube le')
-                                ->content(fn ($record) => $record?->youtube_published_at?->locale('fr')->isoFormat('D MMMM YYYY [à] HH:mm') ?? '–'),
+                                ->content(fn ($record) => $record?->youtube_published_at?->isoFormat('D MMMM YYYY [à] HH:mm') ?? '–'),
 
                             Placeholder::make('synced_at_display')
                                 ->label('Dernière synchronisation')

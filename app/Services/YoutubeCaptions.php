@@ -49,11 +49,15 @@ class YoutubeCaptions
     /**
      * Échange un code d'autorisation contre les jetons OAuth (setup initial).
      *
-     * @return array{access_token: string, refresh_token?: string, expires_in: int}
+     * @return array{
+     *     access_token: string,
+     *     refresh_token?: string,
+     *     expires_in: int,
+     * }
      */
     public function exchangeAuthorizationCode(string $code, string $redirectUri): array
     {
-        $response = Http::asForm()->timeout(30)->post(self::TOKEN_URL, [
+        $response = Http::asForm()->connectTimeout(5)->timeout(30)->post(self::TOKEN_URL, [
             'code' => $code,
             'client_id' => $this->clientId,
             'client_secret' => $this->clientSecret,
@@ -97,11 +101,15 @@ class YoutubeCaptions
      * Sélectionne la meilleure piste pour une langue : sous-titres validés
      * (standard) en priorité, sinon la transcription automatique (asr).
      *
-     * @param  list<array{id: string, language: string, trackKind: string}>  $tracks
+     * @param  list<array{
+     *     id: string,
+     *     language: string,
+     *     trackKind: string,
+     * }>  $tracks
      */
     public function pickBestTrackId(array $tracks, string $language = 'fr'): ?string
     {
-        $forLang = array_filter($tracks, fn ($t) => str_starts_with($t['language'], $language));
+        $forLang = array_filter($tracks, fn (array $track) => str_starts_with($track['language'], $language));
 
         foreach (['standard', 'asr'] as $kind) {
             foreach ($forLang as $track) {
@@ -147,7 +155,7 @@ class YoutubeCaptions
             );
         }
 
-        $response = Http::asForm()->timeout(30)->post(self::TOKEN_URL, [
+        $response = Http::asForm()->connectTimeout(5)->timeout(30)->post(self::TOKEN_URL, [
             'client_id' => $this->clientId,
             'client_secret' => $this->clientSecret,
             'refresh_token' => $this->refreshToken,
@@ -164,6 +172,7 @@ class YoutubeCaptions
     private function client(): PendingRequest
     {
         return Http::withToken($this->accessToken())
+            ->connectTimeout(5)
             ->timeout(30)
             ->retry(2, 500, throw: false)
             ->acceptJson();

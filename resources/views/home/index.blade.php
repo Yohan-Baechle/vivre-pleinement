@@ -130,7 +130,7 @@
                 @else
                     <form action="{{ route('newsletter.store') }}" method="POST" class="space-y-3 lg:col-span-3" novalidate data-newsletter-form>
                         @csrf
-                        <input type="hidden" name="ts" value="{{ time() }}">
+                        <input type="hidden" name="ts" value="{{ \App\Support\SubmissionStamp::issue() }}">
 
                         {{-- Honeypot anti-spam --}}
                         <div aria-hidden="true" class="absolute -left-[9999px] top-auto size-px overflow-hidden">

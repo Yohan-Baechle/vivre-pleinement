@@ -75,7 +75,8 @@ class PreviewMailsCommand extends Command
     }
 
     /**
-     * Construit un rendez-vous en mémoire (jamais persisté) pour le rendu des aperçus.
+     * Construit un rendez-vous en mémoire (jamais persisté) pour le rendu des
+     * aperçus.
      *
      * @param  array<string, mixed>  $overrides
      */

@@ -12,8 +12,9 @@ class BookingSeeder extends Seeder
     use WithoutModelEvents;
 
     /**
-     * Crée la prestation par défaut et ses disponibilités hebdomadaires globales
-     * (day_of_week : 1 = lundi, 2 = mardi, 4 = jeudi), matin et après-midi.
+     * Crée la prestation par défaut et ses disponibilités hebdomadaires
+     * globales (day_of_week : 1 = lundi, 2 = mardi, 4 = jeudi), matin et
+     * après-midi.
      */
     public function run(): void
     {

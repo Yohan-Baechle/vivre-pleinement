@@ -12,7 +12,10 @@ use Illuminate\Console\Command;
 #[Description('Réécrit les liens internes hérités de WordPress (href="/slug") vers les URLs canoniques /blog/... pour éviter les sauts de 301 dans le contenu des articles.')]
 class FixLegacyContentLinks extends Command
 {
-    /** Chemins racine légitimes du nouveau site, à laisser intacts sans avertissement. */
+    /**
+     * Chemins racine légitimes du nouveau site, à laisser intacts sans
+     * avertissement.
+     */
     private const CURRENT_ROOT_PATHS = [
         'contact', 'blog', 'videos', 'formations', 'livre', 'reservation',
         'a-propos', 'mentions-legales', 'politique-cookies',
@@ -66,10 +69,11 @@ class FixLegacyContentLinks extends Command
     }
 
     /**
-     * Réécrit href="/slug" → /blog/slug et href="/category/slug" → /blog/categorie/slug,
-     * uniquement quand le slug correspond à un article ou une catégorie existants.
-     * Les liens absolus vivre-pleinement.fr sont traités de la même façon ; les
-     * chemins racine du nouveau site restent intacts.
+     * Réécrit href="/slug" → /blog/slug et href="/category/slug" →
+     * /blog/categorie/slug, uniquement quand le slug correspond à un article ou
+     * une catégorie existants. Les liens absolus vivre-pleinement.fr sont
+     * traités de la même façon ; les chemins racine du nouveau site restent
+     * intacts.
      *
      * @param  array<string, int>  $postSlugs
      * @param  array<string, int>  $categorySlugs

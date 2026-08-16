@@ -47,7 +47,8 @@ class TrimPostSeoDescriptions extends Command
     }
 
     /**
-     * Descriptions ≤ 155 caractères par slug, réécrites sans perdre l'intention.
+     * Descriptions ≤ 155 caractères par slug, réécrites sans perdre
+     * l'intention.
      *
      * @return array<string, string>
      */

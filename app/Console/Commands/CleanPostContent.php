@@ -41,9 +41,9 @@ class CleanPostContent extends Command
     }
 
     /**
-     * Déroule les <span> sans attribut (résidus Gutenberg) en conservant leur texte,
-     * en répétant la passe pour gérer l'imbrication. Les <span ...> porteurs
-     * d'attributs sont laissés intacts.
+     * Déroule les <span> sans attribut (résidus Gutenberg) en conservant leur
+     * texte, en répétant la passe pour gérer l'imbrication. Les <span ...>
+     * porteurs d'attributs sont laissés intacts.
      *
      * Retire ensuite les résidus WordPress : appels au don Tipeee sous toutes
      * leurs variantes (emojis devenus « ???? » à la migration inclus),

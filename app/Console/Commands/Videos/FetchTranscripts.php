@@ -40,7 +40,7 @@ class FetchTranscripts extends Command
             $query->whereKey($videoId);
         }
         if (! $this->option('force')) {
-            $query->where(fn ($q) => $q->whereNull('transcript')->orWhere('transcript', ''));
+            $query->where(fn ($group) => $group->whereNull('transcript')->orWhere('transcript', ''));
         }
         if (($limit = (int) $this->option('limit')) > 0) {
             $query->limit($limit);
@@ -81,8 +81,6 @@ class FetchTranscripts extends Command
                     continue;
                 }
 
-                // Stocké en texte continu nettoyé ; la reponctuation IA
-                // (videos:repunctuate-transcripts) le mettra en paragraphes.
                 $video->update(['transcript' => '<p>'.e($text).'</p>']);
                 $this->line("  ✓ #{$video->id} « {$video->title} » ({$this->wordCount($text)} mots)");
                 $fetched++;
@@ -106,6 +104,9 @@ class FetchTranscripts extends Command
      * timecodes, balises, annotations [Musique]/[Applaudissements], doublons
      * consécutifs et espaces superflus. La mise en paragraphes et la
      * ponctuation sont restaurées ensuite par l'étape de reponctuation IA.
+     *
+     * La normalisation finale utilise \p{Z} avec le flag /u : \s seul ne
+     * couvre pas les espaces unicode (insécables, etc.) des sous-titres.
      */
     private function srtToText(string $srt): string
     {
@@ -116,14 +117,12 @@ class FetchTranscripts extends Command
         foreach ($lines as $line) {
             $line = trim($line);
 
-            // Index de bloc, timecodes et lignes vides.
             if ($line === '' || ctype_digit($line) || str_contains($line, '-->')) {
                 continue;
             }
 
             $line = trim(strip_tags($line));
 
-            // Annotations non verbales : [Musique], [Applaudissements], (rires)…
             $line = trim((string) preg_replace('/[\[\(][^\]\)]*[\]\)]/u', '', $line));
 
             if ($line === '' || $line === $previous) {
@@ -135,8 +134,6 @@ class FetchTranscripts extends Command
         }
 
         $text = implode(' ', $parts);
-        // \s ne couvre pas tous les espaces unicode (insécables, etc.) des
-        // sous-titres : on normalise avec le flag /u et la classe \p{Z}.
         $text = (string) preg_replace('/[\s\p{Z}]+/u', ' ', $text);
 
         return trim($text);

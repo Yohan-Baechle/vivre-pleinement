@@ -50,7 +50,10 @@ class Video extends Model
     /** Champs qui peuvent être verrouillés contre la sync */
     public const LOCKABLE_FIELDS = ['title', 'description', 'thumbnail_url', 'slug'];
 
-    /** Seuil au-dessus duquel une vidéo n'est plus considérée comme un Short YouTube. */
+    /**
+     * Seuil au-dessus duquel une vidéo n'est plus considérée comme un Short
+     * YouTube.
+     */
     public const SHORT_DURATION_THRESHOLD = 60;
 
     /**
@@ -97,9 +100,9 @@ class Video extends Model
         return $this->belongsTo(Post::class, 'related_post_id');
     }
 
-    public function scopePublished(Builder $query): Builder
+    public function scopePublished(Builder $query): void
     {
-        return $query
+        $query
             ->where('status', VideoStatus::Published)
             ->where('is_missing', false)
             ->whereNotNull('published_at')
@@ -109,9 +112,9 @@ class Video extends Model
     /**
      * Vidéos éligibles aux sitemaps : publiées et sans directive noindex.
      */
-    public function scopeIndexable(Builder $query): Builder
+    public function scopeIndexable(Builder $query): void
     {
-        return $query->published()->where(function (Builder $query): void {
+        $query->published()->where(function (Builder $query): void {
             $query->whereNull('seo_robots')->orWhere('seo_robots', 'not like', '%noindex%');
         });
     }
@@ -174,7 +177,12 @@ class Video extends Model
     /**
      * Chapitres formatés pour schema.org Clip[].
      *
-     * @return list<array{name: string, startOffset: int, endOffset: int|null, url: string}>
+     * @return list<array{
+     *     name: string,
+     *     startOffset: int,
+     *     endOffset: int|null,
+     *     url: string,
+     * }>
      */
     public function chaptersForSchema(): array
     {

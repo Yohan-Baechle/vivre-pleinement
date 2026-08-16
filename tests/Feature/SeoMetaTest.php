@@ -6,7 +6,10 @@ use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
 
 uses(LazilyRefreshDatabase::class);
 
-/** Compte les balises <meta name="description"> et renvoie le content de la première. */
+/**
+ * Compte les balises <meta name="description"> et renvoie le content de la
+ * première.
+ */
 function metaDescription(string $html): array
 {
     $count = substr_count($html, '<meta name="description"');

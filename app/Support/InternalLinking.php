@@ -5,6 +5,7 @@ namespace App\Support;
 use App\Models\Category;
 use App\Models\Post;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Support\Collection as SupportCollection;
 use Illuminate\Support\Facades\Cache;
 
 /**
@@ -39,7 +40,7 @@ class InternalLinking
     public static function similar(Post $post): Collection
     {
         $ids = Cache::remember(
-            self::cacheKey('similar', $post),
+            self::cacheKey('similar', $post->id),
             now()->addMinutes(self::CACHE_TTL_MINUTES),
             fn () => self::computeSimilar($post)->modelKeys(),
         );
@@ -53,7 +54,7 @@ class InternalLinking
             ->with(['categories', 'media'])
             ->whereIn('id', $ids)
             ->get()
-            ->sortBy(fn (Post $p) => array_search($p->id, $ids, true))
+            ->sortBy(fn (Post $post) => array_search($post->id, $ids, true))
             ->values();
     }
 
@@ -65,7 +66,7 @@ class InternalLinking
     public static function pillar(Post $post): ?Post
     {
         $pillarId = Cache::remember(
-            self::cacheKey('pillar', $post),
+            self::cacheKey('pillar', $post->id),
             now()->addMinutes(self::CACHE_TTL_MINUTES),
             fn () => self::computePillarId($post),
         );
@@ -90,17 +91,14 @@ class InternalLinking
         $postIds = Post::query()
             ->when(
                 $categoryIds->isNotEmpty(),
-                fn ($q) => $q->whereHas('categories', fn ($cq) => $cq->whereIn('categories.id', $categoryIds)),
-                fn ($q) => $q->whereKey($post->id),
+                fn ($query) => $query->whereHas('categories', fn ($categoryQuery) => $categoryQuery->whereIn('categories.id', $categoryIds)),
+                fn ($query) => $query->whereKey($post->id),
             )
             ->pluck('id')
             ->push($post->id)
             ->unique();
 
-        foreach ($postIds as $id) {
-            Cache::forget("blog.linking.similar.{$id}");
-            Cache::forget("blog.linking.pillar.{$id}");
-        }
+        self::forgetAll($postIds);
     }
 
     /**
@@ -108,11 +106,17 @@ class InternalLinking
      */
     public static function flushCategory(Category $category): void
     {
-        $postIds = $category->posts()->pluck('posts.id');
+        self::forgetAll($category->posts()->pluck('posts.id'));
+    }
 
+    /**
+     * @param  SupportCollection<int, int>  $postIds
+     */
+    private static function forgetAll(SupportCollection $postIds): void
+    {
         foreach ($postIds as $id) {
-            Cache::forget("blog.linking.similar.{$id}");
-            Cache::forget("blog.linking.pillar.{$id}");
+            Cache::forget(self::cacheKey('similar', $id));
+            Cache::forget(self::cacheKey('pillar', $id));
         }
     }
 
@@ -124,15 +128,21 @@ class InternalLinking
         $categoryIds = $post->categories->pluck('id');
         $tagIds = $post->tags->pluck('id');
 
+        /**
+         * Seules les clés sont conservées (elles seules sont mises en cache) :
+         * inutile de rapatrier `content`, une colonne longText, pour trois
+         * lignes qu'on jette aussitôt.
+         */
         $base = fn () => Post::query()
             ->published()
-            ->where('id', '!=', $post->id);
+            ->select(['posts.id', 'posts.published_at'])
+            ->where('posts.id', '!=', $post->id);
 
         $byCluster = new Collection;
         if ($categoryIds->isNotEmpty()) {
             $byCluster = $base()
-                ->whereHas('categories', fn ($q) => $q->whereIn('categories.id', $categoryIds))
-                ->withCount(['tags as shared_tags' => fn ($q) => $q->whereIn('tags.id', $tagIds)])
+                ->whereHas('categories', fn ($query) => $query->whereIn('categories.id', $categoryIds))
+                ->withCount(['tags as shared_tags' => fn ($query) => $query->whereIn('tags.id', $tagIds)])
                 ->orderByDesc('shared_tags')
                 ->orderByDesc('published_at')
                 ->limit(self::SIMILAR_LIMIT)
@@ -166,8 +176,8 @@ class InternalLinking
         return $pillar->pillar_post_id;
     }
 
-    private static function cacheKey(string $kind, Post $post): string
+    private static function cacheKey(string $kind, int $postId): string
     {
-        return "blog.linking.{$kind}.{$post->id}";
+        return "blog.linking.{$kind}.{$postId}";
     }
 }

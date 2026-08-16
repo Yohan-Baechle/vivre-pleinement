@@ -3,8 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Services\YoutubeCaptions;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Response;
+use Illuminate\Http\Response;
 use Illuminate\Support\Str;
 use Throwable;
 
@@ -27,7 +28,7 @@ class YoutubeOAuthController extends Controller
      * qu'un tiers ne déclenche le callback avec son propre code d'autorisation
      * (CSRF sur le flux OAuth).
      */
-    public function redirect(Request $request)
+    public function redirect(Request $request): RedirectResponse
     {
         $clientId = config('services.youtube.oauth_client_id');
 
@@ -52,62 +53,48 @@ class YoutubeOAuthController extends Controller
     /**
      * Reçoit le code de Google et affiche le refresh token à copier dans .env.
      */
-    public function callback(Request $request)
+    public function callback(Request $request): Response
     {
         abort_unless(config('services.youtube.oauth_client_id'), 404);
 
         $expectedState = $request->session()->pull(self::STATE_SESSION_KEY);
 
         if (! is_string($expectedState) || ! hash_equals($expectedState, (string) $request->query('state'))) {
-            return Response::make('État OAuth invalide ou expiré. Recommencez le flux depuis /youtube/oauth/redirect.', 400)
-                ->header('Content-Type', 'text/html; charset=UTF-8');
+            return $this->failure('État OAuth invalide ou expiré. Recommencez le flux depuis /youtube/oauth/redirect.');
         }
 
         if ($error = $request->query('error')) {
-            return Response::make('Autorisation refusée : '.e($error), 400)
-                ->header('Content-Type', 'text/html; charset=UTF-8');
+            return $this->failure('Autorisation refusée : '.$error);
         }
 
         $code = (string) $request->query('code');
 
         if ($code === '') {
-            return Response::make('Code d\'autorisation manquant.', 400)
-                ->header('Content-Type', 'text/html; charset=UTF-8');
+            return $this->failure('Code d\'autorisation manquant.');
         }
 
         try {
             $tokens = YoutubeCaptions::fromConfig()->exchangeAuthorizationCode($code, url(self::REDIRECT_PATH));
         } catch (Throwable $e) {
-            return Response::make('Échec de l\'échange : '.e($e->getMessage()), 500)
-                ->header('Content-Type', 'text/html; charset=UTF-8');
+            return $this->failure('Échec de l\'échange : '.$e->getMessage(), 500);
         }
 
         $refreshToken = $tokens['refresh_token'] ?? null;
 
         if (! $refreshToken) {
-            return Response::make(
+            return $this->failure(
                 'Google n\'a pas renvoyé de refresh token. Révoquez l\'accès de l\'app dans votre compte Google puis recommencez.',
-                400,
-            )->header('Content-Type', 'text/html; charset=UTF-8');
+            );
         }
 
-        $escapedRefreshToken = e($refreshToken);
+        return response()->view('youtube.oauth.success', ['refreshToken' => $refreshToken]);
+    }
 
-        $html = <<<HTML
-        <!doctype html><html lang="fr"><head><meta charset="utf-8">
-        <title>YouTube OAuth — Succès</title>
-        <style>body{font-family:system-ui,sans-serif;max-width:640px;margin:4rem auto;padding:0 1rem;line-height:1.6;color:#1f2937}
-        code{display:block;background:#f3f4f6;padding:1rem;border-radius:.5rem;word-break:break-all;margin:1rem 0;font-size:.9rem}
-        .ok{color:#047857}</style></head><body>
-        <h1 class="ok">✅ Autorisation réussie</h1>
-        <p>Copiez cette ligne dans votre fichier <strong>.env</strong> :</p>
-        <code>YOUTUBE_OAUTH_REFRESH_TOKEN={$escapedRefreshToken}</code>
-        <p>Puis lancez&nbsp;:</p>
-        <code>vendor/bin/sail artisan youtube:fetch-transcripts --limit=3</code>
-        <p>Vous pouvez fermer cet onglet.</p>
-        </body></html>
-        HTML;
-
-        return Response::make($html)->header('Content-Type', 'text/html; charset=UTF-8');
+    /**
+     * Rend la page d'échec du flux OAuth avec le statut HTTP correspondant.
+     */
+    private function failure(string $message, int $status = 400): Response
+    {
+        return response()->view('youtube.oauth.error', ['message' => $message], $status);
     }
 }

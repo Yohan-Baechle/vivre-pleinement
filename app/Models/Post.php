@@ -121,17 +121,17 @@ class Post extends Model implements HasMedia
         return VideoArticleMatcher::videoForPost($this);
     }
 
-    public function scopePublished(Builder $query): Builder
+    public function scopePublished(Builder $query): void
     {
-        return $query->where('status', PostStatus::Published)->where('published_at', '<=', now());
+        $query->where('status', PostStatus::Published)->where('published_at', '<=', now());
     }
 
     /**
      * Articles éligibles aux sitemaps : publiés et sans directive noindex.
      */
-    public function scopeIndexable(Builder $query): Builder
+    public function scopeIndexable(Builder $query): void
     {
-        return $query->published()->where(function (Builder $query): void {
+        $query->published()->where(function (Builder $query): void {
             $query->whereNull('seo_robots')->orWhere('seo_robots', 'not like', '%noindex%');
         });
     }
@@ -225,8 +225,9 @@ class Post extends Model implements HasMedia
      * Date de dernière modification réelle, pour le dateModified SEO.
      *
      * Les articles migrés depuis WordPress ont tous un updated_at à la date
-     * d'import : on retombe alors sur published_at pour ne pas signaler à Google
-     * une modification fictive. Une édition postérieure à l'import est respectée.
+     * d'import : on retombe alors sur published_at pour ne pas signaler à
+     * Google une modification fictive. Une édition postérieure à l'import est
+     * respectée.
      */
     public function lastModifiedAt(): ?Carbon
     {

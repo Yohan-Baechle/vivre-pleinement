@@ -12,7 +12,8 @@ use Illuminate\Support\Str;
 
 /**
  * Article pilier « Thérapie ACT » — cible SEO « thérapie act » (vol. 800, KD 7)
- * et « act thérapie » (vol. 200, KD 7), avec le cluster TCC / exercices anxiété.
+ * et « act thérapie » (vol. 200, KD 7), avec le cluster TCC / exercices
+ * anxiété.
  *
  * Idempotent : relancer le seeder met à jour l'article sans le dupliquer.
  * Aucune image featured n'est attachée (à ajouter via Filament).

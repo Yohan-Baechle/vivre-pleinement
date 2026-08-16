@@ -23,8 +23,5 @@ return new class extends Migration
      * `youtube_published_at` values it overwrote cannot be recovered, so
      * there is nothing meaningful to reverse here.
      */
-    public function down(): void
-    {
-        //
-    }
+    public function down(): void {}
 };

@@ -31,11 +31,11 @@
         <meta property="og:image" content="{{ $cover }}">
     @endif
     <meta property="article:published_time" content="{{ $post->published_at?->toIso8601String() }}">
-    @foreach ($post->categories as $c)
-        <meta property="article:section" content="{{ $c->name }}">
+    @foreach ($post->categories as $category)
+        <meta property="article:section" content="{{ $category->name }}">
     @endforeach
-    @foreach ($post->tags as $t)
-        <meta property="article:tag" content="{{ $t->name }}">
+    @foreach ($post->tags as $tag)
+        <meta property="article:tag" content="{{ $tag->name }}">
     @endforeach
 
     @php
@@ -122,7 +122,7 @@
                         </div>
                         <span aria-hidden="true">·</span>
                         <time datetime="{{ $post->published_at?->toIso8601String() }}">
-                            {{ $post->published_at?->locale('fr')->isoFormat('D MMMM YYYY') }}
+                            {{ $post->published_at?->isoFormat('D MMMM YYYY') }}
                         </time>
                         <span aria-hidden="true">·</span>
                         <span>{{ $post->readingTimeMinutes() }} min de lecture</span>
@@ -265,7 +265,7 @@
     @php
         $commentsOpen = $post->commentsAreOpen();
         $rootCount = $post->comments->count();
-        $totalCount = $rootCount + $post->comments->sum(fn ($c) => $c->replies->count());
+        $totalCount = $rootCount + $post->comments->sum(fn ($comment) => $comment->replies->count());
     @endphp
 
     @if ($relatedVideo)

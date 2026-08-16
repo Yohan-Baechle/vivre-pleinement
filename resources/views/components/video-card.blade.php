@@ -36,7 +36,7 @@
                 <span class="text-ink-muted" aria-hidden="true">·</span>
             @endif
             <time datetime="{{ $video->published_at?->toIso8601String() }}" class="text-ink-muted">
-                {{ $video->published_at?->locale('fr')->isoFormat('D MMM YYYY') }}
+                {{ $video->published_at?->isoFormat('D MMM YYYY') }}
             </time>
         </div>
         <h3 class="text-ink mt-3 font-serif text-lg leading-snug font-medium transition group-hover:text-teal-700">

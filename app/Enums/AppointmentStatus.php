@@ -48,7 +48,8 @@ enum AppointmentStatus: string implements HasColor, HasIcon, HasLabel
     }
 
     /**
-     * Indique si le rendez-vous est encore ouvert et peut être annulé ou reprogrammé.
+     * Indique si le rendez-vous est encore ouvert et peut être annulé ou
+     * reprogrammé.
      */
     public function isCancellable(): bool
     {

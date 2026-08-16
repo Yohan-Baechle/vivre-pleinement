@@ -1,12 +1,28 @@
 <?php
 
+use App\Models\User;
+use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
 use Illuminate\Support\Facades\Http;
+
+uses(LazilyRefreshDatabase::class);
 
 beforeEach(function () {
     config([
         'services.youtube.oauth_client_id' => 'client-id-test',
         'services.youtube.oauth_client_secret' => 'client-secret-test',
     ]);
+
+    $this->actingAs(User::factory()->create());
+});
+
+it('redirects guests to the admin login instead of exposing the oauth flow', function () {
+    auth()->logout();
+
+    $this->get(route('youtube.oauth.redirect'))
+        ->assertRedirect(route('filament.admin.auth.login'));
+
+    $this->get(route('youtube.oauth.callback'))
+        ->assertRedirect(route('filament.admin.auth.login'));
 });
 
 it('404s when the youtube oauth client is not configured', function () {

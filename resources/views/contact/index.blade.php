@@ -73,7 +73,7 @@
 
                     <form method="POST" action="{{ route('contact.send') }}" class="space-y-5" novalidate>
                         @csrf
-                        <input type="hidden" name="ts" value="{{ time() }}">
+                        <input type="hidden" name="ts" value="{{ \App\Support\SubmissionStamp::issue() }}">
 
                         {{-- Honeypot --}}
                         <div aria-hidden="true" class="absolute top-auto -left-[9999px] size-px overflow-hidden">

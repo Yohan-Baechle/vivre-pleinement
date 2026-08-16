@@ -8,11 +8,6 @@ use Illuminate\Validation\Rules\Password;
 
 class StudentNewPasswordFormRequest extends FormRequest
 {
-    public function authorize(): bool
-    {
-        return true;
-    }
-
     /**
      * @return array<string, ValidationRule|array<mixed>|string>
      */

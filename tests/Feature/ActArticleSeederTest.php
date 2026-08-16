@@ -9,8 +9,6 @@ use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
 uses(LazilyRefreshDatabase::class);
 
 beforeEach(function () {
-    // Le seeder rattache l'article à cette catégorie : on s'assure qu'elle existe
-    // (firstOrCreate car la base de test peut déjà la contenir).
     Category::firstOrCreate(
         ['slug' => 'comprendre-et-se-soigner'],
         ['name' => 'Comprendre & se soigner'],

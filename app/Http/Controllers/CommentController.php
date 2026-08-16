@@ -21,16 +21,14 @@ class CommentController extends Controller
 
         abort_unless($post->commentsAreOpen(), 403);
 
-        $key = 'comment:'.$request->ip();
-        if (SubmissionThrottle::exceeded($key)) {
-            $seconds = SubmissionThrottle::availableIn($key);
+        $retryAfter = SubmissionThrottle::attempt('comment:'.$request->ip());
 
+        if ($retryAfter !== null) {
             return back()
                 ->withInput($request->except(['website', 'consent', 'ts']))
-                ->withErrors(['content' => "Trop d'envois. Réessayez dans {$seconds}s."])
+                ->withErrors(['content' => "Trop d'envois. Réessayez dans {$retryAfter}s."])
                 ->withFragment('commentaires');
         }
-        SubmissionThrottle::hit($key);
 
         $data = $request->validated();
 

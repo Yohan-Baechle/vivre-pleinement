@@ -57,16 +57,16 @@
         }
 
         if (! empty($chapters)) {
-            $videoLd['hasPart'] = array_map(fn ($c) => array_filter([
+            $videoLd['hasPart'] = array_map(fn ($chapter) => array_filter([
                 '@type' => 'Clip',
-                'name' => $c['name'],
-                'startOffset' => $c['startOffset'],
-                'endOffset' => $c['endOffset'],
-                'url' => $c['url'],
-            ], fn ($v) => $v !== null), $chapters);
+                'name' => $chapter['name'],
+                'startOffset' => $chapter['startOffset'],
+                'endOffset' => $chapter['endOffset'],
+                'url' => $chapter['url'],
+            ], fn ($value) => $value !== null), $chapters);
         }
 
-        $videoLd = array_filter($videoLd, fn ($v) => $v !== null && $v !== '');
+        $videoLd = array_filter($videoLd, fn ($value) => $value !== null && $value !== '');
     @endphp
     <script type="application/ld+json">{!! json_encode($videoLd, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG) !!}</script>
 @endpush
@@ -100,7 +100,7 @@
 
                     <div class="text-ink-muted mt-5 flex flex-wrap items-center gap-x-4 gap-y-2 text-sm">
                         <time datetime="{{ $video->published_at?->toIso8601String() }}">
-                            {{ $video->published_at?->locale('fr')->isoFormat('D MMMM YYYY') }}
+                            {{ $video->published_at?->isoFormat('D MMMM YYYY') }}
                         </time>
                         @if ($duration = $video->durationFormatted())
                             <span aria-hidden="true">·</span>

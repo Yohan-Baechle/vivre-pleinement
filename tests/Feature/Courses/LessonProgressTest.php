@@ -52,6 +52,28 @@ it('est idempotent : marquer deux fois ne crée qu\'une ligne', function () {
     expect($student->lessonProgress()->where('lesson_id', $lessons[0]->id)->count())->toBe(1);
 });
 
+it('refuse de dévalider une leçon à un élève non inscrit', function () {
+    [$course, $lessons] = enrolledCourse();
+    $intrus = Student::factory()->create();
+
+    Livewire::actingAs($intrus, 'student')
+        ->test(LessonPlayer::class, ['course' => $course, 'lesson' => $lessons[0]])
+        ->call('markIncomplete')
+        ->assertForbidden();
+});
+
+it('laisse un élève non inscrit gérer une leçon en aperçu gratuit', function () {
+    [$course, $lessons] = enrolledCourse();
+    $lessons[0]->update(['is_free_preview' => true]);
+    $intrus = Student::factory()->create();
+
+    Livewire::actingAs($intrus, 'student')
+        ->test(LessonPlayer::class, ['course' => $course, 'lesson' => $lessons[0]])
+        ->call('markComplete')
+        ->call('markIncomplete')
+        ->assertOk();
+});
+
 it('calcule correctement le pourcentage de progression', function () {
     [$course, $lessons, $student] = enrolledCourse(lessons: 2);
 

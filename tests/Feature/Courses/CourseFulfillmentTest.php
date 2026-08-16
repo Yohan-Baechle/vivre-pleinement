@@ -6,7 +6,7 @@ use App\Mail\CoursePurchaseNotification;
 use App\Models\Course;
 use App\Models\Enrollment;
 use App\Models\Student;
-use App\Services\CoursePaymentService;
+use App\Services\StripePaymentIntents;
 use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
 use Illuminate\Support\Facades\Mail;
 use Laravel\Cashier\Events\WebhookReceived;
@@ -96,8 +96,8 @@ it('rembourse automatiquement un second paiement arrivé sur une inscription dé
     $enrollment = pendingEnrollment();
     courseWebhook($enrollment->id, 'pi_premier');
 
-    $this->partialMock(CoursePaymentService::class, function ($mock) {
-        $mock->shouldReceive('refundPaymentIntent')->once()->with('pi_second');
+    $this->mock(StripePaymentIntents::class, function ($mock) {
+        $mock->shouldReceive('refundQuietly')->once()->with('pi_second')->andReturnTrue();
     });
 
     courseWebhook($enrollment->id, 'pi_second');
