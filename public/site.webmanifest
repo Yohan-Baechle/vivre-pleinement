@@ -1,0 +1,25 @@
+{
+    "name": "Vivre Pleinement, Laura Baechlé",
+    "short_name": "Vivre Pleinement",
+    "lang": "fr-FR",
+    "description": "Accompagnement en thérapie ACT pour l'anxiété, les phobies et les TOC.",
+    "start_url": "/",
+    "scope": "/",
+    "display": "standalone",
+    "theme_color": "#117d89",
+    "background_color": "#fdfcf9",
+    "icons": [
+        {
+            "src": "/icon-192.png",
+            "sizes": "192x192",
+            "type": "image/png",
+            "purpose": "any"
+        },
+        {
+            "src": "/icon-512.png",
+            "sizes": "512x512",
+            "type": "image/png",
+            "purpose": "any"
+        }
+    ]
+}
