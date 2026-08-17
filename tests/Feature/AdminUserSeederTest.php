@@ -31,8 +31,14 @@ it('refuses to seed an admin account without an explicit password', function () 
     $this->assertDatabaseMissing('users', ['email' => 'admin-test@example.com']);
 });
 
+/**
+ * `.env.example` porte une ligne `ADMIN_PASSWORD=` vide, que la CI copie en
+ * `.env` : la configuration vaut alors la chaîne vide et non null. Les deux
+ * disent la même chose — aucun mot de passe livré — et c'est bien `blank()`
+ * que teste AdminUserSeeder avant de refuser de tourner.
+ */
 it('exposes no default password in the shipped configuration', function () {
-    expect(config('admin.password'))->toBeNull();
+    expect(config('admin.password'))->toBeEmpty();
 })->skip(fn () => filled(env('ADMIN_PASSWORD')), 'ADMIN_PASSWORD est défini dans cet environnement.');
 
 it('is idempotent — running it twice updates rather than duplicates the admin user', function () {
