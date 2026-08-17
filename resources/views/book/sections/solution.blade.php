@@ -1,40 +1,75 @@
 @php
-    $pillars = [
+    $reasons = [
         [
             'num' => '01',
-            'title' => 'Comprendre ce qui se passe vraiment',
-            'desc' => "Pourquoi votre cerveau s'accroche à ces pensées précisément. Pourquoi plus vous luttez, plus elles reviennent. Comprendre, c'est déjà se libérer à moitié.",
+            'desc' => "Votre tempérament anxieux vient très certainement de vos parents.",
         ],
         [
             'num' => '02',
-            'title' => 'Désamorcer les pensées sans les combattre',
-            'desc' => "Des techniques simples, à appliquer dès aujourd'hui, pour que les pensées intrusives perdent leur charge. Pas de lutte, pas d'évitement : un nouveau rapport à votre mental.",
+            'desc' => "Vous avez vécu plus d'expériences négatives que d'autres (harcèlement scolaire, décès précoces, etc.).",
         ],
         [
             'num' => '03',
-            'title' => 'Apaiser le corps qui retient l\'anxiété',
-            'desc' => "Le TOC n'est pas que dans la tête. Apprenez à relâcher les tensions, à calmer le système nerveux et à retrouver un sommeil qui répare.",
-        ],
-        [
-            'num' => '04',
-            'title' => 'Reconstruire la confiance jour après jour',
-            'desc' => "Pouvoir à nouveau tenir votre enfant, conduire, cuisiner, vivre. Sans calculer chaque geste. Un retour progressif et solide à votre vie d'avant.",
+            'desc' => "La société a un problème avec la sensibilité. Il faut à tout prix paraître fort, confiant, sans faille.",
         ],
     ];
 @endphp
 
-<x-section bg="bg-cream-50" title="Une méthode douce, en quatre temps.">
+<x-section bg="bg-cream-50" eyebrow="Écoutez" title="Vous n'êtes pas faible.">
     <p class="text-ink-soft mx-auto -mt-8 mb-12 max-w-2xl text-center text-base sm:text-lg">
-        Le fruit de plus de dix ans de recherches, d'essais et d'erreurs, condensé dans <strong class="text-ink font-medium">77 pages claires</strong>, avec <strong class="text-ink font-medium">12 fiches pratiques</strong> à appliquer dès la première lecture.
+        Ce qui vous arrive n'est pas de votre faute. C'est juste que&nbsp;:
     </p>
 
-    <ol class="grid grid-cols-1 gap-6 md:grid-cols-2 md:gap-8">
-        @foreach ($pillars as $pillar)
+    <ol class="grid grid-cols-1 gap-6 md:grid-cols-3 md:gap-8">
+        @foreach ($reasons as $reason)
             <li class="ring-ink/5 relative rounded-3xl bg-white p-7 shadow-xs ring-1">
-                <span class="font-serif text-5xl font-medium text-teal-700/85" aria-hidden="true">{{ $pillar['num'] }}</span>
-                <h3 class="text-ink mt-3 font-serif text-xl font-medium">{{ $pillar['title'] }}</h3>
-                <p class="text-ink-soft mt-3 text-sm leading-relaxed sm:text-base">{{ $pillar['desc'] }}</p>
+                <span class="font-serif text-5xl font-medium text-teal-700/85" aria-hidden="true">{{ $reason['num'] }}</span>
+                <p class="text-ink-soft mt-3 text-sm leading-relaxed sm:text-base">{{ $reason['desc'] }}</p>
             </li>
         @endforeach
     </ol>
+
+    <div class="text-ink-soft mx-auto mt-12 max-w-3xl space-y-4 text-base sm:text-lg">
+        <p class="text-ink font-medium">Mais aussi que&nbsp;:</p>
+        <p>
+            Vous n'avez pas eu les bonnes informations pour aller mieux, car vous ne connaissiez pas mon livre.
+        </p>
+        <p class="text-ink font-medium">Ainsi, en vous procurant mon guide, vous allez recevoir&nbsp;:</p>
+        <p>
+            <span class="text-teal-700" aria-hidden="true">➥</span>
+            Des conseils pour vous libérer de votre phobie d'impulsion. Les solutions que je propose sont naturelles et certaines, inédites.
+        </p>
+        <p>
+            <span class="text-teal-700" aria-hidden="true">➥</span>
+            Un suivi par mail compris dans l'achat de mon livre si vous avez la moindre question à me poser.
+        </p>
+        <p>
+            Vous saurez aussi comment, en quelques jours, vous allez déjà aller mieux. Puis, progressivement, vous libérer de votre phobie d'impulsion.
+        </p>
+        <p>
+            Vous allez mettre la main sur un guide qui vous permettra, au fur et à mesure, de vivre sans vous poser autant de questions, et sans gâcher vos moments de joie.
+        </p>
+    </div>
+
+    <div class="mx-auto mt-16 max-w-3xl">
+        <div class="ring-ink/5 rounded-4xl bg-white p-8 shadow-xs ring-1 sm:p-10">
+            <h3 class="text-ink font-serif text-2xl leading-snug font-medium sm:text-3xl">
+                Mettez toutes les chances de votre côté, allez plus loin que mon livre&nbsp;!
+            </h3>
+            <div class="text-ink-soft mt-5 space-y-4 text-base leading-relaxed sm:text-lg">
+                <p>
+                    Mon livre, à lui seul, va vous donner de nombreuses solutions pour aller mieux. Il sera toujours là pour vous accompagner.
+                </p>
+                <p>
+                    Le problème, c'est que même si vous suivez ce guide, vous risquez de vivre des moments de doutes et de rechutes. Vous pourriez alors vous démotiver et abandonner l'idée d'aller mieux.
+                </p>
+                <p>
+                    C'est pourquoi je vous invite à vous procurer le pack coaching + livre. En effet, l'information seule ne suffit pas&nbsp;: il vous faut un encadrement pour vous investir.
+                </p>
+                <p>
+                    En étant atteint du TOC de la phobie d'impulsion, vous savez ce que cela fait de souffrir depuis longtemps. Donc, autant mettre toutes les chances de votre côté pour aller mieux. En optant pour le pack coaching + livre, vous mettrez ainsi toutes les chances de votre côté.
+                </p>
+            </div>
+        </div>
+    </div>
 </x-section>
