@@ -12,10 +12,23 @@ use Illuminate\Database\Eloquent\Factories\Factory;
  */
 class BookOrderFactory extends Factory
 {
+    /**
+     * Les slugs d'offre sont uniques et servent de contrat au tunnel d'achat :
+     * la factory réutilise le produit existant au lieu d'en créer un second,
+     * sans quoi deux commandes ne peuvent pas coexister dans un même test.
+     */
+    private static function offer(string $slug, int $priceCents): int
+    {
+        return Product::query()->firstOrCreate(
+            ['slug' => $slug],
+            Product::factory()->raw(['slug' => $slug, 'price_cents' => $priceCents]),
+        )->id;
+    }
+
     public function definition(): array
     {
         return [
-            'product_id' => Product::factory()->state(['slug' => 'livre', 'price_cents' => 3700]),
+            'product_id' => fn () => self::offer('livre', 3700),
             'customer_first_name' => fake()->firstName(),
             'customer_last_name' => fake()->lastName(),
             /**
@@ -53,7 +66,7 @@ class BookOrderFactory extends Factory
     public function withCoaching(): static
     {
         return $this->state(fn () => [
-            'product_id' => Product::factory()->state(['slug' => 'livre-coaching', 'price_cents' => 7000]),
+            'product_id' => fn () => self::offer('livre-coaching', 7000),
             'amount_cents' => 7000,
         ]);
     }
