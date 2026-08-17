@@ -8,12 +8,16 @@
     $ogDescription = $video->metaDescription(200) ?? $metaDescription;
     $schemaDescription = $video->summary
         ?: $video->seo_description
+        ?: ($video->intro ? strip_tags($video->intro) : null)
         ?: $video->description;
     $chapters = $video->chaptersForSchema();
 @endphp
 
 @section('title', $video->title.' · Vidéo Vivre Pleinement')
 @section('canonical', route('videos.show', $video->slug))
+@if ($video->seo_robots)
+    @section('robots', $video->seo_robots)
+@endif
 @section('description', $metaDescription)
 @section('og_type', 'video.other')
 @section('og_title', $video->title)
@@ -21,8 +25,6 @@
 @section('og_image', $video->thumbnail())
 
 @push('head')
-    <meta name="twitter:card" content="player">
-
     @php
         $videoLd = [
             '@context' => 'https://schema.org',
@@ -39,10 +41,13 @@
                 'interactionType' => ['@type' => 'WatchAction'],
                 'userInteractionCount' => $video->view_count,
             ] : null,
+            'author' => \App\Support\AuthorEntity::person(),
             'publisher' => [
-                '@type' => 'Person',
-                'name' => 'Laura Baechlé',
+                '@type' => 'Organization',
+                '@id' => url('/').'#organization',
+                'name' => 'Vivre Pleinement',
                 'url' => url('/'),
+                'logo' => ['@type' => 'ImageObject', 'url' => asset('images/logo@4x.webp')],
             ],
             'inLanguage' => 'fr-FR',
         ];
@@ -52,18 +57,18 @@
         }
 
         if (! empty($chapters)) {
-            $videoLd['hasPart'] = array_map(fn ($c) => array_filter([
+            $videoLd['hasPart'] = array_map(fn ($chapter) => array_filter([
                 '@type' => 'Clip',
-                'name' => $c['name'],
-                'startOffset' => $c['startOffset'],
-                'endOffset' => $c['endOffset'],
-                'url' => $c['url'],
-            ], fn ($v) => $v !== null), $chapters);
+                'name' => $chapter['name'],
+                'startOffset' => $chapter['startOffset'],
+                'endOffset' => $chapter['endOffset'],
+                'url' => $chapter['url'],
+            ], fn ($value) => $value !== null), $chapters);
         }
 
-        $videoLd = array_filter($videoLd, fn ($v) => $v !== null && $v !== '');
+        $videoLd = array_filter($videoLd, fn ($value) => $value !== null && $value !== '');
     @endphp
-    <script type="application/ld+json">{!! json_encode($videoLd, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!}</script>
+    <script type="application/ld+json">{!! json_encode($videoLd, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG) !!}</script>
 @endpush
 
 @section('body')
@@ -73,7 +78,7 @@
 
     <article class="bg-cream-50">
         <header class="to-cream-50 relative overflow-hidden bg-linear-to-b from-teal-100 via-teal-50/70 pt-32 pb-8 sm:pt-36">
-            <div class="mx-auto max-w-4xl px-4 sm:px-6 lg:px-10">
+            <div class="mx-auto max-w-5xl px-4 sm:px-6 lg:px-10">
                 <x-breadcrumb :items="[
                     ['label' => 'Accueil', 'url' => route('home')],
                     ['label' => 'Vidéos', 'url' => route('videos.index')],
@@ -84,7 +89,6 @@
                     @if ($category)
                         <a href="{{ route('videos.index', ['category' => $category->slug]) }}"
                            class="inline-flex items-center gap-2 rounded-full bg-white/80 px-4 py-1.5 text-xs font-medium text-teal-700 ring-1 ring-teal-200 transition hover:bg-white">
-                            <span class="size-1.5 rounded-full bg-teal-500"></span>
                             {{ $category->name }}
                         </a>
                     @endif
@@ -95,7 +99,7 @@
 
                     <div class="text-ink-muted mt-5 flex flex-wrap items-center gap-x-4 gap-y-2 text-sm">
                         <time datetime="{{ $video->published_at?->toIso8601String() }}">
-                            {{ $video->published_at?->locale('fr')->isoFormat('D MMMM YYYY') }}
+                            {{ $video->published_at?->isoFormat('D MMMM YYYY') }}
                         </time>
                         @if ($duration = $video->durationFormatted())
                             <span aria-hidden="true">·</span>
@@ -116,7 +120,15 @@
             </div>
         </header>
 
-        <div class="mx-auto -mt-2 max-w-5xl px-4 sm:px-6 lg:px-10">
+        @if ($video->intro)
+            <div class="mx-auto max-w-5xl px-4 pt-8 sm:px-6 lg:px-10">
+                <div class="prose prose-ink max-w-none text-lg leading-relaxed">
+                    {!! $video->intro !!}
+                </div>
+            </div>
+        @endif
+
+        <div class="mx-auto mt-8 max-w-5xl px-4 sm:px-6 lg:px-10">
             <x-youtube-embed :video="$video" priority />
 
             <div class="mt-4 flex justify-end">
@@ -129,7 +141,7 @@
         </div>
 
         @if (! empty($chapters))
-            <section class="mx-auto max-w-3xl px-4 pt-12 sm:px-6 lg:px-10" aria-labelledby="chapters-heading">
+            <section class="mx-auto max-w-5xl px-4 pt-12 sm:px-6 lg:px-10" aria-labelledby="chapters-heading">
                 <h2 id="chapters-heading" class="text-ink font-serif text-2xl font-medium">
                     Chapitres
                 </h2>
@@ -154,7 +166,7 @@
         @endif
 
         @if (! empty($video->key_takeaways))
-            <section class="mx-auto max-w-3xl px-4 pt-12 sm:px-6 lg:px-10" aria-labelledby="takeaways-heading">
+            <section class="mx-auto max-w-5xl px-4 pt-12 sm:px-6 lg:px-10" aria-labelledby="takeaways-heading">
                 <h2 id="takeaways-heading" class="text-ink font-serif text-2xl font-medium">
                     À retenir
                 </h2>
@@ -179,22 +191,66 @@
         @endif
 
         @if ($video->transcript)
-            <section class="mx-auto max-w-3xl px-4 pt-12 sm:px-6 lg:px-10" aria-labelledby="transcript-heading">
-                <details class="group ring-ink/5 overflow-hidden rounded-2xl bg-white ring-1 [&_summary::-webkit-details-marker]:hidden">
-                    <summary class="flex cursor-pointer items-center justify-between gap-4 px-5 py-4 sm:px-6">
-                        <h2 id="transcript-heading" class="text-ink font-serif text-2xl font-medium">
-                            Transcription
-                        </h2>
-                        <svg class="text-ink-muted size-5 shrink-0 transition group-open:rotate-180" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="m6 9 6 6 6-6"/>
-                        </svg>
-                    </summary>
-                    <div class="prose prose-ink border-ink/10 max-w-none border-t px-5 py-5 sm:px-6">
+            <section class="mx-auto max-w-5xl px-4 pt-12 sm:px-6 lg:px-10" aria-labelledby="transcript-heading">
+                <h2 id="transcript-heading" class="text-ink font-serif text-2xl font-medium">
+                    Transcription
+                </h2>
+
+                {{-- Aperçu repliable sans JS : la transcription complète reste
+                     toujours dans le DOM (indexée par Google) ; la case à cocher
+                     ne fait que révéler la partie masquée pour le visiteur. --}}
+                <div class="ring-ink/5 relative mt-4 overflow-hidden rounded-2xl bg-white ring-1">
+                    <input type="checkbox" id="transcript-toggle" class="peer sr-only">
+
+                    <div class="prose prose-ink max-h-[22rem] max-w-none overflow-hidden p-5 transition-[max-height] duration-500 peer-checked:max-h-none sm:px-6">
                         {!! $video->transcript !!}
                     </div>
-                </details>
+
+                    {{-- Dégradé de fondu sur l'aperçu, masqué une fois déplié.
+                         Frère direct de la case à cocher pour que peer-checked
+                         s'applique. --}}
+                    <div class="from-white pointer-events-none absolute inset-x-0 bottom-14 h-24 bg-gradient-to-t to-transparent peer-checked:hidden"></div>
+
+                    <div class="border-ink/10 border-t p-4 text-center peer-checked:hidden">
+                        <label for="transcript-toggle"
+                               class="inline-flex cursor-pointer items-center gap-2 text-sm font-medium text-teal-700 transition hover:text-teal-800">
+                            Lire la transcription complète
+                            <svg class="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="m6 9 6 6 6-6"/>
+                            </svg>
+                        </label>
+                    </div>
+                </div>
             </section>
         @endif
+
+        @if ($relatedPost)
+            <section class="mx-auto max-w-5xl px-4 pt-12 sm:px-6 lg:px-10" aria-labelledby="related-post-heading">
+                <h2 id="related-post-heading" class="text-ink font-serif text-2xl font-medium">
+                    À lire aussi
+                </h2>
+                <a href="{{ route('blog.show', $relatedPost->slug) }}"
+                   class="group ring-ink/5 mt-4 flex items-center gap-5 rounded-2xl bg-white p-5 ring-1 transition hover:ring-teal-200">
+                    @if ($cover = $relatedPost->featuredImageUrl('thumb'))
+                        <img src="{{ $cover }}" alt="" loading="lazy" width="96" height="96"
+                             class="size-20 flex-none rounded-2xl object-cover sm:size-24">
+                    @endif
+                    <div class="min-w-0">
+                        <p class="text-xs font-medium tracking-wider text-teal-700 uppercase">Article</p>
+                        <p class="text-ink mt-1 font-serif text-lg leading-snug font-medium transition group-hover:text-teal-700">
+                            {{ $relatedPost->title }}
+                        </p>
+                        <p class="text-ink-soft mt-2 inline-flex items-center gap-1.5 text-sm">
+                            <span class="border-b border-teal-700/30">Lire l'article complet</span> →
+                        </p>
+                    </div>
+                </a>
+            </section>
+        @endif
+
+        <x-health-disclaimer class="mx-auto max-w-5xl px-4 pt-10 sm:px-6 lg:px-10" />
+
+        <x-content-cta :category="$category" class="mx-auto max-w-5xl px-4 pt-10 sm:px-6 lg:px-10" />
 
         <div class="pb-12 sm:pb-16"></div>
     </article>

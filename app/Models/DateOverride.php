@@ -2,7 +2,9 @@
 
 namespace App\Models;
 
+use Database\Factories\DateOverrideFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 #[Fillable([
@@ -13,6 +15,9 @@ use Illuminate\Database\Eloquent\Model;
 ])]
 class DateOverride extends Model
 {
+    /** @use HasFactory<DateOverrideFactory> */
+    use HasFactory;
+
     protected function casts(): array
     {
         return [
@@ -21,7 +26,8 @@ class DateOverride extends Model
     }
 
     /**
-     * Indique si cette exception bloque la journée entière (aucune plage horaire définie).
+     * Indique si cette exception bloque la journée entière (aucune plage
+     * horaire définie).
      */
     public function isFullDay(): bool
     {

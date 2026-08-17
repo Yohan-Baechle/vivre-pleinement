@@ -11,13 +11,13 @@
     ];
 @endphp
 
-<x-section bg="bg-cream-50" eyebrow="Imaginez" title="Et si, dans quelques semaines…">
+<x-section bg="bg-cream-50" title="Et si, dans quelques semaines…">
     <div class="mx-auto max-w-3xl">
         <ul class="grid grid-cols-1 gap-x-8 gap-y-4 sm:grid-cols-2">
             @foreach ($benefits as $benefit)
                 <li class="text-ink flex items-start gap-3 text-base sm:text-lg">
                     <span class="mt-1 flex size-5 shrink-0 items-center justify-center rounded-full bg-teal-700 text-white">
-                        <svg class="size-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <svg class="size-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                             <path d="M5 13l4 4L19 7"/>
                         </svg>
                     </span>

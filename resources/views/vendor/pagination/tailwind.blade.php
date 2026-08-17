@@ -3,7 +3,7 @@
 
         <p class="text-sm text-ink-soft">
             @if ($paginator->firstItem())
-                Articles <span class="font-medium text-ink">{{ $paginator->firstItem() }}</span>
+                <span class="font-medium text-ink">{{ $paginator->firstItem() }}</span>
                 à <span class="font-medium text-ink">{{ $paginator->lastItem() }}</span>
                 sur <span class="font-medium text-ink">{{ $paginator->total() }}</span>
             @else

@@ -1,13 +1,15 @@
 <?php
 
+use App\Filament\Admin\Resources\Posts\Pages\ListPosts;
 use App\Models\Appointment;
 use App\Models\Comment;
 use App\Models\Post;
 use App\Models\User;
 use App\Models\Video;
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use Filament\Actions\Testing\TestAction;
+use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
 
-uses(RefreshDatabase::class);
+uses(LazilyRefreshDatabase::class);
 
 beforeEach(fn () => $this->actingAs(User::factory()->create()));
 
@@ -50,4 +52,15 @@ it('renders the appointments list and edit page', function () {
 
     $this->get(route('filament.admin.resources.appointments.index'))->assertOk();
     $this->get(route('filament.admin.resources.appointments.edit', $appointment))->assertOk();
+});
+
+it('links the post preview action to the blog route', function () {
+    Filament\Facades\Filament::setCurrentPanel(Filament\Facades\Filament::getPanel('admin'));
+    $post = Post::factory()->create();
+
+    Livewire\Livewire::test(ListPosts::class)
+        ->assertActionHasUrl(
+            TestAction::make('view_on_site')->table($post),
+            route('blog.show', $post),
+        );
 });

@@ -2,11 +2,11 @@
     <div class="grid grid-cols-1 items-center gap-12 lg:grid-cols-5 lg:gap-16">
         <div class="lg:col-span-2">
             <div class="relative mx-auto w-full max-w-sm">
-                <div class="rounded-5xl via-cream-100 to-rose-soft/40 absolute inset-0 -z-10 bg-linear-to-br from-teal-100/60 blur-2xl"></div>
-                <div class="bg-cream-100 relative aspect-square overflow-hidden rounded-4xl shadow-2xl ring-8 ring-white">
+                <div class="via-cream-100 to-rose-soft/40 absolute inset-0 -z-10 rounded-full bg-linear-to-br from-teal-100/60 blur-2xl"></div>
+                <div class="bg-cream-100 relative aspect-square overflow-hidden rounded-full shadow-2xl ring-8 ring-white">
                     <img
-                        src="{{ asset('images/laura-portrait-800.webp') }}"
-                        srcset="{{ asset('images/laura-portrait-400.webp') }} 400w, {{ asset('images/laura-portrait-800.webp') }} 800w, {{ asset('images/laura-portrait-1200.webp') }} 1200w"
+                        src="{{ asset('images/laura-livre-800.webp') }}"
+                        srcset="{{ asset('images/laura-livre-400.webp') }} 400w, {{ asset('images/laura-livre-800.webp') }} 800w, {{ asset('images/laura-livre-1200.webp') }} 1200w"
                         sizes="(min-width: 1024px) 384px, 100vw"
                         alt="Laura Baechlé, auteure du livre"
                         width="800"
@@ -20,7 +20,6 @@
 
         <div class="lg:col-span-3">
             <p class="inline-flex items-center gap-2 rounded-full bg-teal-50 px-4 py-1.5 text-xs font-medium text-teal-700 ring-1 ring-teal-200">
-                <span class="size-1.5 rounded-full bg-teal-500"></span>
                 L'auteure
             </p>
             <h2 class="text-ink mt-5 font-serif text-3xl font-medium tracking-tight sm:text-4xl lg:text-5xl">
@@ -28,7 +27,7 @@
             </h2>
             <div class="text-ink-soft mt-6 space-y-4 text-base leading-relaxed">
                 <p>
-                    Je m'appelle Laura Baechlé. Je ne suis pas médecin, je ne suis pas psychologue. Je suis quelqu'un qui a vécu la phobie d'impulsion et les pensées intrusives de l'intérieur, pendant plus de dix ans &mdash; et qui en est sortie.
+                    Je m'appelle Laura Baechlé. Je ne suis pas médecin, je ne suis pas psychologue. Je suis quelqu'un qui a vécu la phobie d'impulsion et les pensées intrusives de l'intérieur, pendant plus de dix ans, et qui en est sortie.
                 </p>
                 <p>
                     J'ai testé sur moi-même tout ce qui existe : TCC, médicaments, hypnose, méditation, sophrologie, EMDR, naturopathie, travail somatique, écriture, ennéagramme&hellip; J'ai gardé ce qui marchait vraiment et écarté le reste.

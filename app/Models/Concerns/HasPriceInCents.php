@@ -7,7 +7,8 @@ use Illuminate\Database\Eloquent\Casts\Attribute;
 trait HasPriceInCents
 {
     /**
-     * Expose la colonne entière `price_cents` comme un `price` décimal en unité principale.
+     * Expose la colonne entière `price_cents` comme un `price` décimal en unité
+     * principale.
      */
     protected function price(): Attribute
     {

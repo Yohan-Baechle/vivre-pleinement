@@ -30,6 +30,13 @@ class Comment extends Model
 
     use SoftDeletes;
 
+    /**
+     * @var array<string, mixed>
+     */
+    protected $attributes = [
+        'status' => 'approved',
+    ];
+
     protected function casts(): array
     {
         return [
@@ -39,7 +46,8 @@ class Comment extends Model
     }
 
     /**
-     * Indique si le commentaire émane de l'auteure du site (par adresse e-mail).
+     * Indique si le commentaire émane de l'auteure du site (par adresse
+     * e-mail).
      */
     public function isFromAuthor(): bool
     {

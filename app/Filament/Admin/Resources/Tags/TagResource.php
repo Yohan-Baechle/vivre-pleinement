@@ -27,9 +27,16 @@ class TagResource extends Resource
 
     protected static ?string $pluralModelLabel = 'Étiquettes';
 
-    protected static string|UnitEnum|null $navigationGroup = 'Taxonomies';
+    protected static string|UnitEnum|null $navigationGroup = 'Contenu';
 
-    protected static ?int $navigationSort = 4;
+    protected static ?int $navigationSort = 50;
+
+    protected static ?string $recordTitleAttribute = 'name';
+
+    public static function getGloballySearchableAttributes(): array
+    {
+        return ['name', 'slug'];
+    }
 
     public static function form(Schema $schema): Schema
     {

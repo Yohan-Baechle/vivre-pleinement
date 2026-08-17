@@ -9,7 +9,7 @@
 @section('body')
     @include('layouts.partials.navbar')
 
-    <main class="relative flex min-h-screen items-center justify-center overflow-hidden pt-24 sm:pt-28">
+    <main class="relative flex min-h-[100dvh] items-center justify-center overflow-hidden pt-24 sm:pt-28">
         {{-- Ciel dégradé, comme le hero de l'accueil --}}
         <div class="to-cream-50 pointer-events-none absolute inset-0 -z-10 bg-linear-to-b from-teal-50 via-sky-50" aria-hidden="true"></div>
 
@@ -20,7 +20,7 @@
             <div class="relative mx-auto max-w-2xl text-center">
                 {{-- Numéro d'erreur géant en filigrane, derrière le contenu --}}
                 <span
-                    class="text-teal-600/20 pointer-events-none absolute -top-12 left-1/2 -z-10 -translate-x-1/2 text-[12rem] leading-none font-bold tracking-tighter select-none sm:-top-20 sm:text-[20rem]"
+                    class="pointer-events-none absolute -top-12 left-1/2 -z-10 -translate-x-1/2 text-[12rem] leading-none font-bold tracking-tighter text-teal-600/20 select-none sm:-top-20 sm:text-[20rem]"
                     aria-hidden="true"
                 >
                     {{ $code ?? '' }}
@@ -50,7 +50,7 @@
                         <li><a href="{{ route('blog.index') }}" class="transition hover:text-teal-700">Le blog</a></li>
                         <li><a href="{{ route('videos.index') }}" class="transition hover:text-teal-700">Les vidéos</a></li>
                         <li><a href="{{ route('book.show') }}" class="transition hover:text-teal-700">Mon livre</a></li>
-                        <li><a href="{{ route('booking.index') }}" class="transition hover:text-teal-700">Prendre RDV</a></li>
+                        <li><a href="{{ route('booking.index') }}" class="transition hover:text-teal-700">Prendre rendez-vous</a></li>
                     </ul>
                 </div>
             </div>

@@ -1,7 +1,7 @@
 <x-mail::message>
 # Nouveau commentaire à valider
 
-**Auteur :** {{ $authorName }}
+**Auteur :** {{ $authorName }}\
 **Article :** {{ $postTitle }}
 
 ---

@@ -12,7 +12,8 @@ use Illuminate\Console\Command;
 class FixPostSeo extends Command
 {
     /**
-     * Domaines d'affiliation dont les liens doivent être marqués sponsorisés (exigence Google).
+     * Domaines d'affiliation dont les liens doivent être marqués sponsorisés
+     * (exigence Google).
      *
      * @var array<string>
      */
@@ -58,9 +59,10 @@ class FixPostSeo extends Command
     }
 
     /**
-     * Supprime les bannières yoga orphelines (image seule, sans lien d'affiliation
-     * autour) : ce sont d'anciennes pubs sans cible, donc sans valeur. Les bannières
-     * correctement liées sont protégées par un marqueur le temps de la suppression.
+     * Supprime les bannières yoga orphelines (image seule, sans lien
+     * d'affiliation autour) : ce sont d'anciennes pubs sans cible, donc sans
+     * valeur. Les bannières correctement liées sont protégées par un marqueur
+     * le temps de la suppression.
      */
     private static function removeOrphanYogaBanners(string $content): string
     {
@@ -77,7 +79,8 @@ class FixPostSeo extends Command
 
     /**
      * Remplace les anciens smileys Divi (images vers l'ancien WordPress) par
-     * l'emoji Unicode correspondant, sinon ils seront cassés une fois le WP éteint.
+     * l'emoji Unicode correspondant, sinon ils seront cassés une fois le WP
+     * éteint.
      */
     private static function replaceBrokenSmileys(string $content): string
     {
@@ -85,7 +88,8 @@ class FixPostSeo extends Command
     }
 
     /**
-     * Le <h1> du contenu fait doublon avec le titre de page : on le rétrograde en <h2>.
+     * Le <h1> du contenu fait doublon avec le titre de page : on le rétrograde
+     * en <h2>.
      */
     private static function demoteContentH1(string $content): string
     {
@@ -107,7 +111,8 @@ class FixPostSeo extends Command
     }
 
     /**
-     * Marque les liens d'affiliation comme sponsorisés et ouverts dans un nouvel onglet.
+     * Marque les liens d'affiliation comme sponsorisés et ouverts dans un
+     * nouvel onglet.
      */
     private static function markAffiliateLinks(string $content): string
     {

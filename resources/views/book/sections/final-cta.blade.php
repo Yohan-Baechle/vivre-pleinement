@@ -11,7 +11,6 @@
 
     <div class="relative mx-auto max-w-3xl px-4 text-center sm:px-6 lg:px-10">
         <p class="inline-flex items-center gap-2 rounded-full bg-white/80 px-4 py-1.5 text-xs font-medium text-teal-700 ring-1 ring-teal-200">
-            <span class="size-1.5 rounded-full bg-teal-500"></span>
             Dernière chose
         </p>
 
@@ -28,19 +27,42 @@
             </p>
         </div>
 
-        <div class="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row">
-            <a href="{{ route('book.checkout', 'livre') }}" class="group inline-flex w-full items-center justify-center gap-2 rounded-full bg-teal-700 px-7 py-3.5 text-sm font-medium text-white shadow-lg shadow-teal-700/20 transition hover:bg-teal-800 sm:w-auto sm:text-base">
-                Obtenir le livre &mdash; 37&nbsp;€
-                <span class="transition group-hover:translate-x-0.5" aria-hidden="true">→</span>
-            </a>
-            <a href="{{ route('book.checkout', 'livre-coaching') }}" class="group hover:bg-cream-50 inline-flex w-full items-center justify-center gap-2 rounded-full bg-white px-7 py-3.5 text-sm font-medium text-teal-800 shadow-xs ring-1 ring-teal-200 transition sm:w-auto sm:text-base">
-                Livre + coaching &mdash; 70&nbsp;€
-                <span class="transition group-hover:translate-x-0.5" aria-hidden="true">→</span>
-            </a>
-        </div>
+        {{-- Bloc de conversion, pas de comparaison : tant que rien n'est en
+             vente, il porte une seule invitation plutôt que deux formules
+             grisées. --}}
+        @if ($offerAvailable('livre') || $offerAvailable('livre-coaching'))
+            <div class="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row">
+                <div class="w-full sm:w-auto">
+                    <x-book-offer-cta
+                        slug="livre"
+                        :available="$offerAvailable('livre')"
+                        :label="'Obtenir le livre · '.$offerPrice($offerSolo)"
+                        class="inline-flex w-full items-center justify-center gap-2 rounded-full bg-teal-700 px-7 py-3.5 text-sm font-medium text-white shadow-lg shadow-teal-700/20 transition hover:bg-teal-800 sm:w-auto sm:text-base" />
+                </div>
+                <div class="w-full sm:w-auto">
+                    <x-book-offer-cta
+                        slug="livre-coaching"
+                        :available="$offerAvailable('livre-coaching')"
+                        :label="'Livre + coaching · '.$offerPrice($offerCoaching)"
+                        class="hover:bg-cream-50 inline-flex w-full items-center justify-center gap-2 rounded-full bg-white px-7 py-3.5 text-sm font-medium text-teal-800 shadow-xs ring-1 ring-teal-200 transition sm:w-auto sm:text-base" />
+                </div>
+            </div>
 
-        <p class="text-ink-muted mt-8 text-xs sm:text-sm">
-            Téléchargement immédiat · Paiement sécurisé · Garantie 30 jours
-        </p>
+            <p class="text-ink-muted mt-8 text-xs sm:text-sm">
+                Téléchargement immédiat, paiement sécurisé, garantie 30 jours
+            </p>
+        @else
+            <div class="mt-10">
+                <a href="{{ route('contact') }}"
+                   class="group inline-flex items-center justify-center gap-2 rounded-full bg-teal-700 px-7 py-3.5 text-sm font-medium text-white shadow-lg shadow-teal-700/20 transition hover:bg-teal-800 sm:text-base">
+                    Être prévenu de la sortie
+                    <span class="transition group-hover:translate-x-0.5" aria-hidden="true">→</span>
+                </a>
+            </div>
+
+            <p class="text-ink-muted mt-8 text-xs sm:text-sm">
+                Sortie imminente. Aucun engagement, je vous écris une seule fois.
+            </p>
+        @endif
     </div>
 </section>

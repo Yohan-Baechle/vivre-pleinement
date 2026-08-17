@@ -18,6 +18,11 @@ class UserFactory extends Factory
     protected static ?string $password;
 
     /**
+     * La double authentification est configurée par défaut : le panneau
+     * d'administration l'exige, un compte qui ne l'a pas est redirigé vers sa
+     * page de configuration. Le défaut reflète donc l'état normal en
+     * production.
+     *
      * @return array<string, mixed>
      */
     public function definition(): array
@@ -28,6 +33,7 @@ class UserFactory extends Factory
             'email_verified_at' => now(),
             'password' => static::$password ??= Hash::make('password'),
             'remember_token' => Str::random(10),
+            'app_authentication_secret' => Str::random(32),
         ];
     }
 
@@ -38,6 +44,16 @@ class UserFactory extends Factory
     {
         return $this->state(fn (array $attributes) => [
             'email_verified_at' => null,
+        ]);
+    }
+
+    /**
+     * Compte qui n'a pas encore activé la double authentification.
+     */
+    public function withoutMultiFactorAuthentication(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'app_authentication_secret' => null,
         ]);
     }
 }

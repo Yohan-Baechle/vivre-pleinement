@@ -2,6 +2,8 @@
 
 @php
     use Carbon\CarbonImmutable;
+    use Illuminate\Support\Number;
+
     $start = CarbonImmutable::parse($appointment->starts_at);
 @endphp
 
@@ -28,14 +30,14 @@
                 <p class="text-xs font-medium tracking-wider text-teal-700 uppercase">Votre rendez-vous</p>
                 <div class="mt-3 flex items-baseline justify-between gap-4">
                     <p class="text-ink font-serif text-xl font-medium">{{ $appointment->service->name }}</p>
-                    <p class="text-ink font-serif text-xl font-medium">{{ number_format($appointment->price_cents / 100, 2, ',', ' ') }} €</p>
+                    <p class="text-ink font-serif text-xl font-medium">{{ Number::currency($appointment->price_cents / 100, in: 'EUR', locale: 'fr') }}</p>
                 </div>
                 <p class="text-ink-soft mt-1 text-sm">
-                    {{ $start->locale('fr')->isoFormat('dddd D MMMM YYYY à H\hi') }} · {{ $appointment->service->duration_minutes }} min · en visioconférence
+                    {{ $start->isoFormat('dddd D MMMM YYYY à H\hi') }} · {{ $appointment->service->duration_minutes }} min, en visioconférence
                 </p>
             </div>
 
-            @php $amountLabel = number_format($appointment->price_cents / 100, 2, ',', ' ').' €'; @endphp
+            @php $amountLabel = Number::currency($appointment->price_cents / 100, in: 'EUR', locale: 'fr'); @endphp
 
             {{-- Paiement --}}
             <form id="payment-form"
@@ -43,7 +45,7 @@
                   data-stripe-key="{{ $stripeKey }}"
                   data-client-secret="{{ $clientSecret }}"
                   data-amount-label="{{ $amountLabel }}"
-                  data-return-url="{{ route('booking.confirmation', $appointment->reference) }}">
+                  data-return-url="{{ route('booking.confirmation', $appointment->token) }}">
 
                 <div id="payment-skeleton" class="space-y-4" aria-hidden="true">
                     <div class="bg-cream-100 h-11 animate-pulse rounded-2xl"></div>
@@ -70,15 +72,15 @@
                 {{-- Réassurance --}}
                 <ul class="text-ink-muted mt-5 flex flex-wrap items-center justify-center gap-x-5 gap-y-2 text-xs">
                     <li class="inline-flex items-center gap-1.5">
-                        <svg class="size-3.5 text-teal-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>
+                        <svg class="size-3.5 text-teal-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>
                         Paiement sécurisé via Stripe
                     </li>
                     <li class="inline-flex items-center gap-1.5">
-                        <svg class="size-3.5 text-teal-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="m5 13 4 4L19 7"/></svg>
+                        <svg class="size-3.5 text-teal-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="m5 13 4 4L19 7"/></svg>
                         Annulation gratuite
                     </li>
                     <li class="inline-flex items-center gap-1.5">
-                        <svg class="size-3.5 text-teal-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="m5 13 4 4L19 7"/></svg>
+                        <svg class="size-3.5 text-teal-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="m5 13 4 4L19 7"/></svg>
                         Lien visio envoyé après paiement
                     </li>
                 </ul>

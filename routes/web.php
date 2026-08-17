@@ -4,22 +4,77 @@ use App\Http\Controllers\BookController;
 use App\Http\Controllers\BookingController;
 use App\Http\Controllers\CommentController;
 use App\Http\Controllers\ContactController;
+use App\Http\Controllers\CourseCheckoutController;
+use App\Http\Controllers\CourseController;
+use App\Http\Controllers\HomeController;
+use App\Http\Controllers\NewsletterController;
 use App\Http\Controllers\PostController;
 use App\Http\Controllers\SitemapController;
+use App\Http\Controllers\Student\AccountController as StudentAccountController;
+use App\Http\Controllers\Student\Auth\AuthenticatedSessionController;
+use App\Http\Controllers\Student\Auth\EmailVerificationNotificationController;
+use App\Http\Controllers\Student\Auth\EmailVerificationPromptController;
+use App\Http\Controllers\Student\Auth\NewPasswordController;
+use App\Http\Controllers\Student\Auth\PasswordResetLinkController;
+use App\Http\Controllers\Student\Auth\RegisteredStudentController;
+use App\Http\Controllers\Student\Auth\VerifyEmailController;
+use App\Http\Controllers\Student\CourseController as StudentCourseController;
+use App\Http\Controllers\Student\DashboardController as StudentDashboardController;
 use App\Http\Controllers\VideoController;
+use App\Http\Controllers\YoutubeOAuthController;
 use Illuminate\Support\Facades\Route;
 
-Route::view('/', 'home.index')->name('home');
+Route::get('/', [HomeController::class, 'index'])->name('home');
 
+/**
+ * Installation OAuth YouTube (sous-titres) — accessible uniquement si les
+ * identifiants OAuth sont configurés ; sert une seule fois à l'autorisation.
+ *
+ * Réservé à un administrateur connecté : le flux consomme le client_id du site
+ * et sa page de retour affiche un refresh token en clair.
+ */
+Route::middleware('auth:web')->group(function () {
+    Route::get('/youtube/oauth/redirect', [YoutubeOAuthController::class, 'redirect'])->name('youtube.oauth.redirect');
+    Route::get('/youtube/oauth/callback', [YoutubeOAuthController::class, 'callback'])->name('youtube.oauth.callback');
+});
+
+Route::view('/a-propos', 'about.index')->name('about');
+Route::view('/therapie-act', 'therapie-act.index')->name('therapie-act');
+
+/**
+ * Les formulaires publics portent un plafond de requêtes au niveau de la route,
+ * en plus de la limitation applicative de SubmissionThrottle.
+ *
+ * SubmissionThrottle est consulté dans le contrôleur, donc après la validation
+ * : la règle `email:rfc,dns` déclenchait une résolution DNS sur un domaine
+ * choisi par l'appelant à chaque requête, sans plafond. Le middleware
+ * `throttle` s'exécute avant la FormRequest et referme ce coin ; réglé plus
+ * haut que SubmissionThrottle, il laisse le message d'erreur soigné arriver en
+ * premier pour un visiteur normal et ne coupe que les envois massifs.
+ */
 Route::get('/contact', [ContactController::class, 'show'])->name('contact');
-Route::post('/contact', [ContactController::class, 'send'])->name('contact.send');
+Route::post('/contact', [ContactController::class, 'send'])
+    ->middleware('throttle:20,10')
+    ->name('contact.send');
 Route::get('/contact/merci', [ContactController::class, 'thanks'])->name('contact.thanks');
 
+Route::post('/newsletter', [NewsletterController::class, 'store'])
+    ->middleware('throttle:20,10')
+    ->name('newsletter.store');
+Route::view('/inscription-confirmee', 'newsletter.confirmed')->name('newsletter.confirmed');
+
+/**
+ * Les pages liées à un rendez-vous sont toutes adressées par `token` (48
+ * caractères aléatoires) et jamais par `reference` : cette dernière est une
+ * référence lisible affichée au client, trop courte pour servir de clé d'accès
+ * à des données personnelles (nom, e-mail, téléphone, notes) sur une URL
+ * publique.
+ */
 Route::prefix('reservation')->name('booking.')->controller(BookingController::class)->group(function () {
     Route::get('/', 'index')->name('index');
-    Route::get('confirmation/{appointment:reference}', 'confirmation')->name('confirmation');
-    Route::get('confirmation/{appointment:reference}/agenda.ics', 'ics')->name('ics');
-    Route::get('paiement-annule/{appointment:reference}', 'paymentCancelled')->name('paymentCancelled');
+    Route::get('confirmation/{appointment:token}', 'confirmation')->name('confirmation');
+    Route::get('confirmation/{appointment:token}/agenda.ics', 'ics')->name('ics');
+    Route::get('paiement-annule/{appointment:token}', 'paymentCancelled')->name('paymentCancelled');
     Route::get('payer/{appointment:token}', 'pay')->name('pay');
     Route::get('gerer/{appointment:token}', 'manage')->name('manage');
     Route::post('gerer/{appointment:token}/annuler', 'cancel')->name('cancel');
@@ -27,10 +82,108 @@ Route::prefix('reservation')->name('booking.')->controller(BookingController::cl
     Route::get('{service:slug}', 'show')->name('show');
 });
 
-Route::get('/livre', [BookController::class, 'show'])->name('book.show');
-Route::get('/livre/commande/{offer}', [BookController::class, 'checkout'])
-    ->name('book.checkout')
-    ->where('offer', 'livre|livre-coaching');
+/*
+|--------------------------------------------------------------------------
+| Espace formation (e-learning)
+|--------------------------------------------------------------------------
+*/
+
+/**
+ * Authentification élève (guard « student »).
+ */
+Route::middleware('guest:student')->group(function () {
+    Route::get('/espace-formation/inscription', [RegisteredStudentController::class, 'create'])->name('student.register');
+    Route::post('/espace-formation/inscription', [RegisteredStudentController::class, 'store'])
+        ->middleware('throttle:6,1')
+        ->name('student.register.store');
+    Route::get('/espace-formation/connexion', [AuthenticatedSessionController::class, 'create'])->name('student.login');
+    Route::post('/espace-formation/connexion', [AuthenticatedSessionController::class, 'store'])
+        ->middleware('throttle:20,1')
+        ->name('student.login.store');
+    Route::get('/espace-formation/mot-de-passe-oublie', [PasswordResetLinkController::class, 'create'])->name('student.password.request');
+    Route::post('/espace-formation/mot-de-passe-oublie', [PasswordResetLinkController::class, 'store'])
+        ->middleware('throttle:6,1')
+        ->name('student.password.email');
+    Route::get('/espace-formation/reinitialiser/{token}', [NewPasswordController::class, 'create'])->name('student.password.reset');
+    Route::post('/espace-formation/reinitialiser', [NewPasswordController::class, 'store'])
+        ->middleware('throttle:6,1')
+        ->name('student.password.update');
+});
+
+Route::post('/espace-formation/deconnexion', [AuthenticatedSessionController::class, 'destroy'])
+    ->middleware('auth:student')
+    ->name('student.logout');
+
+/**
+ * Catalogue et page de vente (public).
+ */
+Route::get('/formations', [CourseController::class, 'index'])->name('courses.index');
+
+/**
+ * Achat (élève connecté) — déclaré avant la route catch-all {course:slug}.
+ */
+Route::middleware('auth:student')->group(function () {
+    Route::post('/formations/{course:slug}/acheter', [CourseCheckoutController::class, 'start'])->name('courses.checkout.start');
+    Route::get('/formations/{course:slug}/paiement', [CourseCheckoutController::class, 'pay'])->name('courses.checkout.pay');
+    Route::get('/formations/{course:slug}/merci', [CourseCheckoutController::class, 'success'])->name('courses.checkout.success');
+});
+
+Route::get('/formations/{course:slug}', [CourseController::class, 'show'])->name('courses.show');
+
+/**
+ * Espace élève (formations achetées).
+ */
+Route::prefix('espace-formation')->name('student.')->middleware('auth:student')->group(function () {
+    /**
+     * Vérification d'e-mail (accessible aux comptes non encore vérifiés).
+     */
+    Route::get('/verification-email', EmailVerificationPromptController::class)->name('verification.notice');
+    Route::get('/verification-email/{id}/{hash}', VerifyEmailController::class)
+        ->middleware(['signed', 'throttle:6,1'])
+        ->name('verification.verify');
+    Route::post('/verification-email/renvoyer', [EmailVerificationNotificationController::class, 'store'])
+        ->middleware('throttle:6,1')
+        ->name('verification.send');
+
+    /**
+     * Gestion du compte (accessible sans vérification d'e-mail).
+     */
+    Route::get('/compte', [StudentAccountController::class, 'edit'])->name('account.edit');
+    Route::patch('/compte/profil', [StudentAccountController::class, 'updateProfile'])->name('account.profile');
+    Route::put('/compte/mot-de-passe', [StudentAccountController::class, 'updatePassword'])->name('account.password');
+    Route::delete('/compte', [StudentDashboardController::class, 'destroy'])->name('account.destroy');
+
+    /**
+     * Contenu réservé aux comptes vérifiés.
+     */
+    Route::middleware('verified:student.verification.notice')->group(function () {
+        Route::get('/', [StudentDashboardController::class, 'index'])->name('dashboard');
+        Route::get('/{course:slug}', [StudentCourseController::class, 'show'])->middleware('enrolled')->name('course');
+        Route::get('/{course:slug}/lecons/{lesson:slug}', [StudentCourseController::class, 'lesson'])
+            ->middleware('enrolled')
+            ->scopeBindings()
+            ->name('lesson');
+    });
+});
+
+/*
+ * Le tunnel d'achat du livre s'appuie sur le token de la commande, jamais sur
+ * son identifiant : ces URL sont publiques et donnent accès au fichier vendu
+ * comme aux coordonnées de l'acheteur.
+ */
+Route::controller(BookController::class)->group(function () {
+    Route::get('/livre', 'show')->name('book.show');
+    Route::get('/livre/commande/{offer}', 'checkout')
+        ->name('book.checkout')
+        ->where('offer', 'livre|livre-coaching');
+    Route::post('/livre/commande/{offer}', 'start')
+        ->name('book.start')
+        ->where('offer', 'livre|livre-coaching');
+    Route::get('/livre/paiement/{order:token}', 'pay')->name('book.pay');
+    Route::get('/livre/merci/{order:token}', 'success')->name('book.success');
+    Route::get('/livre/telecharger/{order:token}', 'download')->name('book.download');
+    Route::get('/livre/coaching/{order:token}', 'coaching')->name('book.coaching');
+});
 
 Route::prefix('videos')->name('videos.')->controller(VideoController::class)->group(function () {
     Route::get('/', 'index')->name('index');
@@ -48,13 +201,20 @@ Route::prefix('blog')->name('blog.')->group(function () {
         Route::get('rss', 'rss')->name('rss');
         Route::get('categorie/{slug}', 'byCategory')->name('category');
         Route::get('tag/{slug}', 'byTag')->name('tag');
-        Route::get('{slug}', 'show')->name('show')->where('slug', '(?!rss|categorie|tag$).+');
+        Route::get('apercu/{post}', 'preview')->middleware('signed')->name('preview');
+        Route::get('{slug}', 'show')->name('show')->where('slug', '(?!(?:rss|categorie|tag|apercu)$).+');
     });
 
     Route::post('{slug}/commentaire', [CommentController::class, 'store'])
+        ->middleware('throttle:20,10')
         ->name('comments.store')
-        ->where('slug', '(?!rss|categorie|tag$).+');
+        ->where('slug', '(?!(?:rss|categorie|tag)$).+');
 });
 
 Route::get('/sitemap.xml', [SitemapController::class, 'index'])->name('sitemap');
 Route::get('/sitemap-videos.xml', [SitemapController::class, 'videos'])->name('sitemap.videos');
+Route::get('/llms.txt', [SitemapController::class, 'llms'])->name('llms');
+
+if ($indexNowKey = config('services.indexnow.key')) {
+    Route::get("/{$indexNowKey}.txt", fn () => response($indexNowKey)->header('Content-Type', 'text/plain'));
+}

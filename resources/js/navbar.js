@@ -66,4 +66,29 @@
             }
         });
     }
+
+    /**
+     * Menu utilisateur (<details name="student-menu">) : se ferme après un clic
+     * sur un lien du menu, au clic en dehors du menu, et à la touche Échap.
+     */
+    const studentMenu = header.querySelector('details[name="student-menu"]');
+    if (studentMenu) {
+        const closeStudentMenu = () => { studentMenu.open = false; };
+
+        studentMenu.querySelectorAll('a, button').forEach((link) => {
+            link.addEventListener('click', closeStudentMenu);
+        });
+
+        document.addEventListener('click', (e) => {
+            if (studentMenu.open && !studentMenu.contains(e.target)) {
+                closeStudentMenu();
+            }
+        });
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && studentMenu.open) {
+                closeStudentMenu();
+            }
+        });
+    }
 })();

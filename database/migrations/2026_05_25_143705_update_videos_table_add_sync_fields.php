@@ -2,7 +2,6 @@
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
@@ -14,10 +13,6 @@ return new class extends Migration
             $table->boolean('is_missing')->default(false)->after('synced_at');
             $table->json('sync_locked_fields')->nullable()->after('is_missing');
         });
-
-        if (Schema::hasColumn('videos', 'published_at')) {
-            DB::statement('UPDATE videos SET youtube_published_at = published_at WHERE youtube_published_at IS NULL');
-        }
 
         Schema::table('category_video', function (Blueprint $table) {
             $table->timestamps();

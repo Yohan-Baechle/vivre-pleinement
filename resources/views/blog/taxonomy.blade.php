@@ -16,11 +16,7 @@
 @section('canonical', $taxonomyUrl)
 @section('description', $description)
 
-@push('head')
-    @if ($posts->currentPage() > 1)
-        <meta name="robots" content="noindex, follow">
-    @endif
-@endpush
+@section('robots', $posts->currentPage() > 1 ? 'noindex, follow' : 'index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1')
 
 @section('body')
     @include('layouts.partials.navbar')
@@ -37,7 +33,6 @@
 
             <div class="mt-6 max-w-3xl">
                 <p class="inline-flex items-center gap-2 rounded-full bg-white/80 px-4 py-1.5 text-xs font-medium text-teal-700 ring-1 ring-teal-200">
-                    <span class="size-1.5 rounded-full bg-teal-500"></span>
                     {{ $isCategory ? 'Catégorie' : 'Tag' }}
                 </p>
                 <h1 class="text-ink mt-5 font-serif text-4xl font-medium tracking-tight sm:text-5xl">

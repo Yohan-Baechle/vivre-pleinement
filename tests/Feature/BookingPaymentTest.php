@@ -10,14 +10,16 @@ use App\Models\Appointment;
 use App\Models\AppointmentService;
 use App\Models\Availability;
 use App\Services\BookingPaymentService;
+use App\Services\StripePaymentIntents;
 use Carbon\CarbonImmutable;
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
 use Illuminate\Support\Facades\Mail;
 use Laravel\Cashier\Events\WebhookReceived;
 use Livewire\Livewire;
+use Stripe\Exception\ApiConnectionException;
 use Stripe\PaymentIntent;
 
-uses(RefreshDatabase::class);
+uses(LazilyRefreshDatabase::class);
 
 function payableService(int $priceCents = 7000): AppointmentService
 {
@@ -27,13 +29,7 @@ function payableService(int $priceCents = 7000): AppointmentService
         'min_notice_hours' => 12,
     ]);
     foreach (range(0, 6) as $dow) {
-        Availability::create([
-            'appointment_service_id' => null,
-            'day_of_week' => $dow,
-            'start_time' => '08:00',
-            'end_time' => '20:00',
-            'is_active' => true,
-        ]);
+        Availability::factory()->dayOfWeek($dow)->create();
     }
 
     return $service;
@@ -50,14 +46,13 @@ it('creates an unpaid pending appointment and redirects to the on-site payment p
         ->set('email', 'camille@gmail.com')
         ->set('consent', true)
         ->call('book')
-        ->assertRedirect(); // vers booking.pay (aucun appel Stripe ici)
+        ->assertRedirect();
 
     $appointment = Appointment::query()->firstOrFail();
     expect($appointment->status)->toBe(AppointmentStatus::Pending)
         ->and($appointment->payment_status)->toBe(PaymentStatus::Unpaid)
         ->and($appointment->token)->not->toBeNull();
 
-    // Pas d'email avant paiement.
     Mail::assertNothingQueued();
 });
 
@@ -74,7 +69,6 @@ it('renders the payment page with a client secret for a payable appointment', fu
         'ends_at' => $start->addMinutes(60),
     ]);
 
-    // On mocke createPaymentIntent pour ne pas appeler Stripe.
     $intent = PaymentIntent::constructFrom(['id' => 'pi_test', 'client_secret' => 'pi_test_secret_123']);
     $this->mock(BookingPaymentService::class)
         ->shouldReceive('createPaymentIntent')
@@ -87,6 +81,25 @@ it('renders the payment page with a client secret for a payable appointment', fu
         ->assertSee('payment-element', escape: false);
 });
 
+it('returns a 503 instead of a raw 500 when Stripe is unavailable', function () {
+    $service = payableService();
+    $appointment = Appointment::factory()->create([
+        'appointment_service_id' => $service->id,
+        'token' => Appointment::generateToken(),
+        'status' => AppointmentStatus::Pending,
+        'payment_status' => PaymentStatus::Unpaid,
+        'price_cents' => 7000,
+    ]);
+
+    $this->mock(BookingPaymentService::class)
+        ->shouldReceive('createPaymentIntent')
+        ->once()
+        ->andThrow(new ApiConnectionException('Stripe est indisponible'));
+
+    $this->get(route('booking.pay', $appointment->token))
+        ->assertStatus(503);
+});
+
 it('redirects the payment page to confirmation if already paid', function () {
     $service = payableService();
     $appointment = Appointment::factory()->create([
@@ -97,7 +110,7 @@ it('redirects the payment page to confirmation if already paid', function () {
     ]);
 
     $this->get(route('booking.pay', $appointment->token))
-        ->assertRedirect(route('booking.confirmation', $appointment->reference));
+        ->assertRedirect(route('booking.confirmation', $appointment->token));
 });
 
 it('keeps the direct flow for a free service', function () {
@@ -165,7 +178,6 @@ it('refunds and apologises if the slot was taken during payment', function () {
     $service = payableService();
     $start = CarbonImmutable::now()->addDays(3)->setTime(10, 0);
 
-    // Le RDV en cours de paiement.
     $appointment = Appointment::factory()->create([
         'appointment_service_id' => $service->id,
         'status' => AppointmentStatus::Pending,
@@ -174,7 +186,6 @@ it('refunds and apologises if the slot was taken during payment', function () {
         'ends_at' => $start->addMinutes(60),
     ]);
 
-    // Un autre RDV confirmé a pris le même créneau entre-temps.
     Appointment::factory()->create([
         'appointment_service_id' => $service->id,
         'status' => AppointmentStatus::Confirmed,
@@ -182,7 +193,6 @@ it('refunds and apologises if the slot was taken during payment', function () {
         'ends_at' => $start->addMinutes(60),
     ]);
 
-    // paymentIntentId null : on n'appelle pas l'API Stripe, mais le flux d'excuse s'exécute.
     app(BookingPaymentService::class)->fulfill($appointment, null);
 
     expect($appointment->fresh()->status)->toBe(AppointmentStatus::Cancelled);
@@ -196,5 +206,23 @@ it('is idempotent on duplicate paid webhooks', function () {
 
     app(BookingPaymentService::class)->fulfill($appointment);
 
+    Mail::assertNothingQueued();
+});
+
+it('rembourse automatiquement un second paiement arrivé sur un rendez-vous déjà payé', function () {
+    Mail::fake();
+    $appointment = Appointment::factory()->create([
+        'payment_status' => PaymentStatus::Paid,
+        'status' => AppointmentStatus::Confirmed,
+        'stripe_payment_intent_id' => 'pi_premier',
+    ]);
+
+    $this->mock(StripePaymentIntents::class, function ($mock) {
+        $mock->shouldReceive('refundQuietly')->once()->with('pi_second')->andReturnTrue();
+    });
+
+    app(BookingPaymentService::class)->fulfill($appointment, 'pi_second');
+
+    expect($appointment->fresh()->stripe_payment_intent_id)->toBe('pi_premier');
     Mail::assertNothingQueued();
 });

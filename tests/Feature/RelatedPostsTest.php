@@ -4,10 +4,10 @@ use App\Models\Category;
 use App\Models\Post;
 use App\Models\Tag;
 use App\Support\InternalLinking;
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
 use Illuminate\Support\Facades\Cache;
 
-uses(RefreshDatabase::class);
+uses(LazilyRefreshDatabase::class);
 
 it('suggests posts from the same category cluster', function () {
     $phobies = Category::factory()->create();
@@ -37,10 +37,10 @@ it('ranks same-cluster posts by shared tags first', function () {
 
     $proche = Post::factory()->create(['slug' => 'proche', 'published_at' => now()->subYear()]);
     $proche->categories()->attach($cluster);
-    $proche->tags()->attach($tag); // partage un tag
+    $proche->tags()->attach($tag);
 
     $loin = Post::factory()->create(['slug' => 'loin', 'published_at' => now()]);
-    $loin->categories()->attach($cluster); // plus récent mais aucun tag partagé
+    $loin->categories()->attach($cluster);
 
     $similar = $this->get('/blog/reference')->assertOk()->viewData('similar');
 
@@ -129,7 +129,7 @@ it('reports a healthy mesh when everything is wired', function () {
 });
 
 it('fails the audit when a published post is orphaned', function () {
-    Post::factory()->create(['slug' => 'orphelin']); // aucune catégorie
+    Post::factory()->create(['slug' => 'orphelin']);
 
     $this->artisan('seo:maillage')
         ->expectsOutputToContain('orphelin')

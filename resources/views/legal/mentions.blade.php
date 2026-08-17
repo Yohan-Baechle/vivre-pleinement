@@ -18,6 +18,7 @@
         <li><strong>{{ $editor['name'] }}</strong>, exerçant en tant que {{ strtolower($editor['type']) }}</li>
         <li>Adresse : {{ $editor['address'] }}</li>
         <li>SIRET : {{ $editor['siret'] }}</li>
+        <li>{{ $editor['vat'] }}</li>
         <li>Email : <a href="mailto:{{ $editor['email'] }}">{{ $editor['email'] }}</a></li>
         @if ($editor['phone'])
             <li>Téléphone : <a href="tel:{{ str_replace(' ', '', $editor['phone']) }}">{{ $editor['phone'] }}</a></li>
@@ -39,7 +40,7 @@
     <h2>4. Conception & maintenance</h2>
     <p>
         Site conçu et maintenu par <strong>{{ $webmaster['name'] }}</strong>
-        – <a href="mailto:{{ $webmaster['email'] }}">{{ $webmaster['email'] }}</a>.
+        - <a href="mailto:{{ $webmaster['email'] }}">{{ $webmaster['email'] }}</a>.
     </p>
 
     <h2>5. Propriété intellectuelle</h2>

@@ -5,6 +5,9 @@
  * « copié » (coche + tooltip) pendant 2 s avant de revenir à l'icône de copie.
  * Le retour visuel est piloté par l'attribut `data-copied` (false/true), sur
  * lequel s'appuient les utilitaires Tailwind du markup.
+ *
+ * Un repli par textarea + execCommand couvre les contextes sans Clipboard API
+ * (http, anciens navigateurs).
  */
 (() => {
     const RESET_DELAY = 2000;
@@ -27,7 +30,6 @@
         try {
             await navigator.clipboard.writeText(url);
         } catch {
-            // Repli pour les contextes sans Clipboard API (http, anciens navigateurs).
             const field = document.createElement('textarea');
             field.value = url;
             field.setAttribute('readonly', '');

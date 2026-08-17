@@ -1,15 +1,20 @@
+@php
+    /**
+     * Le prix vient du catalogue partagé avec la page du livre. Il n'est
+     * affiché que si l'offre est réellement achetable : annoncer un montant
+     * pour un produit indisponible enverrait le visiteur sur une impasse.
+     */
+    $bookPriceLabel = ($bookOffer?->isDeliverable() ?? false)
+        ? ' · '.rtrim(rtrim(number_format($bookOffer->price, 2, ',', "\u{202f}"), '0'), ',').' €'
+        : '';
+@endphp
+
 <section class="relative overflow-hidden bg-white py-20 sm:py-24 lg:py-32">
     <div class="site-container">
         <div class="group relative overflow-hidden rounded-4xl bg-linear-to-br from-teal-700 to-teal-800 shadow-2xl shadow-teal-700/20">
-            <div class="pointer-events-none absolute inset-0 -z-0 overflow-hidden opacity-50">
-                <div class="cloud-r cloud-d-160 absolute top-8 -left-20">
-                    <div class="cloud-sway cloud-s-15 text-white/20">
-                        <svg class="size-32" viewBox="0 0 256 256" fill="currentColor" aria-hidden="true">
-                            <path d="M160.06,40A88.1,88.1,0,0,0,81.29,88.67h0A87.48,87.48,0,0,0,72,127.73,8.18,8.18,0,0,1,64.57,136,8,8,0,0,1,56,128a103.66,103.66,0,0,1,5.34-32.92,4,4,0,0,0-4.75-5.18A64.09,64.09,0,0,0,8,152c0,35.19,29.75,64,65,64H160a88.09,88.09,0,0,0,87.93-91.48C246.11,77.54,207.07,40,160.06,40Z"/>
-                        </svg>
-                    </div>
-                </div>
-            </div>
+            {{-- Halo sous la couverture : la section a déjà son sujet visuel,
+                 elle manquait de profondeur, pas d'un motif de plus. --}}
+            <div class="pointer-events-none absolute inset-0 [background:radial-gradient(60%_70%_at_28%_45%,rgba(255,255,255,0.16),transparent_70%)]" aria-hidden="true"></div>
 
             <div class="relative grid grid-cols-1 items-center gap-10 px-8 py-12 sm:px-10 sm:py-16 lg:grid-cols-5 lg:gap-12 lg:px-14 lg:py-20">
                 <div class="flex justify-center lg:col-span-2">
@@ -38,8 +43,7 @@
 
                 <div class="text-center lg:col-span-3 lg:text-left">
                     <p class="inline-flex items-center gap-2 rounded-full bg-white/15 px-4 py-1.5 text-xs font-medium text-white ring-1 ring-white/20 backdrop-blur-sm">
-                        <span class="bg-rose-soft size-1.5 rounded-full"></span>
-                        Le livre · 77 pages · PDF
+                        Le livre, 77 pages en PDF
                     </p>
                     <h2 class="mt-5 font-serif text-3xl leading-tight font-medium tracking-tight text-white sm:text-4xl lg:text-5xl">
                         Pensées intrusives, TOC, phobie d'impulsion&nbsp;?
@@ -50,11 +54,10 @@
 
                     <div class="mt-8 flex flex-wrap items-center justify-center gap-3 sm:gap-4 lg:justify-start">
                         <a href="{{ route('book.show') }}" class="group hover:bg-cream-50 inline-flex items-center gap-2 rounded-full bg-white px-7 py-3.5 text-sm font-medium text-teal-800 shadow-lg transition sm:text-base">
-                            Découvrir le livre &mdash; 37&nbsp;€
-                            <span class="transition group-hover:translate-x-0.5" aria-hidden="true">→</span>
+                            Découvrir le livre{{ $bookPriceLabel }}
                         </a>
                         <span class="inline-flex items-center gap-1.5 text-xs text-teal-100 sm:text-sm">
-                            <svg class="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 12 2 2 4-4"/><path d="M21 12c0 4.97-4.03 9-9 9s-9-4.03-9-9 4.03-9 9-9 9 4.03 9 9z"/></svg>
+                            <svg class="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 12 2 2 4-4"/><path d="M21 12c0 4.97-4.03 9-9 9s-9-4.03-9-9 4.03-9 9-9 9 4.03 9 9z"/></svg>
                             Garantie 30 jours satisfait ou remboursé
                         </span>
                     </div>

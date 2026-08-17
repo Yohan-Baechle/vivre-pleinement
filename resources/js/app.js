@@ -2,8 +2,13 @@ import './cookies.js';
 import './youtube-facade.js';
 import './navbar.js';
 import './parallax.js';
+import './reveal.js';
+import './seed-wind.js';
 import './share.js';
 import './booking-cta.js';
+import './newsletter.js';
+import './blog-drawer.js';
+import './account-delete-dialog.js';
 
 /**
  * Anime l'ouverture/fermeture des <details.accordion-item> via grid-template-rows.

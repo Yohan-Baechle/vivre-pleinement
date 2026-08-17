@@ -53,6 +53,7 @@ class SiteContact
             'Facebook' => Settings::get('social_facebook'),
             'YouTube' => Settings::get('social_youtube'),
             'TikTok' => Settings::get('social_tiktok'),
+            'LinkedIn' => Settings::get('social_linkedin'),
         ];
 
         return array_filter($links, fn ($url) => filled($url));

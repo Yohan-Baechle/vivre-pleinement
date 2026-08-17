@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Str;
@@ -20,11 +21,14 @@ use Illuminate\Support\Str;
     'slug',
     'description',
     'seo_description',
+    'seo_robots',
     'summary',
+    'intro',
     'key_takeaways',
     'transcript',
     'chapters',
     'thumbnail_url',
+    'related_post_id',
     'youtube_published_at',
     'duration_seconds',
     'view_count',
@@ -46,8 +50,19 @@ class Video extends Model
     /** Champs qui peuvent être verrouillés contre la sync */
     public const LOCKABLE_FIELDS = ['title', 'description', 'thumbnail_url', 'slug'];
 
-    /** Seuil au-dessus duquel une vidéo n'est plus considérée comme un Short YouTube. */
+    /**
+     * Seuil au-dessus duquel une vidéo n'est plus considérée comme un Short
+     * YouTube.
+     */
     public const SHORT_DURATION_THRESHOLD = 60;
+
+    /**
+     * @var array<string, mixed>
+     */
+    protected $attributes = [
+        'status' => 'published',
+        'is_missing' => false,
+    ];
 
     protected function casts(): array
     {
@@ -74,13 +89,34 @@ class Video extends Model
         return $this->belongsToMany(Category::class);
     }
 
-    public function scopePublished(Builder $query): Builder
+    /**
+     * Article de blog explicitement associé à cette vidéo (même sujet),
+     * détecté depuis le lien présent dans la description YouTube.
+     *
+     * @return BelongsTo<Post, $this>
+     */
+    public function relatedPost(): BelongsTo
     {
-        return $query
+        return $this->belongsTo(Post::class, 'related_post_id');
+    }
+
+    public function scopePublished(Builder $query): void
+    {
+        $query
             ->where('status', VideoStatus::Published)
             ->where('is_missing', false)
             ->whereNotNull('published_at')
             ->where('duration_seconds', '>', self::SHORT_DURATION_THRESHOLD);
+    }
+
+    /**
+     * Vidéos éligibles aux sitemaps : publiées et sans directive noindex.
+     */
+    public function scopeIndexable(Builder $query): void
+    {
+        $query->published()->where(function (Builder $query): void {
+            $query->whereNull('seo_robots')->orWhere('seo_robots', 'not like', '%noindex%');
+        });
     }
 
     public function isShort(): bool
@@ -119,14 +155,34 @@ class Video extends Model
     public function hasEditorialContent(): bool
     {
         return filled($this->summary)
+            || filled($this->intro)
             || filled($this->transcript)
             || ! empty($this->key_takeaways);
     }
 
     /**
+     * La vidéo a-t-elle son contenu éditorial principal (intro + résumé) ?
+     * Sert d'indicateur « page indexable » dans l'admin.
+     */
+    public function isEnriched(): bool
+    {
+        return filled($this->intro) && filled($this->summary);
+    }
+
+    public function hasTranscript(): bool
+    {
+        return filled($this->transcript);
+    }
+
+    /**
      * Chapitres formatés pour schema.org Clip[].
      *
-     * @return list<array{name: string, startOffset: int, endOffset: int|null, url: string}>
+     * @return list<array{
+     *     name: string,
+     *     startOffset: int,
+     *     endOffset: int|null,
+     *     url: string,
+     * }>
      */
     public function chaptersForSchema(): array
     {

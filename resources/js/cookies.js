@@ -113,6 +113,14 @@
         }
     });
 
+    document.addEventListener('click', (e) => {
+        const trigger = e.target.closest('[data-cookie-open]');
+        if (!trigger) return;
+
+        e.preventDefault();
+        window.dispatchEvent(new CustomEvent('cookies:reopen'));
+    });
+
     window.addEventListener('cookies:reopen', () => {
         const stored = load();
         if (stored) {

@@ -44,7 +44,7 @@
                 <span class="text-ink-muted" aria-hidden="true">·</span>
             @endif
             <time datetime="{{ $post->published_at?->toIso8601String() }}" class="text-ink-muted">
-                {{ $post->published_at?->locale('fr')->isoFormat('D MMM YYYY') }}
+                {{ $post->published_at?->isoFormat('D MMM YYYY') }}
             </time>
             <span class="text-ink-muted" aria-hidden="true">·</span>
             <span class="text-ink-muted">{{ $post->readingTimeMinutes() }} min de lecture</span>

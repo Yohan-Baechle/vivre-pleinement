@@ -19,7 +19,7 @@
                 <p class="text-ink-soft mt-5 text-base sm:text-lg">{{ $intro }}</p>
             @endif
             <p class="text-ink-muted mt-4 text-xs">
-                Dernière mise à jour : {{ \Carbon\Carbon::parse(config('legal.last_updated'))->locale('fr')->isoFormat('D MMMM YYYY') }}
+                Dernière mise à jour : {{ \Carbon\Carbon::parse(config('legal.last_updated'))->isoFormat('D MMMM YYYY') }}
             </p>
         </div>
     </header>

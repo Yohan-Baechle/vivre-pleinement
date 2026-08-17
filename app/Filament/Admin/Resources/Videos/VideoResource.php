@@ -14,6 +14,7 @@ use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Illuminate\Support\Facades\Cache;
 use UnitEnum;
 
 class VideoResource extends Resource
@@ -28,7 +29,7 @@ class VideoResource extends Resource
 
     protected static ?string $pluralModelLabel = 'Vidéos';
 
-    protected static ?int $navigationSort = 2;
+    protected static ?int $navigationSort = 20;
 
     protected static string|UnitEnum|null $navigationGroup = 'Contenu';
 
@@ -36,7 +37,11 @@ class VideoResource extends Resource
 
     public static function getNavigationBadge(): ?string
     {
-        $missing = Video::query()->where('is_missing', true)->count();
+        $missing = Cache::remember(
+            'filament.badge.videos.missing',
+            now()->addMinute(),
+            fn () => Video::query()->where('is_missing', true)->count(),
+        );
 
         return $missing > 0 ? (string) $missing : null;
     }
@@ -60,7 +65,7 @@ class VideoResource extends Resource
     {
         return [
             'Statut' => $record->is_missing
-                ? '⚠️ Manquante sur YouTube'
+                ? 'Manquante sur YouTube'
                 : $record->status->getLabel(),
             'Publiée le' => $record->published_at?->format('d/m/Y') ?? '–',
         ];

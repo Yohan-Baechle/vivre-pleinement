@@ -2,9 +2,9 @@
 
 use App\Models\Category;
 use App\Models\Video;
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
 
-uses(RefreshDatabase::class);
+uses(LazilyRefreshDatabase::class);
 
 it('renders a long video page with its related videos', function () {
     $category = Category::factory()->create();
@@ -12,7 +12,6 @@ it('renders a long video page with its related videos', function () {
     $video = Video::factory()->create(['slug' => 'video-principale', 'duration_seconds' => 600]);
     $video->categories()->attach($category);
 
-    // Vidéos similaires : leur relation categories est accédée par la video-card.
     Video::factory()->count(3)->create(['duration_seconds' => 600])
         ->each(fn ($v) => $v->categories()->attach($category));
 
@@ -35,4 +34,22 @@ it('lists only long videos on the index, never shorts', function () {
         ->assertOk()
         ->assertSee('longue')
         ->assertDontSee('courte');
+});
+
+it('exposes correct SEO metadata on the video page', function () {
+    Video::factory()->create([
+        'slug' => 'video-seo',
+        'duration_seconds' => 600,
+        'view_count' => 1234,
+    ]);
+
+    $html = $this->get('/videos/video-seo')->assertOk()->getContent();
+
+    expect($html)
+        ->toContain('"publisher":{"@type":"Organization","@id":"'.url('/').'#organization","name":"Vivre Pleinement"')
+        ->toContain('"author":{"@type":"Person","@id":"'.url('/').'#laura","name":"Laura Baechlé"')
+        ->toContain('"logo":{"@type":"ImageObject"');
+
+    expect(substr_count($html, 'name="twitter:card"'))->toBe(1);
+    expect($html)->toContain('max-video-preview:-1');
 });

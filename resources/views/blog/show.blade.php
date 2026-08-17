@@ -2,6 +2,7 @@
 
 @php
     use App\Support\AffiliateLinks;
+    use App\Support\AuthorEntity;
     use App\Support\Toc;
 
     $toc = Toc::build($post->content);
@@ -17,11 +18,11 @@
 @section('canonical', route('blog.show', $post->slug))
 @section('description', $post->seo_description ?: $post->excerpt)
 
-@push('head')
-    @if ($post->seo_robots)
-        <meta name="robots" content="{{ $post->seo_robots }}">
-    @endif
+@if ($post->seo_robots)
+    @section('robots', $post->seo_robots)
+@endif
 
+@push('head')
     <meta property="og:type" content="article">
     <meta property="og:title" content="{{ $post->seo_title ?: $post->title }}">
     <meta property="og:description" content="{{ $post->seo_description ?: $post->excerpt }}">
@@ -30,11 +31,11 @@
         <meta property="og:image" content="{{ $cover }}">
     @endif
     <meta property="article:published_time" content="{{ $post->published_at?->toIso8601String() }}">
-    @foreach ($post->categories as $c)
-        <meta property="article:section" content="{{ $c->name }}">
+    @foreach ($post->categories as $category)
+        <meta property="article:section" content="{{ $category->name }}">
     @endforeach
-    @foreach ($post->tags as $t)
-        <meta property="article:tag" content="{{ $t->name }}">
+    @foreach ($post->tags as $tag)
+        <meta property="article:tag" content="{{ $tag->name }}">
     @endforeach
 
     @php
@@ -46,15 +47,39 @@
             'image' => $cover ? [$cover] : [],
             'datePublished' => $post->published_at?->toIso8601String(),
             'dateModified' => $post->lastModifiedAt()?->toIso8601String(),
-            'author' => ['@type' => 'Person', 'name' => 'Laura Baechlé', 'url' => url('/')],
-            'publisher' => ['@type' => 'Person', 'name' => 'Laura Baechlé', 'url' => url('/')],
+            'author' => AuthorEntity::person(),
+            'publisher' => [
+                '@type' => 'Organization',
+                '@id' => url('/').'#organization',
+                'name' => 'Vivre Pleinement',
+                'url' => url('/'),
+                'logo' => ['@type' => 'ImageObject', 'url' => asset('images/logo@4x.webp')],
+            ],
             'mainEntityOfPage' => ['@type' => 'WebPage', '@id' => route('blog.show', $post->slug)],
             'articleSection' => $post->categories->pluck('name')->all(),
             'keywords' => $post->tags->pluck('name')->all(),
             'inLanguage' => 'fr-FR',
         ];
     @endphp
-    <script type="application/ld+json">{!! json_encode($articleLd, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!}</script>
+    <script type="application/ld+json">{!! json_encode($articleLd, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG) !!}</script>
+
+    @if (! empty($post->faq))
+        @php
+            $faqLd = [
+                '@context' => 'https://schema.org',
+                '@type' => 'FAQPage',
+                'mainEntity' => collect($post->faq)->map(fn ($item) => [
+                    '@type' => 'Question',
+                    'name' => $item['question'],
+                    'acceptedAnswer' => [
+                        '@type' => 'Answer',
+                        'text' => strip_tags(html_entity_decode($item['answer'], ENT_QUOTES | ENT_HTML5)),
+                    ],
+                ])->all(),
+            ];
+        @endphp
+        <script type="application/ld+json">{!! json_encode($faqLd, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG) !!}</script>
+    @endif
 @endpush
 
 @section('body')
@@ -75,7 +100,6 @@
                     @if ($category)
                         <a href="{{ route('blog.category', $category->slug) }}"
                            class="inline-flex items-center gap-2 rounded-full bg-white/80 px-4 py-1.5 text-xs font-medium text-teal-700 ring-1 ring-teal-200 transition hover:bg-white">
-                            <span class="size-1.5 rounded-full bg-teal-500"></span>
                             {{ $category->name }}
                         </a>
                     @endif
@@ -97,7 +121,7 @@
                         </div>
                         <span aria-hidden="true">·</span>
                         <time datetime="{{ $post->published_at?->toIso8601String() }}">
-                            {{ $post->published_at?->locale('fr')->isoFormat('D MMMM YYYY') }}
+                            {{ $post->published_at?->isoFormat('D MMMM YYYY') }}
                         </time>
                         <span aria-hidden="true">·</span>
                         <span>{{ $post->readingTimeMinutes() }} min de lecture</span>
@@ -125,7 +149,7 @@
                 <details class="ring-ink/5 group mb-10 rounded-3xl bg-white p-5 shadow-xs ring-1 lg:hidden">
                     <summary class="text-ink flex cursor-pointer list-none items-center justify-between font-medium">
                         <span class="text-ink-muted text-xs font-medium tracking-wider uppercase">Sommaire</span>
-                        <svg class="text-ink-muted size-5 transition group-open:rotate-180" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                        <svg class="text-ink-muted size-5 transition group-open:rotate-180" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
                             <path stroke-linecap="round" stroke-linejoin="round" d="m6 9 6 6 6-6"/>
                         </svg>
                     </summary>
@@ -197,7 +221,7 @@
                     <button type="button" data-copy-url="{{ $shareUrl }}" data-copied="false" aria-label="Copier le lien"
                             class="group ring-ink/5 text-ink-soft relative flex size-9 items-center justify-center rounded-full bg-white ring-1 transition hover:bg-teal-700 hover:text-white data-[copied=true]:bg-teal-700 data-[copied=true]:text-white">
                         {{-- Icône copie (état par défaut) --}}
-                        <svg class="size-4 transition group-data-[copied=true]:hidden" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                        <svg class="size-4 transition group-data-[copied=true]:hidden" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
                             <rect x="9" y="9" width="13" height="13" rx="2"/>
                             <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
                         </svg>
@@ -206,20 +230,59 @@
                             <path stroke-linecap="round" stroke-linejoin="round" d="M20 6 9 17l-5-5"/>
                         </svg>
                         {{-- Tooltip --}}
-                        <span class="bg-ink pointer-events-none absolute -top-9 left-1/2 -translate-x-1/2 scale-95 rounded-lg px-2.5 py-1 text-xs font-medium whitespace-nowrap text-white opacity-0 transition group-data-[copied=true]:scale-100 group-data-[copied=true]:opacity-100" role="status" aria-live="polite">
+                        <span class="bg-ink pointer-events-none absolute -top-9 left-1/2 -translate-x-1/2 scale-95 rounded-2xl px-2.5 py-1 text-xs font-medium whitespace-nowrap text-white opacity-0 transition group-data-[copied=true]:scale-100 group-data-[copied=true]:opacity-100" role="status" aria-live="polite">
                             Copié&nbsp;!
                         </span>
                     </button>
                 </div>
             </div>
+
+            @if (! empty($post->faq))
+                <section class="mt-14" aria-labelledby="article-faq-heading">
+                    <p class="text-xs font-medium tracking-wider text-teal-700 uppercase">Questions fréquentes</p>
+                    <h2 id="article-faq-heading" class="text-ink mt-2 font-serif text-2xl font-medium tracking-tight sm:text-3xl">
+                        Vos questions sur le sujet
+                    </h2>
+                    <div class="mt-6 space-y-4">
+                        @foreach ($post->faq as $item)
+                            <x-accordion-item :question="$item['question']" :open="$loop->first">
+                                {!! $item['answer'] !!}
+                            </x-accordion-item>
+                        @endforeach
+                    </div>
+                </section>
+            @endif
+
+            <x-author-card class="mt-14" />
+
+            <x-health-disclaimer class="mt-6" />
+
+            <x-content-cta :category="$category" class="mt-12" />
         </div>
     </article>
 
     @php
         $commentsOpen = $post->commentsAreOpen();
         $rootCount = $post->comments->count();
-        $totalCount = $rootCount + $post->comments->sum(fn ($c) => $c->replies->count());
+        $totalCount = $rootCount + $post->comments->sum(fn ($comment) => $comment->replies->count());
     @endphp
+
+    @if ($relatedVideo)
+        <section class="bg-white py-12 sm:py-16">
+            <div class="site-container max-w-3xl">
+                <p class="text-xs font-medium tracking-wider text-teal-700 uppercase">À regarder</p>
+                <h2 class="text-ink mt-2 font-serif text-2xl font-medium tracking-tight sm:text-3xl">
+                    La vidéo sur ce sujet
+                </h2>
+                <a href="{{ route('videos.show', $relatedVideo->slug) }}" class="mt-6 block">
+                    <x-youtube-embed :video="$relatedVideo" class="pointer-events-none" />
+                    <p class="text-ink-soft mt-4 inline-flex items-center gap-2 text-sm font-medium transition group-hover:text-teal-700">
+                        <span class="border-b border-teal-700/30">Voir la vidéo et son résumé</span> →
+                    </p>
+                </a>
+            </div>
+        </section>
+    @endif
 
     @if ($pillar)
         <section class="bg-cream-50 py-12 sm:py-16">
@@ -227,7 +290,7 @@
                 <a href="{{ route('blog.show', $pillar->slug) }}" class="group block py-6">
                     <p class="text-ink-muted text-sm">Vous avez aimé cet article&nbsp;?</p>
                     <div class="mt-4 flex items-start gap-5 sm:gap-8">
-                        <svg class="mt-1 size-10 shrink-0 text-teal-700/70 transition group-hover:-translate-y-1 group-hover:translate-x-1 group-hover:text-teal-700 sm:size-14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
+                        <svg class="mt-1 size-10 shrink-0 text-teal-700/70 transition group-hover:translate-x-1 group-hover:-translate-y-1 group-hover:text-teal-700 sm:size-14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M7 17 17 7M9 7h8v8"/>
                         </svg>
                         <div class="min-w-0">
@@ -246,7 +309,6 @@
                 <div class="flex items-end justify-between gap-6">
                     <div>
                         <p class="inline-flex items-center gap-2 rounded-full bg-teal-50 px-4 py-1.5 text-xs font-medium text-teal-700 ring-1 ring-teal-200">
-                            <span class="size-1.5 rounded-full bg-teal-500"></span>
                             À lire aussi
                         </p>
                         <h2 class="text-ink mt-4 font-serif text-2xl font-medium tracking-tight sm:text-3xl">
