@@ -2,10 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\VideoIndexFormRequest;
 use App\Models\Category;
 use App\Models\Video;
+use App\Support\VideoArticleMatcher;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Http\Request;
 use Illuminate\View\View;
 
 class VideoController extends Controller
@@ -14,35 +15,32 @@ class VideoController extends Controller
 
     private const RELATED_LIMIT = 4;
 
-    public function index(Request $request): View
+    /**
+     * Page liste des vidéos. Le listing interactif (recherche, filtres,
+     * pagination) est géré par le composant Livewire VideoSearch ; le
+     * contrôleur ne fournit que les métadonnées SEO (titre, catégories) et
+     * $topVideos pour le JSON-LD ItemList de la page canonique uniquement.
+     */
+    public function index(VideoIndexFormRequest $request): View
     {
-        $validated = $request->validate([
-            'category' => 'nullable|string|max:120',
-        ]);
-
-        $query = Video::query()
-            ->published()
-            ->with('categories');
-
-        if ($category = $validated['category'] ?? null) {
-            $query->whereHas('categories', fn (Builder $q) => $q->where('slug', $category));
-        }
-
-        $videos = $query
-            ->orderByDesc('published_at')
-            ->paginate(self::PER_PAGE)
-            ->withQueryString();
+        $validated = $request->validated();
 
         $categories = Category::query()
             ->whereHas('videos', fn (Builder $q) => $q->published())
-            ->withCount(['videos' => fn ($q) => $q->published()])
             ->orderBy('name')
             ->get();
 
+        $topVideos = Video::query()
+            ->published()
+            ->orderByDesc('published_at')
+            ->limit(self::PER_PAGE)
+            ->get(['id', 'slug', 'title']);
+
         return view('videos.index', [
-            'videos' => $videos,
             'categories' => $categories,
+            'topVideos' => $topVideos,
             'activeCategory' => $validated['category'] ?? null,
+            'activeSearch' => $validated['q'] ?? null,
         ]);
     }
 
@@ -50,7 +48,7 @@ class VideoController extends Controller
     {
         $video = Video::query()
             ->published()
-            ->with('categories')
+            ->with(['categories', 'relatedPost' => fn ($query) => $query->published()->with('media')])
             ->where('slug', $slug)
             ->firstOrFail();
 
@@ -67,11 +65,12 @@ class VideoController extends Controller
             )
             ->orderByDesc('published_at')
             ->limit(self::RELATED_LIMIT)
-            ->get();
+            ->get(['id', 'slug', 'title', 'youtube_id', 'thumbnail_url', 'duration_seconds', 'published_at']);
 
         return view('videos.show', [
             'video' => $video,
             'related' => $related,
+            'relatedPost' => VideoArticleMatcher::postForVideo($video),
         ]);
     }
 }

@@ -12,6 +12,7 @@ use Filament\Actions\EditAction;
 use Filament\Actions\ForceDeleteBulkAction;
 use Filament\Actions\RestoreBulkAction;
 use Filament\Notifications\Notification;
+use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Columns\TextColumn;
@@ -28,12 +29,19 @@ class VideosTable
     public static function configure(Table $table): Table
     {
         return $table
+            ->persistFiltersInSession()
+            ->persistSortInSession()
+            ->emptyStateIcon(Heroicon::OutlinedPlayCircle)
+            ->emptyStateHeading('Aucune vidéo synchronisée')
+            ->emptyStateDescription('Lancez « Synchroniser depuis YouTube » '
+                .'pour importer les vidéos de la chaîne.')
             ->columns([
                 ImageColumn::make('thumbnail_url')
-                    ->label('Miniature')
+                    ->label('')
                     ->getStateUsing(fn (Video $record) => $record->thumbnail())
-                    ->extraImgAttributes(['class' => 'rounded-md'])
-                    ->size(64),
+                    ->extraImgAttributes(['class' => 'rounded-lg object-cover'])
+                    ->imageWidth(120)
+                    ->imageHeight(68),
 
                 TextColumn::make('title')
                     ->label('Titre')
@@ -41,15 +49,20 @@ class VideosTable
                     ->sortable()
                     ->limit(60)
                     ->wrap()
-                    ->description(fn (Video $record) => 'YouTube ID : '.$record->youtube_id),
+                    ->tooltip(fn (Video $record) => 'Identifiant YouTube : '.$record->youtube_id),
 
                 TextColumn::make('status')
                     ->label('Statut')
                     ->badge()
                     ->formatStateUsing(fn (Video $record) => match (true) {
-                        $record->is_missing => '⚠️ Manquante',
+                        $record->is_missing => 'Manquante',
                         $record->isShort() => 'Short',
                         default => $record->status->getLabel(),
+                    })
+                    ->icon(fn (Video $record) => match (true) {
+                        $record->is_missing => Heroicon::ExclamationTriangle,
+                        $record->isShort() => Heroicon::Bolt,
+                        default => null,
                     })
                     ->color(fn (Video $record) => match (true) {
                         $record->is_missing => 'danger',
@@ -68,6 +81,32 @@ class VideosTable
                     ->formatStateUsing(fn (Video $record) => $record->durationFormatted() ?? '–')
                     ->sortable()
                     ->toggleable(),
+
+                TextColumn::make('editorial')
+                    ->label('Éditorial')
+                    ->badge()
+                    ->getStateUsing(fn (Video $record) => match (true) {
+                        $record->isEnriched() && $record->hasTranscript() => 'Complet',
+                        $record->isEnriched() => 'Sans transcription',
+                        $record->hasTranscript() => 'À enrichir',
+                        default => 'À traiter',
+                    })
+                    ->icon(fn (Video $record) => match (true) {
+                        $record->isEnriched() && $record->hasTranscript() => Heroicon::CheckCircle,
+                        $record->isEnriched() || $record->hasTranscript() => Heroicon::PencilSquare,
+                        default => Heroicon::ExclamationTriangle,
+                    })
+                    ->color(fn (Video $record) => match (true) {
+                        $record->isEnriched() && $record->hasTranscript() => 'success',
+                        $record->isEnriched() || $record->hasTranscript() => 'warning',
+                        default => 'danger',
+                    })
+                    ->tooltip(fn (Video $record) => sprintf(
+                        'Intro : %s · Résumé : %s · Transcription : %s',
+                        filled($record->intro) ? 'oui' : 'non',
+                        filled($record->summary) ? 'oui' : 'non',
+                        $record->hasTranscript() ? 'oui' : 'non',
+                    )),
 
                 TextColumn::make('categories.name')
                     ->label('Catégories')
@@ -111,13 +150,36 @@ class VideosTable
                     ->query(fn (Builder $query) => $query->where('duration_seconds', '<=', Video::SHORT_DURATION_THRESHOLD))
                     ->toggle(),
 
+                SelectFilter::make('editorial')
+                    ->label('État éditorial')
+                    ->options([
+                        'to_enrich' => 'À enrichir (sans intro/résumé)',
+                        'no_transcript' => 'Sans transcription',
+                        'complete' => 'Complètes',
+                    ])
+                    ->query(function (Builder $query, array $data): Builder {
+                        return match ($data['value'] ?? null) {
+                            'to_enrich' => $query->where(fn (Builder $q) => $q
+                                ->whereNull('intro')->orWhere('intro', '')
+                                ->orWhereNull('summary')->orWhere('summary', '')),
+                            'no_transcript' => $query->where(fn (Builder $q) => $q
+                                ->whereNull('transcript')->orWhere('transcript', '')),
+                            'complete' => $query
+                                ->whereNotNull('intro')->where('intro', '!=', '')
+                                ->whereNotNull('summary')->where('summary', '!=', '')
+                                ->whereNotNull('transcript')->where('transcript', '!=', ''),
+                            default => $query,
+                        };
+                    }),
+
                 SelectFilter::make('categories')
                     ->label('Catégorie')
                     ->relationship('categories', 'name')
                     ->preload(),
 
                 TrashedFilter::make(),
-            ], layout: FiltersLayout::AboveContent)
+            ], layout: FiltersLayout::Dropdown)
+            ->filtersTriggerAction(fn ($action) => $action->label('Filtres')->icon('heroicon-m-funnel'))
             ->recordActions([
                 Action::make('view_on_site')
                     ->label('Voir')
@@ -161,6 +223,28 @@ class VideosTable
                             $count = $records->each(fn (Video $v) => $v->update(['status' => VideoStatus::Draft]))->count();
                             Notification::make()
                                 ->title("{$count} vidéo(s) masquée(s)")
+                                ->success()
+                                ->send();
+                        })
+                        ->deselectRecordsAfterCompletion(),
+
+                    BulkAction::make('lock_content')
+                        ->label('Verrouiller titre/description')
+                        ->icon('heroicon-o-lock-closed')
+                        ->color('gray')
+                        ->requiresConfirmation()
+                        ->modalDescription('Protège le titre, la description et la miniature contre la prochaine synchronisation YouTube. Utile après une réécriture manuelle.')
+                        ->action(function (Collection $records): void {
+                            $count = $records->each(function (Video $v): void {
+                                $locked = array_values(array_unique(array_merge(
+                                    $v->sync_locked_fields ?? [],
+                                    ['title', 'description', 'thumbnail_url'],
+                                )));
+                                $v->update(['sync_locked_fields' => $locked]);
+                            })->count();
+
+                            Notification::make()
+                                ->title("{$count} vidéo(s) verrouillée(s) contre la sync")
                                 ->success()
                                 ->send();
                         })

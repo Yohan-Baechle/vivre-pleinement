@@ -9,6 +9,7 @@ use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
+use Filament\Support\Icons\Heroicon;
 
 class CommentForm
 {
@@ -16,6 +17,7 @@ class CommentForm
     {
         return $schema->components([
             Section::make('Commentaire')
+                ->icon(Heroicon::OutlinedChatBubbleLeftRight)
                 ->columns(2)
                 ->schema([
                     Select::make('post_id')
@@ -51,6 +53,7 @@ class CommentForm
                 ]),
 
             Section::make('Réponse à')
+                ->icon(Heroicon::OutlinedArrowUturnLeft)
                 ->collapsed()
                 ->collapsible()
                 ->schema([
@@ -61,6 +64,7 @@ class CommentForm
                 ]),
 
             Section::make('Détails techniques')
+                ->icon(Heroicon::OutlinedWrenchScrewdriver)
                 ->columns(2)
                 ->collapsed()
                 ->collapsible()

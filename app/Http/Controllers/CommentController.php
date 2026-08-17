@@ -2,12 +2,12 @@
 
 namespace App\Http\Controllers;
 
-use App\Console\Commands\CleanCommentContent;
 use App\Enums\CommentStatus;
 use App\Http\Requests\CommentFormRequest;
 use App\Mail\NewCommentNotification;
 use App\Models\Comment;
 use App\Models\Post;
+use App\Support\CommentSanitizer;
 use App\Support\SiteContact;
 use App\Support\SubmissionThrottle;
 use Illuminate\Http\RedirectResponse;
@@ -21,23 +21,21 @@ class CommentController extends Controller
 
         abort_unless($post->commentsAreOpen(), 403);
 
-        $key = 'comment:'.$request->ip();
-        if (SubmissionThrottle::exceeded($key)) {
-            $seconds = SubmissionThrottle::availableIn($key);
+        $retryAfter = SubmissionThrottle::attempt('comment:'.$request->ip());
 
+        if ($retryAfter !== null) {
             return back()
                 ->withInput($request->except(['website', 'consent', 'ts']))
-                ->withErrors(['content' => "Trop d'envois. Réessayez dans {$seconds}s."])
+                ->withErrors(['content' => "Trop d'envois. Réessayez dans {$retryAfter}s."])
                 ->withFragment('commentaires');
         }
-        SubmissionThrottle::hit($key);
 
         $data = $request->validated();
 
         $comment = $post->comments()->create([
             'author_name' => $data['author_name'],
             'author_email' => $data['author_email'],
-            'content' => CleanCommentContent::clean($data['content']),
+            'content' => CommentSanitizer::clean($data['content']),
             'status' => CommentStatus::Pending,
             'posted_at' => now(),
             'author_ip' => $request->ip(),

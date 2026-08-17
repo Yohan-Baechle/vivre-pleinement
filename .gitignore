@@ -6,6 +6,7 @@
 .env.testing
 .phpactor.json
 .phpunit.result.cache
+/.claude
 /.codex
 /.cursor/
 /.idea
@@ -32,9 +33,16 @@ Thumbs.db
 
 # Archives locales (backups, exports binaires)
 /database/storage-archive.tar.gz
+/storage/backups
 /database/*.tar.gz
 /database/*.zip
 
 # Backups manuels du seed et exports SEO de travail
 /database/seed.sql.bak-*
 /seo/
+/vivre-pleinement.fr-audit/
+
+# Produits vendus : ils vivent sur le disque prive via la mediatheque,
+# jamais dans le depot.
+*.pdf
+!resources/**/*.pdf

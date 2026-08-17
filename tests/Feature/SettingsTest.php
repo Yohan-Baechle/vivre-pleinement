@@ -2,10 +2,10 @@
 
 use App\Models\Setting;
 use App\Support\Settings;
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
 use Illuminate\Support\Facades\Cache;
 
-uses(RefreshDatabase::class);
+uses(LazilyRefreshDatabase::class);
 
 beforeEach(fn () => Settings::flush());
 
@@ -31,7 +31,7 @@ it('casts booleans correctly', function () {
 
 it('invalidates the cache on write', function () {
     Settings::set('meet_url', 'old');
-    expect(Settings::get('meet_url'))->toBe('old'); // primes cache
+    expect(Settings::get('meet_url'))->toBe('old');
 
     Settings::set('meet_url', 'new');
     expect(Settings::get('meet_url'))->toBe('new');

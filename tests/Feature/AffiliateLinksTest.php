@@ -24,7 +24,6 @@ it('does not create a card inside a card (single pass)', function () {
     $in = '<a href="https://amzn.to/abc">Le livre</a>';
     $out = AffiliateLinks::enhance($in);
 
-    // Une seule carte générée, pas d'imbrication (un seul bouton CTA).
     expect(substr_count($out, 'Voir sur Amazon'))->toBe(1)
         ->and(substr_count($out, 'Lien partenaire'))->toBe(1);
 });

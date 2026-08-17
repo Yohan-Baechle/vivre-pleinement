@@ -7,6 +7,7 @@ use App\Filament\Admin\Resources\Appointments\Pages\CreateAppointment;
 use App\Filament\Admin\Resources\Appointments\Pages\EditAppointment;
 use App\Filament\Admin\Resources\Appointments\Pages\ListAppointments;
 use App\Filament\Admin\Resources\Appointments\Schemas\AppointmentForm;
+use App\Filament\Admin\Resources\Appointments\Schemas\AppointmentInfolist;
 use App\Filament\Admin\Resources\Appointments\Tables\AppointmentsTable;
 use App\Models\Appointment;
 use BackedEnum;
@@ -14,6 +15,7 @@ use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
+use Illuminate\Support\Facades\Cache;
 use UnitEnum;
 
 class AppointmentResource extends Resource
@@ -24,13 +26,13 @@ class AppointmentResource extends Resource
 
     protected static ?string $navigationLabel = 'Rendez-vous';
 
-    protected static ?string $modelLabel = 'rendez-vous';
+    protected static ?string $modelLabel = 'un rendez-vous';
 
     protected static ?string $pluralModelLabel = 'Rendez-vous';
 
     protected static string|UnitEnum|null $navigationGroup = 'Rendez-vous';
 
-    protected static ?int $navigationSort = 5;
+    protected static ?int $navigationSort = 10;
 
     protected static ?string $recordTitleAttribute = 'reference';
 
@@ -41,7 +43,11 @@ class AppointmentResource extends Resource
 
     public static function getNavigationBadge(): ?string
     {
-        $pending = static::getModel()::query()->where('status', AppointmentStatus::Pending)->count();
+        $pending = Cache::remember(
+            'filament.badge.appointments.pending',
+            now()->addMinute(),
+            fn () => static::getModel()::query()->where('status', AppointmentStatus::Pending)->count(),
+        );
 
         return $pending > 0 ? (string) $pending : null;
     }
@@ -54,6 +60,11 @@ class AppointmentResource extends Resource
     public static function form(Schema $schema): Schema
     {
         return AppointmentForm::configure($schema);
+    }
+
+    public static function infolist(Schema $schema): Schema
+    {
+        return AppointmentInfolist::configure($schema);
     }
 
     public static function table(Table $table): Table

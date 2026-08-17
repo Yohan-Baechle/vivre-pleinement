@@ -7,9 +7,9 @@ use App\Models\Availability;
 use App\Models\DateOverride;
 use App\Services\AppointmentSlotService;
 use Carbon\CarbonImmutable;
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
 
-uses(RefreshDatabase::class);
+uses(LazilyRefreshDatabase::class);
 
 /**
  * Returns the next occurrence of a given weekday (Carbon dayOfWeek, 0=Sun),
@@ -34,31 +34,27 @@ function serviceWithAvailability(int $dayOfWeek, string $start = '09:00', string
         'max_advance_days' => 60,
     ], $attributes));
 
-    Availability::create([
-        'appointment_service_id' => null,
+    Availability::factory()->create([
         'day_of_week' => $dayOfWeek,
         'start_time' => $start,
         'end_time' => $end,
-        'is_active' => true,
     ]);
 
     return $service;
 }
 
 it('generates slots stepped by the service duration', function () {
-    $day = nextWeekday(3); // mercredi
+    $day = nextWeekday(3);
     $service = serviceWithAvailability($day->dayOfWeek, '09:00', '12:00');
 
     $slots = app(AppointmentSlotService::class)->slotsForDate($service, $day);
 
-    // 3h / 30 min = 6 créneaux : 09:00 … 11:30
     expect($slots)->toHaveCount(6)
         ->and($slots->first()['label'])->toBe('09:00')
         ->and($slots->last()['label'])->toBe('11:30');
 });
 
 it('excludes slots inside the minimum-notice window', function () {
-    // Disponibilité aujourd'hui, mais min_notice de 12h => créneaux du matin écartés.
     $today = CarbonImmutable::now();
     $service = serviceWithAvailability($today->dayOfWeek, '00:00', '23:30', ['min_notice_hours' => 12]);
 
@@ -115,7 +111,7 @@ it('blocks the whole day with a full-day override', function () {
     $day = nextWeekday(3);
     $service = serviceWithAvailability($day->dayOfWeek, '09:00', '12:00');
 
-    DateOverride::create(['date' => $day->toDateString()]);
+    DateOverride::factory()->closed()->create(['date' => $day->toDateString()]);
 
     expect(app(AppointmentSlotService::class)->slotsForDate($service, $day))->toBeEmpty();
 });
@@ -124,11 +120,7 @@ it('blocks only the overlapping range of a partial override', function () {
     $day = nextWeekday(3);
     $service = serviceWithAvailability($day->dayOfWeek, '09:00', '12:00');
 
-    DateOverride::create([
-        'date' => $day->toDateString(),
-        'start_time' => '09:00',
-        'end_time' => '10:00',
-    ]);
+    DateOverride::factory()->partial('09:00', '10:00')->create(['date' => $day->toDateString()]);
 
     $slots = app(AppointmentSlotService::class)->slotsForDate($service, $day);
 
@@ -145,4 +137,39 @@ it('confirms a specific slot is bookable', function () {
 
     expect(app(AppointmentSlotService::class)->isSlotBookable($service, $start))->toBeTrue()
         ->and(app(AppointmentSlotService::class)->isSlotBookable($service, $day->setTime(13, 0)))->toBeFalse();
+});
+
+it('computes a full month of availability in three queries', function () {
+    $day = nextWeekday(3);
+    $service = serviceWithAvailability($day->dayOfWeek);
+
+    $this->expectsDatabaseQueryCount(3);
+
+    app(AppointmentSlotService::class)->availableDaysForMonth($service, $day->year, $day->month);
+});
+
+it('finds the next available slots in three queries', function () {
+    $day = nextWeekday(3);
+    $service = serviceWithAvailability($day->dayOfWeek);
+
+    $this->expectsDatabaseQueryCount(3);
+
+    app(AppointmentSlotService::class)->nextAvailableSlots($service);
+});
+
+it('never offers the same start time twice when windows overlap', function () {
+    $day = nextWeekday(3);
+    $service = serviceWithAvailability($day->dayOfWeek, '09:00', '12:00');
+
+    Availability::factory()->create([
+        'day_of_week' => $day->dayOfWeek,
+        'start_time' => '09:00',
+        'end_time' => '11:00',
+    ]);
+
+    $slots = app(AppointmentSlotService::class)->slotsForDate($service, $day);
+    $labels = $slots->pluck('label')->all();
+
+    expect($labels)->toBe(array_values(array_unique($labels)))
+        ->and($slots)->toHaveCount(6);
 });

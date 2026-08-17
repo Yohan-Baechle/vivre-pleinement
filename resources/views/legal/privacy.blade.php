@@ -5,7 +5,7 @@
     $site = config('legal.site');
 
     $title = 'Politique de confidentialité';
-    $intro = "Nous attachons une grande importance au respect de votre vie privée. Cette politique décrit comment nous collectons, utilisons et protégeons vos données personnelles, conformément au Règlement Général sur la Protection des Données (RGPD – UE 2016/679) et à la loi Informatique et Libertés modifiée.";
+    $intro = "Nous attachons une grande importance au respect de votre vie privée. Cette politique décrit comment nous collectons, utilisons et protégeons vos données personnelles, conformément au Règlement Général sur la Protection des Données (RGPD - UE 2016/679) et à la loi Informatique et Libertés modifiée.";
     $breadcrumb = [['label' => 'Politique de confidentialité']];
 @endphp
 
@@ -65,6 +65,14 @@
         <li><strong>Durée de conservation</strong> : 13 mois maximum, conformément aux recommandations CNIL.</li>
     </ul>
 
+    <h3>2.5 Compte et espace formation</h3>
+    <ul>
+        <li><strong>Données collectées</strong> : prénom et nom, adresse email, mot de passe (haché), historique d'achat de formations et progression dans les leçons (leçons terminées).</li>
+        <li><strong>Finalité</strong> : créer et gérer votre compte élève, vous donner accès aux formations achetées et suivre votre progression pédagogique.</li>
+        <li><strong>Base légale</strong> : exécution du contrat (RGPD art. 6.1.b) : ces données sont nécessaires à la fourniture de la formation que vous avez achetée.</li>
+        <li><strong>Durée de conservation</strong> : pendant toute la durée de vie du compte. En cas de suppression du compte, vos données personnelles sont anonymisées ; les justificatifs de vente sont conservés de manière anonymisée 10 ans pour répondre aux obligations comptables et fiscales.</li>
+    </ul>
+
     <h2>3. Destinataires des données</h2>
     <p>
         Vos données sont uniquement traitées par {{ $controller['name'] }} dans le cadre de ses
@@ -75,9 +83,10 @@
         besoins du service :
     </p>
     <ul>
-        <li><strong>Hetzner Online GmbH</strong> (hébergement) – UE, conforme RGPD ;</li>
-        <li><strong>Brevo</strong> (envoi des emails marketing et transactionnels) – UE, conforme RGPD ;</li>
-        <li><strong>Google Ireland Limited</strong> (mesure d'audience via Google Analytics) – sous réserve de votre consentement.</li>
+        <li><strong>Hetzner Online GmbH</strong> (hébergement) - UE, conforme RGPD ;</li>
+        <li><strong>Brevo</strong> (envoi des emails marketing et transactionnels) - UE, conforme RGPD ;</li>
+        <li><strong>Stripe Payments Europe Ltd</strong> (traitement des paiements de rendez-vous et de formations) - UE, conforme RGPD ;</li>
+        <li><strong>Google Ireland Limited</strong> (mesure d'audience via Google Analytics) - sous réserve de votre consentement.</li>
     </ul>
     <p>
         Aucune donnée n'est vendue ou cédée à des tiers à des fins commerciales.

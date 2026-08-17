@@ -4,6 +4,7 @@
     use App\Enums\AppointmentStatus;
     use App\Enums\PaymentStatus;
     use Carbon\CarbonImmutable;
+    use Illuminate\Support\Number;
 
     $isPaidService = $appointment->price_cents > 0;
     $isConfirmed = $appointment->status === AppointmentStatus::Confirmed;
@@ -13,7 +14,7 @@
 
     if ($isProcessingPayment) {
         $title = 'Paiement reçu !';
-        $message = 'Votre paiement a bien été pris en compte. Votre rendez-vous se confirme à l\'instant – vous allez recevoir un email de confirmation dans quelques secondes.';
+        $message = 'Votre paiement a bien été pris en compte. Votre rendez-vous se confirme à l\'instant - vous allez recevoir un email de confirmation dans quelques secondes.';
     } elseif ($isPending) {
         $title = 'Demande bien reçue !';
         $message = 'Votre demande est en attente de confirmation. Je reviens vers vous très vite par email.';
@@ -26,7 +27,7 @@
     $gcalEnd = CarbonImmutable::parse($appointment->ends_at)->utc()->format('Ymd\THis\Z');
     $gcalUrl = 'https://calendar.google.com/calendar/render?'.http_build_query([
         'action' => 'TEMPLATE',
-        'text' => 'RDV – '.$appointment->service->name,
+        'text' => 'RDV - '.$appointment->service->name,
         'dates' => $gcalStart.'/'.$gcalEnd,
         'details' => 'Rendez-vous en visioconférence avec Laura Baechlé. Référence : '.$appointment->reference,
     ]);
@@ -53,11 +54,11 @@
             ])>
                 @if ($isProcessingPayment)
                     <svg class="size-8 animate-spin" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="3"/>
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2.5"/>
                         <path class="opacity-90" fill="currentColor" d="M4 12a8 8 0 0 1 8-8V0C5.4 0 0 5.4 0 12h4z"/>
                     </svg>
                 @else
-                    <svg class="size-8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m5 13 4 4L19 7"/></svg>
+                    <svg class="size-8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="m5 13 4 4L19 7"/></svg>
                 @endif
             </span>
 
@@ -81,16 +82,16 @@
                     </div>
                     <div class="flex justify-between gap-4">
                         <dt class="text-ink-muted">Date</dt>
-                        <dd class="text-ink font-medium">{{ $appointment->starts_at->locale('fr')->isoFormat('dddd D MMMM YYYY') }}</dd>
+                        <dd class="text-ink font-medium">{{ $appointment->starts_at->isoFormat('dddd D MMMM YYYY') }}</dd>
                     </div>
                     <div class="flex justify-between gap-4">
                         <dt class="text-ink-muted">Heure</dt>
-                        <dd class="text-ink font-medium">{{ $appointment->starts_at->format('H:i') }} – {{ $appointment->ends_at->format('H:i') }}</dd>
+                        <dd class="text-ink font-medium">{{ $appointment->starts_at->format('H:i') }} - {{ $appointment->ends_at->format('H:i') }}</dd>
                     </div>
                     @if ($isPaidService)
                         <div class="flex justify-between gap-4">
                             <dt class="text-ink-muted">Montant</dt>
-                            <dd class="text-ink font-medium">{{ number_format($appointment->price_cents / 100, 2, ',', ' ') }} €</dd>
+                            <dd class="text-ink font-medium">{{ Number::currency($appointment->price_cents / 100, in: 'EUR', locale: 'fr') }}</dd>
                         </div>
                     @endif
                     @if ($appointment->meeting_url)
@@ -135,7 +136,7 @@
                     <svg class="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="3"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
                     Ajouter à Google Agenda
                 </a>
-                <a href="{{ route('booking.ics', $appointment->reference) }}"
+                <a href="{{ route('booking.ics', $appointment->token) }}"
                    class="text-ink ring-ink/10 hover:bg-cream-50 inline-flex items-center gap-2 rounded-full bg-white px-5 py-2.5 text-sm font-medium ring-1 transition">
                     <svg class="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
                     Télécharger (.ics)

@@ -20,11 +20,11 @@ class ContactSettings extends Page
 {
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedIdentification;
 
-    protected static ?string $navigationLabel = 'Coordonnées';
+    protected static ?string $navigationLabel = 'Coordonnées & réseaux';
 
     protected static ?string $title = 'Coordonnées & réseaux sociaux';
 
-    protected static string|UnitEnum|null $navigationGroup = 'Site';
+    protected static string|UnitEnum|null $navigationGroup = 'Réglages du site';
 
     protected static ?int $navigationSort = 10;
 
@@ -44,6 +44,7 @@ class ContactSettings extends Page
             'social_facebook' => Settings::get('social_facebook'),
             'social_youtube' => Settings::get('social_youtube'),
             'social_tiktok' => Settings::get('social_tiktok'),
+            'social_linkedin' => Settings::get('social_linkedin'),
             'comments_enabled' => Settings::boolean('comments_enabled', true),
         ]);
     }
@@ -54,6 +55,7 @@ class ContactSettings extends Page
             ->statePath('data')
             ->components([
                 Section::make('Coordonnées publiques')
+                    ->icon(Heroicon::OutlinedMapPin)
                     ->description('Affichées sur la page Contact et le pied de page du site.')
                     ->columns(2)
                     ->schema([
@@ -71,6 +73,7 @@ class ContactSettings extends Page
                     ]),
 
                 Section::make('Réseaux sociaux')
+                    ->icon(Heroicon::OutlinedShare)
                     ->description('Collez l\'adresse complète de chaque profil. Les réseaux laissés vides n\'apparaissent pas sur le site.')
                     ->columns(2)
                     ->schema([
@@ -94,9 +97,15 @@ class ContactSettings extends Page
                             ->label('TikTok')
                             ->url()
                             ->placeholder('https://tiktok.com/@...'),
+
+                        TextInput::make('social_linkedin')
+                            ->label('LinkedIn')
+                            ->url()
+                            ->placeholder('https://linkedin.com/in/...'),
                     ]),
 
                 Section::make('Blog')
+                    ->icon(Heroicon::OutlinedNewspaper)
                     ->description('Réglages globaux des commentaires d\'articles.')
                     ->schema([
                         Toggle::make('comments_enabled')
@@ -118,6 +127,7 @@ class ContactSettings extends Page
             'social_facebook' => $data['social_facebook'] ?? '',
             'social_youtube' => $data['social_youtube'] ?? '',
             'social_tiktok' => $data['social_tiktok'] ?? '',
+            'social_linkedin' => $data['social_linkedin'] ?? '',
             'comments_enabled' => ! empty($data['comments_enabled']) ? '1' : '0',
         ]);
 

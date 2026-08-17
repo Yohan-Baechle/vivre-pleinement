@@ -169,7 +169,14 @@ return [
     |
     */
 
-    'secure' => env('SESSION_SECURE_COOKIE'),
+    /*
+    | Le défaut suit l'environnement plutôt que `null` : hors développement le
+    | site est servi en HTTPS, et un cookie de session sans attribut Secure
+    | partirait en clair à la première requête http:// accidentelle. Oublier
+    | SESSION_SECURE_COOKIE en production ne doit pas être silencieux.
+    */
+
+    'secure' => env('SESSION_SECURE_COOKIE', env('APP_ENV') !== 'local' && env('APP_ENV') !== 'testing'),
 
     /*
     |--------------------------------------------------------------------------

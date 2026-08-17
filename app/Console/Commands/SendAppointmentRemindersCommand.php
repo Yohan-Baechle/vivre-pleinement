@@ -4,6 +4,7 @@ namespace App\Console\Commands;
 
 use App\Enums\AppointmentStatus;
 use App\Enums\PaymentStatus;
+use App\Mail\AppointmentCheckoutExpired;
 use App\Mail\AppointmentFollowUp;
 use App\Mail\AppointmentReminder;
 use App\Models\Appointment;
@@ -74,19 +75,43 @@ class SendAppointmentRemindersCommand extends Command
     /**
      * Libère les créneaux des réservations payantes restées "Pending/unpaid"
      * (checkout Stripe abandonné) au-delà du TTL de la session (~30 min).
+     * Claim atomique sur le statut : seul le process qui bascule effectivement
+     * le statut de Pending à Cancelled envoie le mail.
      */
     private function sweepStaleCheckouts(CarbonImmutable $now): int
     {
-        return Appointment::query()
+        $count = 0;
+
+        Appointment::query()
+            ->with('service')
             ->where('status', AppointmentStatus::Pending)
             ->where('payment_status', PaymentStatus::Unpaid)
             ->where('created_at', '<', $now->subMinutes(30))
-            ->update([
-                'status' => AppointmentStatus::Cancelled,
-                'cancelled_at' => $now,
-            ]);
+            ->get()
+            ->each(function (Appointment $appointment) use ($now, &$count) {
+                $claimed = Appointment::query()
+                    ->whereKey($appointment->getKey())
+                    ->where('status', AppointmentStatus::Pending)
+                    ->update([
+                        'status' => AppointmentStatus::Cancelled,
+                        'cancelled_at' => $now,
+                    ]);
+
+                if ($claimed === 1) {
+                    Mail::to($appointment->customer_email)
+                        ->send(new AppointmentCheckoutExpired($appointment));
+
+                    $count++;
+                }
+            });
+
+        return $count;
     }
 
+    /**
+     * Claim atomique sur `followed_up_at` : seul le process qui passe le flag
+     * de null à maintenant envoie le mail de suivi.
+     */
     private function sendFollowUps(CarbonImmutable $now): int
     {
         $count = 0;
@@ -98,12 +123,18 @@ class SendAppointmentRemindersCommand extends Command
             ->where('ends_at', '<=', $now)
             ->get()
             ->each(function (Appointment $appointment) use (&$count) {
-                Mail::to($appointment->customer_email)->send(new AppointmentFollowUp($appointment));
-                $appointment->forceFill([
-                    'status' => AppointmentStatus::Completed,
-                    'followed_up_at' => CarbonImmutable::now(),
-                ])->save();
-                $count++;
+                $claimed = Appointment::query()
+                    ->whereKey($appointment->getKey())
+                    ->whereNull('followed_up_at')
+                    ->update([
+                        'status' => AppointmentStatus::Completed,
+                        'followed_up_at' => CarbonImmutable::now(),
+                    ]);
+
+                if ($claimed === 1) {
+                    Mail::to($appointment->customer_email)->send(new AppointmentFollowUp($appointment));
+                    $count++;
+                }
             });
 
         return $count;

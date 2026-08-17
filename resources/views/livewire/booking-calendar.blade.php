@@ -1,5 +1,6 @@
 @php
     use Carbon\CarbonImmutable;
+    use Illuminate\Support\Number;
 
     $service = $this->service;
     $weekDays = ['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim'];
@@ -16,16 +17,16 @@
 
 <div class="mx-auto max-w-2xl space-y-6">
     <p class="sr-only" aria-live="polite">
-        @if ($selectedSlot)
-            Créneau sélectionné : {{ CarbonImmutable::parse($selectedSlot)->locale('fr')->isoFormat('dddd D MMMM') }} à {{ CarbonImmutable::parse($selectedSlot)->format('H\hi') }}.
-        @elseif ($selectedDate)
-            {{ count($this->slots) }} créneaux disponibles le {{ CarbonImmutable::parse($selectedDate)->locale('fr')->isoFormat('dddd D MMMM') }}.
+        @if ($this->selectedSlotStart)
+            Créneau sélectionné : {{ $this->selectedSlotStart->isoFormat('dddd D MMMM') }} à {{ $this->selectedSlotStart->format('H\hi') }}.
+        @elseif ($this->selectedDateStart)
+            {{ count($this->slots) }} créneaux disponibles le {{ $this->selectedDateStart->isoFormat('dddd D MMMM') }}.
         @else
             {{ $monthNames[$month] }} {{ $year }} : {{ $available->count() }} jours disponibles.
         @endif
     </p>
 
-    {{-- Étape 1 – Calendrier + créneaux --}}
+    {{-- Étape 1 - Calendrier + créneaux --}}
     <section class="ring-ink/5 relative rounded-4xl bg-white p-6 shadow-xs ring-1 sm:p-8"
              aria-label="Choisir une date et un horaire">
 
@@ -45,14 +46,14 @@
                     wire:loading.attr="disabled" wire:target="previousMonth,nextMonth"
                     class="text-ink ring-ink/10 hover:bg-cream-50 flex size-9 items-center justify-center rounded-full ring-1 transition focus-visible:ring-2 focus-visible:ring-teal-500 focus-visible:outline-hidden disabled:cursor-not-allowed disabled:opacity-30"
                     aria-label="Mois précédent">
-                <svg class="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="m15 18-6-6 6-6"/></svg>
+                <svg class="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="m15 18-6-6 6-6"/></svg>
             </button>
             <h3 class="text-ink font-serif text-lg font-medium" aria-live="off">{{ $monthNames[$month] }} {{ $year }}</h3>
             <button type="button" wire:click="nextMonth"
                     wire:loading.attr="disabled" wire:target="previousMonth,nextMonth"
                     class="text-ink ring-ink/10 hover:bg-cream-50 flex size-9 items-center justify-center rounded-full ring-1 transition focus-visible:ring-2 focus-visible:ring-teal-500 focus-visible:outline-hidden disabled:opacity-30"
                     aria-label="Mois suivant">
-                <svg class="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg>
+                <svg class="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg>
             </button>
         </div>
 
@@ -73,13 +74,13 @@
                     $isAvailable = $available->contains($date);
                     $isSelected = $selectedDate === $date;
                     $isToday = $date === $today;
-                    $fullLabel = $dateObj->locale('fr')->isoFormat('dddd D MMMM YYYY');
+                    $fullLabel = $dateObj->isoFormat('dddd D MMMM YYYY');
                 @endphp
                 @if ($isAvailable)
-                    <button type="button" wire:click="selectDate('{{ $date }}')"
+                    <button type="button" wire:key="day-{{ $date }}" wire:click="selectDate('{{ $date }}')"
                             wire:loading.attr="disabled" wire:target="selectDate,previousMonth,nextMonth"
                             @class([
-                                'aspect-square rounded-xl text-sm font-medium transition focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-teal-500',
+                                'aspect-square rounded-2xl text-sm font-medium transition focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-teal-500',
                                 'bg-teal-700 text-white shadow' => $isSelected,
                                 'bg-teal-50 text-teal-800 ring-1 ring-teal-200 hover:bg-teal-100' => ! $isSelected,
                             ])
@@ -88,8 +89,8 @@
                         {{ $day }}
                     </button>
                 @else
-                    <div @class([
-                            'flex aspect-square items-center justify-center rounded-xl text-sm text-ink-muted line-through decoration-ink-muted/30',
+                    <div wire:key="day-{{ $date }}" @class([
+                            'flex aspect-square items-center justify-center rounded-2xl text-sm text-ink-muted line-through decoration-ink-muted/30',
                             'ring-1 ring-teal-100' => $isToday,
                         ])
                         title="{{ $fullLabel }}, indisponible" aria-hidden="true">
@@ -111,15 +112,15 @@
             <div class="border-ink/5 mt-8 border-t pt-6"
                  x-data x-init="$el.scrollIntoView({ behavior: 'smooth', block: 'nearest' })">
                 <p class="text-ink-muted text-xs font-medium tracking-wider uppercase">
-                    Créneaux le {{ CarbonImmutable::parse($selectedDate)->locale('fr')->isoFormat('dddd D MMMM') }}
+                    Créneaux le {{ $this->selectedDateStart?->isoFormat('dddd D MMMM') }}
                     <span class="text-ink-muted/70 ml-1 tracking-normal normal-case">· {{ $service->duration_minutes }} min chacun</span>
                 </p>
                 @if (count($this->slots) > 0)
                     <div class="mt-4 grid grid-cols-3 gap-2 sm:grid-cols-4 md:grid-cols-5" role="group" aria-label="Créneaux horaires disponibles">
                         @foreach ($this->slots as $slot)
-                            <button type="button" wire:click="selectSlot('{{ $slot['value'] }}')"
+                            <button type="button" wire:key="slot-{{ $slot['value'] }}" wire:click="selectSlot('{{ $slot['value'] }}')"
                                     @class([
-                                        'rounded-xl px-2 py-2.5 text-sm font-medium transition focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-teal-500',
+                                        'rounded-2xl px-2 py-2.5 text-sm font-medium transition focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-teal-500',
                                         'bg-teal-700 text-white shadow' => $selectedSlot === $slot['value'],
                                         'bg-cream-50 text-ink ring-1 ring-ink/10 hover:ring-teal-300' => $selectedSlot !== $slot['value'],
                                     ])
@@ -136,9 +137,9 @@
         @endif
     </section>
 
-    {{-- Étape 2 – Récap + coordonnées --}}
-    @if ($selectedSlot)
-        @php $slotStart = CarbonImmutable::parse($selectedSlot); @endphp
+    {{-- Étape 2 - Récap + coordonnées --}}
+    @if ($this->selectedSlotStart)
+        @php $slotStart = $this->selectedSlotStart; @endphp
         <section id="booking-form" class="ring-ink/5 rounded-4xl bg-white p-6 shadow-xs ring-1 sm:p-8"
                  x-data x-init="$el.scrollIntoView({ behavior: 'smooth', block: 'nearest' })"
                  aria-label="Récapitulatif et coordonnées">
@@ -151,7 +152,7 @@
                     <div class="flex items-center gap-2">
                         <svg class="size-4 shrink-0 text-teal-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="3"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
                         <dt class="sr-only">Date et heure</dt>
-                        <dd>{{ $slotStart->locale('fr')->isoFormat('dddd D MMMM YYYY') }} à {{ $slotStart->format('H\hi') }}</dd>
+                        <dd>{{ $slotStart->isoFormat('dddd D MMMM YYYY') }} à {{ $slotStart->format('H\hi') }}</dd>
                     </div>
                     <div class="flex items-center gap-2">
                         <svg class="size-4 shrink-0 text-teal-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
@@ -161,7 +162,7 @@
                     <div class="flex items-center gap-2">
                         <svg class="size-4 shrink-0 text-teal-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M9.5 9a2.5 2.5 0 0 1 5 0c0 1.5-2.5 2-2.5 3.5M12 17h.01"/></svg>
                         <dt class="sr-only">Tarif</dt>
-                        <dd>{{ $service->isFree() ? 'Gratuit · Sans engagement' : number_format($service->price, 2, ',', ' ').' €' }}</dd>
+                        <dd>{{ $service->isFree() ? 'Gratuit · Sans engagement' : Number::currency($service->price, in: 'EUR', locale: 'fr') }}</dd>
                     </div>
                 </dl>
                 <button type="button" wire:click="$set('selectedSlot', null)"
@@ -207,7 +208,7 @@
                                 <span class="text-ink-muted block text-xs">{{ $option['desc'] }}</span>
                             </span>
                             <span class="ring-ink/20 flex size-5 shrink-0 items-center justify-center rounded-full text-white ring-1 transition peer-checked:bg-teal-600 peer-checked:ring-teal-600" aria-hidden="true">
-                                <svg class="size-3 opacity-0 transition peer-checked:opacity-100" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13l4 4L19 7"/></svg>
+                                <svg class="size-3 opacity-0 transition peer-checked:opacity-100" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13l4 4L19 7"/></svg>
                             </span>
                         </label>
                     @endforeach
@@ -287,15 +288,15 @@
                 {{-- Réassurance --}}
                 <ul class="text-ink-muted flex flex-wrap items-center justify-center gap-x-5 gap-y-2 pt-1 text-xs">
                     <li class="inline-flex items-center gap-1.5">
-                        <svg class="size-3.5 text-teal-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="m5 13 4 4L19 7"/></svg>
+                        <svg class="size-3.5 text-teal-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="m5 13 4 4L19 7"/></svg>
                         Sans engagement
                     </li>
                     <li class="inline-flex items-center gap-1.5">
-                        <svg class="size-3.5 text-teal-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="m5 13 4 4L19 7"/></svg>
+                        <svg class="size-3.5 text-teal-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="m5 13 4 4L19 7"/></svg>
                         Annulable à tout moment
                     </li>
                     <li class="inline-flex items-center gap-1.5">
-                        <svg class="size-3.5 text-teal-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="m5 13 4 4L19 7"/></svg>
+                        <svg class="size-3.5 text-teal-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="m5 13 4 4L19 7"/></svg>
                         Lien visio envoyé avant
                     </li>
                 </ul>

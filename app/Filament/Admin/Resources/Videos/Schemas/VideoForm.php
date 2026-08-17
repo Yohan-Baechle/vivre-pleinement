@@ -4,6 +4,7 @@ namespace App\Filament\Admin\Resources\Videos\Schemas;
 
 use App\Enums\VideoStatus;
 use App\Models\Category;
+use App\Models\Video;
 use Filament\Actions\Action;
 use Filament\Forms\Components\Checkbox;
 use Filament\Forms\Components\CheckboxList;
@@ -18,15 +19,21 @@ use Filament\Schemas\Components\Section;
 use Filament\Schemas\Components\Tabs;
 use Filament\Schemas\Components\Tabs\Tab;
 use Filament\Schemas\Schema;
+use Filament\Support\Enums\IconSize;
 use Filament\Support\Icons\Heroicon;
 use Illuminate\Support\HtmlString;
+use Illuminate\View\ComponentAttributeBag;
+
+use function Filament\Support\generate_icon_html;
 
 class VideoForm
 {
     public static function configure(Schema $schema): Schema
     {
         return $schema->components([
-            Section::make('⚠️ Vidéo manquante sur YouTube')
+            Section::make('Vidéo manquante sur YouTube')
+                ->icon(Heroicon::OutlinedExclamationTriangle)
+                ->iconColor('danger')
                 ->description('Cette vidéo a disparu de la chaîne YouTube (supprimée ou passée en privée). Elle est automatiquement masquée du site public.')
                 ->visible(fn ($record) => $record?->is_missing === true)
                 ->extraAttributes(['class' => 'border-warning-300 bg-warning-50 ring-warning-300'])
@@ -92,18 +99,22 @@ class VideoForm
 
                     Tab::make('SEO & Contenu éditorial')
                         ->icon(Heroicon::OutlinedSparkles)
-                        ->badge(fn ($record) => $record?->hasEditorialContent() ? '✓' : null)
-                        ->badgeColor('success')
+                        ->badge(fn ($record) => match (true) {
+                            $record === null => null,
+                            $record->isEnriched() && $record->hasTranscript() => 'Complet',
+                            $record->isEnriched() || $record->hasTranscript() => 'Partiel',
+                            default => 'À faire',
+                        })
+                        ->badgeColor(fn ($record) => match (true) {
+                            $record === null => 'gray',
+                            $record->isEnriched() && $record->hasTranscript() => 'success',
+                            $record->isEnriched() || $record->hasTranscript() => 'warning',
+                            default => 'danger',
+                        })
                         ->schema([
                             Placeholder::make('seo_help')
                                 ->hiddenLabel()
-                                ->content(new HtmlString(
-                                    '<div class="bg-primary-50 text-primary-900 ring-primary-200 rounded-lg p-4 text-sm ring-1">'
-                                    .'<p class="font-medium">Pourquoi remplir cette section ?</p>'
-                                    .'<p class="mt-2">Ajouter du contenu éditorial unique (résumé, points clés, transcription) transforme cette page en contenu indexable par Google. Sans ça, la page ne ranke pas car la description YouTube existe déjà ailleurs.</p>'
-                                    .'<p class="text-primary-700 mt-2 text-xs">Concentrez vos efforts sur les vidéos piliers : 2-3 vidéos bien rédigées valent mieux que 20 pages vides.</p>'
-                                    .'</div>'
-                                ))
+                                ->content(fn ($record) => new HtmlString(self::editorialChecklist($record)))
                                 ->columnSpanFull(),
 
                             TextInput::make('seo_description')
@@ -112,10 +123,26 @@ class VideoForm
                                 ->maxLength(320)
                                 ->columnSpanFull(),
 
+                            TextInput::make('seo_robots')
+                                ->label('Robots')
+                                ->placeholder('index, follow')
+                                ->helperText('Vide = index, follow par défaut. Mettre « noindex, follow » pour exclure la page de Google.')
+                                ->columnSpanFull(),
+
                             Textarea::make('summary')
                                 ->label('Résumé d\'introduction')
                                 ->helperText('2-4 phrases affichées en intro sur la page publique. Contenu unique = signal SEO.')
                                 ->rows(3)
+                                ->columnSpanFull(),
+
+                            RichEditor::make('intro')
+                                ->label('Texte d\'introduction (au-dessus de la vidéo)')
+                                ->helperText('Paragraphe(s) affichés AVANT la vidéo. C\'est le texte le plus important pour Google : il pose le sujet avec les mots-clés que les gens recherchent.')
+                                ->toolbarButtons([
+                                    ['bold', 'italic'],
+                                    ['link'],
+                                    ['undo', 'redo'],
+                                ])
                                 ->columnSpanFull(),
 
                             Repeater::make('key_takeaways')
@@ -199,7 +226,7 @@ class VideoForm
 
                             Placeholder::make('youtube_published_at_display')
                                 ->label('Publiée sur YouTube le')
-                                ->content(fn ($record) => $record?->youtube_published_at?->locale('fr')->isoFormat('D MMMM YYYY [à] HH:mm') ?? '–'),
+                                ->content(fn ($record) => $record?->youtube_published_at?->isoFormat('D MMMM YYYY [à] HH:mm') ?? '–'),
 
                             Placeholder::make('synced_at_display')
                                 ->label('Dernière synchronisation')
@@ -210,6 +237,14 @@ class VideoForm
                                 ->relationship('categories', 'name')
                                 ->options(fn () => Category::orderBy('name')->pluck('name', 'id'))
                                 ->columns(2)
+                                ->columnSpanFull(),
+
+                            Select::make('related_post_id')
+                                ->label('Article de blog associé')
+                                ->relationship('relatedPost', 'title')
+                                ->searchable()
+                                ->preload()
+                                ->helperText('Maillage interne : affiche un bloc « À lire aussi » sur la vidéo et un bloc vidéo sur l\'article. Détecté automatiquement depuis le lien dans la description YouTube.')
                                 ->columnSpanFull(),
 
                             Checkbox::make('is_missing')
@@ -251,6 +286,43 @@ class VideoForm
                         ->columns(2),
                 ]),
         ]);
+    }
+
+    /**
+     * Liste de complétude éditoriale : montre d'un coup d'œil ce qui est fait
+     * et ce qui reste, pour guider la rédaction directement dans l'admin.
+     */
+    private static function editorialChecklist(?Video $record): string
+    {
+        $row = function (bool $done, string $label): string {
+            $icon = generate_icon_html(
+                $done ? Heroicon::CheckCircle : Heroicon::OutlinedMinusCircle,
+                attributes: (new ComponentAttributeBag)->class([
+                    $done ? 'text-success-600' : 'text-danger-500',
+                ]),
+                size: IconSize::Small,
+            )?->toHtml() ?? '';
+
+            $class = $done ? 'text-gray-600' : 'font-medium text-gray-900';
+
+            return '<li class="flex items-center gap-2 '.$class.'">'.$icon.' '.$label.'</li>';
+        };
+
+        $items = $record
+            ? implode('', [
+                $row(filled($record->intro), 'Introduction (texte au-dessus de la vidéo)'),
+                $row(filled($record->summary), 'Résumé court'),
+                $row(filled($record->seo_description), 'Meta description SEO'),
+                $row(! empty($record->key_takeaways), 'Points clés à retenir'),
+                $row(filled($record->transcript), 'Transcription'),
+            ])
+            : '';
+
+        return '<div class="bg-primary-50 text-primary-900 ring-primary-200 rounded-lg p-4 text-sm ring-1">'
+            .'<p class="font-medium">Complétude éditoriale</p>'
+            .'<p class="mt-1 text-xs text-primary-700">Plus la page est riche en contenu unique, mieux elle se positionne sur Google.</p>'
+            .'<ul class="mt-3 space-y-1.5">'.$items.'</ul>'
+            .'</div>';
     }
 
     /**

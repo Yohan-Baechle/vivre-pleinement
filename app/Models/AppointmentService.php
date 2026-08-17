@@ -35,6 +35,21 @@ class AppointmentService extends Model
     use HasPriceInCents;
     use SoftDeletes;
 
+    /**
+     * @var array<string, mixed>
+     */
+    protected $attributes = [
+        'duration_minutes' => 30,
+        'price_cents' => 0,
+        'currency' => 'EUR',
+        'buffer_minutes' => 0,
+        'min_notice_hours' => 12,
+        'max_advance_days' => 60,
+        'requires_confirmation' => false,
+        'is_active' => true,
+        'sort_order' => 0,
+    ];
+
     protected function casts(): array
     {
         return [

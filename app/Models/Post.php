@@ -6,6 +6,7 @@ use App\Enums\PostStatus;
 use App\Models\Concerns\HasOptimizedMedia;
 use App\Observers\PostObserver;
 use App\Support\Settings;
+use App\Support\VideoArticleMatcher;
 use Database\Factories\PostFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
@@ -16,6 +17,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\URL;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
 
@@ -31,11 +33,25 @@ use Spatie\MediaLibrary\InteractsWithMedia;
     'seo_canonical',
     'seo_robots',
     'seo_schema_json',
+    'faq',
     'published_at',
 ])]
 #[ObservedBy([PostObserver::class])]
 class Post extends Model implements HasMedia
 {
+    /**
+     * Directive robots d'une page indexable : le « max-snippet » hérité de
+     * WordPress autorise les extraits longs et les grandes images, ce qui est
+     * précisément ce qu'on veut sur un article.
+     */
+    public const ROBOTS_INDEXED = 'index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1';
+
+    /**
+     * Directive robots d'une page retirée de l'index : les liens restent
+     * suivis pour ne pas casser le maillage interne.
+     */
+    public const ROBOTS_HIDDEN = 'noindex, follow';
+
     /**
      * Borne haute de l'import WordPress : un updated_at antérieur correspond
      * à la migration, pas à une vraie édition.
@@ -50,13 +66,23 @@ class Post extends Model implements HasMedia
     }
     use SoftDeletes;
 
+    /**
+     * @var array<string, mixed>
+     */
+    protected $attributes = [
+        'status' => 'draft',
+        'comments_enabled' => true,
+    ];
+
     protected function casts(): array
     {
         return [
             'status' => PostStatus::class,
             'comments_enabled' => 'boolean',
             'seo_schema_json' => 'array',
+            'faq' => 'array',
             'published_at' => 'datetime',
+            'reading_time_minutes' => 'integer',
         ];
     }
 
@@ -89,9 +115,52 @@ class Post extends Model implements HasMedia
         return $this->hasMany(Comment::class);
     }
 
-    public function scopePublished(Builder $query): Builder
+    /**
+     * Vidéos explicitement associées à cet article (même sujet).
+     *
+     * @return HasMany<Video, $this>
+     */
+    public function videos(): HasMany
     {
-        return $query->where('status', PostStatus::Published)->where('published_at', '<=', now());
+        return $this->hasMany(Video::class, 'related_post_id');
+    }
+
+    /**
+     * URL d'aperçu signée, valable deux heures, pour relire un brouillon dans
+     * sa mise en page réelle sans avoir à le publier.
+     */
+    public function previewUrl(): string
+    {
+        return URL::temporarySignedRoute(
+            'blog.preview',
+            now()->addHours(2),
+            ['post' => $this->getRouteKey()],
+        );
+    }
+
+    /**
+     * Meilleure vidéo à présenter sur l'article : la vidéo explicitement
+     * associée en priorité, sinon la vidéo de la même catégorie dont le titre
+     * est le plus proche thématiquement. Null si rien d'assez pertinent.
+     */
+    public function bestRelatedVideo(): ?Video
+    {
+        return VideoArticleMatcher::videoForPost($this);
+    }
+
+    public function scopePublished(Builder $query): void
+    {
+        $query->where('status', PostStatus::Published)->where('published_at', '<=', now());
+    }
+
+    /**
+     * Articles éligibles aux sitemaps : publiés et sans directive noindex.
+     */
+    public function scopeIndexable(Builder $query): void
+    {
+        $query->published()->where(function (Builder $query): void {
+            $query->whereNull('seo_robots')->orWhere('seo_robots', 'not like', '%noindex%');
+        });
     }
 
     /**
@@ -129,9 +198,25 @@ class Post extends Model implements HasMedia
         return 'meshed';
     }
 
+    /**
+     * Persisté dans reading_time_minutes (recalculé à chaque sauvegarde par
+     * PostObserver) pour éviter de charger la colonne content (longText) dans
+     * les listings juste pour ce calcul. Recalculé à la volée en repli si la
+     * colonne n'est pas encore renseignée (ligne pas encore sauvegardée depuis
+     * l'ajout de la colonne).
+     */
     public function readingTimeMinutes(): int
     {
-        $words = str_word_count(strip_tags((string) $this->content));
+        if ($this->reading_time_minutes !== null) {
+            return $this->reading_time_minutes;
+        }
+
+        return self::computeReadingTimeMinutes((string) $this->content);
+    }
+
+    public static function computeReadingTimeMinutes(string $content): int
+    {
+        $words = str_word_count(strip_tags($content));
 
         return max(1, (int) ceil($words / 230));
     }
@@ -167,8 +252,9 @@ class Post extends Model implements HasMedia
      * Date de dernière modification réelle, pour le dateModified SEO.
      *
      * Les articles migrés depuis WordPress ont tous un updated_at à la date
-     * d'import : on retombe alors sur published_at pour ne pas signaler à Google
-     * une modification fictive. Une édition postérieure à l'import est respectée.
+     * d'import : on retombe alors sur published_at pour ne pas signaler à
+     * Google une modification fictive. Une édition postérieure à l'import est
+     * respectée.
      */
     public function lastModifiedAt(): ?Carbon
     {

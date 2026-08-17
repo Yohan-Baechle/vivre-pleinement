@@ -16,7 +16,7 @@
              loading="lazy"
              class="size-9 shrink-0 rounded-full object-cover ring-2 ring-teal-200 sm:size-10">
     @else
-        <div class="bg-teal-50 flex size-9 shrink-0 items-center justify-center rounded-full text-sm font-medium text-teal-700 sm:size-10">
+        <div class="flex size-9 shrink-0 items-center justify-center rounded-full bg-teal-50 text-sm font-medium text-teal-700 sm:size-10">
             {{ $initial }}
         </div>
     @endif
@@ -32,7 +32,7 @@
             @endif
 
             <time datetime="{{ $comment->posted_at?->toIso8601String() }}" class="text-ink-muted text-xs">
-                {{ $comment->posted_at?->locale('fr')->diffForHumans() }}
+                {{ $comment->posted_at?->diffForHumans() }}
             </time>
         </div>
 

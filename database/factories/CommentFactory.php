@@ -23,4 +23,9 @@ class CommentFactory extends Factory
             'posted_at' => fake()->dateTimeBetween('-1 year'),
         ];
     }
+
+    public function pending(): static
+    {
+        return $this->state(fn () => ['status' => CommentStatus::Pending]);
+    }
 }

@@ -9,7 +9,7 @@
             </div>
 
             <div class="mt-6 flex items-baseline gap-2">
-                <span class="text-ink font-serif text-5xl font-medium">37&nbsp;€</span>
+                <span class="text-ink font-serif text-5xl font-medium">{!! $offerPrice($offerSolo) !!}</span>
                 <span class="text-ink-muted text-sm">TTC · paiement unique</span>
             </div>
 
@@ -36,10 +36,13 @@
                 </li>
             </ul>
 
-            <a href="{{ route('book.checkout', 'livre') }}" class="group bg-ink shadow-ink/20 mt-8 inline-flex w-full items-center justify-center gap-2 rounded-full px-7 py-3.5 text-sm font-medium text-white shadow-lg transition hover:bg-teal-800 sm:text-base">
-                Obtenir le livre &mdash; 37&nbsp;€
-                <span class="transition group-hover:translate-x-0.5" aria-hidden="true">→</span>
-            </a>
+            <div class="mt-8">
+                <x-book-offer-cta
+                    slug="livre"
+                    :available="$offerAvailable('livre')"
+                    :label="'Obtenir le livre · '.$offerPrice($offerSolo)"
+                    class="bg-ink shadow-ink/20 inline-flex w-full items-center justify-center gap-2 rounded-full px-7 py-3.5 text-sm font-medium text-white shadow-lg transition hover:bg-teal-800 sm:text-base" />
+            </div>
         </article>
 
         <article class="relative flex flex-col rounded-4xl bg-linear-to-br from-teal-700 to-teal-800 p-8 text-white shadow-2xl shadow-teal-700/20 sm:p-10">
@@ -54,7 +57,7 @@
             </div>
 
             <div class="mt-6 flex items-baseline gap-2">
-                <span class="font-serif text-5xl font-medium">70&nbsp;€</span>
+                <span class="font-serif text-5xl font-medium">{!! $offerPrice($offerCoaching) !!}</span>
                 <span class="text-sm text-teal-100">TTC · paiement unique</span>
             </div>
 
@@ -81,14 +84,35 @@
                 </li>
             </ul>
 
-            <a href="{{ route('book.checkout', 'livre-coaching') }}" class="group hover:bg-cream-50 mt-8 inline-flex w-full items-center justify-center gap-2 rounded-full bg-white px-7 py-3.5 text-sm font-medium text-teal-800 shadow-lg transition sm:text-base">
-                Obtenir le livre + coaching &mdash; 70&nbsp;€
-                <span class="transition group-hover:translate-x-0.5" aria-hidden="true">→</span>
-            </a>
+            <div class="mt-8">
+                <x-book-offer-cta
+                    slug="livre-coaching"
+                    :available="$offerAvailable('livre-coaching')"
+                    :label="'Obtenir le livre + coaching · '.$offerPrice($offerCoaching)"
+                    class="hover:bg-cream-50 inline-flex w-full items-center justify-center gap-2 rounded-full bg-white px-7 py-3.5 text-sm font-medium text-teal-800 shadow-lg transition sm:text-base" />
+            </div>
         </article>
     </div>
 
-    <p class="text-ink-muted mt-10 text-center text-xs sm:text-sm">
-        Paiement sécurisé par Stripe et PayPal · Aucun renouvellement, aucun abonnement caché
-    </p>
+    @php $anyAvailable = $offerAvailable('livre') || $offerAvailable('livre-coaching'); @endphp
+
+    @if ($anyAvailable)
+        <p class="text-ink-muted mt-10 text-center text-xs sm:text-sm">
+            Paiement sécurisé par Stripe et PayPal · Aucun renouvellement, aucun abonnement caché
+        </p>
+    @else
+        {{-- Rien n'est encore en vente : une seule invitation, et surtout pas
+             la mention « paiement sécurisé » qui laisserait croire le
+             contraire. --}}
+        <div class="mt-10 text-center">
+            <a href="{{ route('contact') }}"
+               class="group text-ink ring-ink/10 hover:bg-cream-50 inline-flex items-center gap-2 rounded-full bg-white px-7 py-3.5 text-sm font-medium ring-1 transition sm:text-base">
+                Être prévenu de la sortie
+                <span class="transition group-hover:translate-x-0.5" aria-hidden="true">→</span>
+            </a>
+            <p class="text-ink-muted mt-4 text-xs sm:text-sm">
+                Le livre est en cours de finalisation. Laissez-moi un mot, je vous préviens dès sa mise en ligne.
+            </p>
+        </div>
+    @endif
 </x-section>

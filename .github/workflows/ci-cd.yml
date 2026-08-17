@@ -1,0 +1,171 @@
+name: CI / CD
+
+on:
+  push:
+    branches:
+      - main
+      - develop
+  pull_request:
+    branches:
+      - main
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  ci:
+    name: Tests (Pint + Pest)
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    services:
+      mariadb:
+        image: mariadb:11
+        env:
+          MARIADB_ROOT_PASSWORD: root
+          MARIADB_DATABASE: testing
+          MARIADB_USER: testing
+          MARIADB_PASSWORD: testing
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="healthcheck.sh --connect --innodb_initialized"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=10
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Setup PHP 8.5
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.5'
+          extensions: mbstring, intl, pdo_mysql, gd, imagick, redis, zip, bcmath
+          coverage: none
+          tools: composer:v2
+
+      - name: Setup Node 22
+        uses: actions/setup-node@v6
+        with:
+          node-version: '22'
+          cache: 'npm'
+
+      - name: Cache Composer dependencies
+        uses: actions/cache@v5
+        with:
+          path: vendor
+          key: composer-${{ runner.os }}-${{ hashFiles('composer.lock') }}
+          restore-keys: composer-${{ runner.os }}-
+
+      - name: Install Composer dependencies
+        run: composer install --prefer-dist --no-interaction --no-progress
+
+      - name: Install npm dependencies
+        run: npm ci
+
+      - name: Build frontend assets
+        run: npm run build
+
+      - name: Prepare .env for tests
+        run: |
+          cp .env.example .env
+          php artisan key:generate
+          # La base de service CI remplace celle de .env.example
+          sed -i 's|^DB_CONNECTION=.*|DB_CONNECTION=mariadb|' .env
+          sed -i 's|^DB_HOST=.*|DB_HOST=127.0.0.1|' .env
+          sed -i 's|^DB_PORT=.*|DB_PORT=3306|' .env
+          sed -i 's|^DB_DATABASE=.*|DB_DATABASE=testing|' .env
+          sed -i 's|^DB_USERNAME=.*|DB_USERNAME=testing|' .env
+          sed -i 's|^DB_PASSWORD=.*|DB_PASSWORD=testing|' .env
+
+      - name: Run migrations
+        run: php artisan migrate --force
+
+      - name: Run Pint (code style)
+        run: vendor/bin/pint --test
+
+      - name: Run Pest
+        run: vendor/bin/pest --compact
+
+  deploy:
+    name: Deploy to production
+    needs: ci
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Setup PHP 8.5
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.5'
+          extensions: mbstring, intl, pdo_mysql, gd, imagick, redis, zip, bcmath
+          coverage: none
+          tools: composer:v2
+
+      - name: Setup Node 22
+        uses: actions/setup-node@v6
+        with:
+          node-version: '22'
+          cache: 'npm'
+
+      - name: Install Composer dependencies (production)
+        run: composer install --no-dev --prefer-dist --optimize-autoloader --no-interaction --no-progress
+
+      - name: Install npm dependencies
+        run: npm ci
+
+      - name: Build frontend assets
+        run: npm run build
+
+      - name: Create deployment artifact
+        run: |
+          tar -czf /tmp/vivre-pleinement-deploy.tar.gz \
+            --exclude='.git' \
+            --exclude='.github' \
+            --exclude='.agents' \
+            --exclude='.claude' \
+            --exclude='node_modules' \
+            --exclude='tests' \
+            --exclude='docs' \
+            --exclude='seo' \
+            --exclude='.env' \
+            --exclude='.env.example' \
+            --exclude='storage' \
+            --exclude='phpunit.xml' \
+            --exclude='compose.yaml' \
+            --exclude='CLAUDE.md' \
+            --exclude='boost.json' \
+            --exclude='skills-lock.json' \
+            .
+          ls -lh /tmp/vivre-pleinement-deploy.tar.gz
+
+      - name: Setup SSH
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+          ssh-keyscan -H ${{ secrets.SSH_HOST }} >> ~/.ssh/known_hosts
+
+      - name: Upload artifact to VPS
+        run: |
+          scp -i ~/.ssh/deploy_key \
+            /tmp/vivre-pleinement-deploy.tar.gz \
+            ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:/tmp/vivre-pleinement-deploy.tar.gz
+
+      - name: Trigger deploy on VPS
+        run: |
+          ssh -i ~/.ssh/deploy_key \
+            ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} \
+            "bash ${{ secrets.DEPLOY_PATH }}/deploy.sh /tmp/vivre-pleinement-deploy.tar.gz"
+
+      - name: Verify deployment
+        run: |
+          sleep 2
+          curl -fsS -o /dev/null -w "HTTP %{http_code} in %{time_total}s\n" ${{ vars.DEPLOY_URL }}/up || exit 1

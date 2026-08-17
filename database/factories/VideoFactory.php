@@ -32,4 +32,9 @@ class VideoFactory extends Factory
             'synced_at' => now(),
         ];
     }
+
+    public function short(): static
+    {
+        return $this->state(fn () => ['duration_seconds' => 45]);
+    }
 }

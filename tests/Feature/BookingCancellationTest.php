@@ -11,23 +11,17 @@ use App\Models\AppointmentService;
 use App\Models\Availability;
 use App\Services\AppointmentSlotService;
 use Carbon\CarbonImmutable;
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
 use Illuminate\Support\Facades\Mail;
 use Livewire\Livewire;
 
-uses(RefreshDatabase::class);
+uses(LazilyRefreshDatabase::class);
 
 function serviceWithDailyAvailability(): AppointmentService
 {
     $service = AppointmentService::factory()->create(['duration_minutes' => 30, 'min_notice_hours' => 12]);
     foreach (range(0, 6) as $dow) {
-        Availability::create([
-            'appointment_service_id' => null,
-            'day_of_week' => $dow,
-            'start_time' => '08:00',
-            'end_time' => '20:00',
-            'is_active' => true,
-        ]);
+        Availability::factory()->dayOfWeek($dow)->create();
     }
 
     return $service;
@@ -60,7 +54,6 @@ it('cancels an appointment and frees the slot', function () {
     $start = CarbonImmutable::now()->addDays(3)->setTime(10, 0);
     $appointment = futureAppointment($service, $start);
 
-    // Le créneau est occupé avant annulation.
     expect(app(AppointmentSlotService::class)->isSlotBookable($service, $start))->toBeFalse();
 
     $this->post(route('booking.cancel', $appointment->token))
@@ -69,7 +62,7 @@ it('cancels an appointment and frees the slot', function () {
     expect($appointment->fresh()->status)->toBe(AppointmentStatus::Cancelled)
         ->and(app(AppointmentSlotService::class)->isSlotBookable($service, $start))->toBeTrue();
 
-    Mail::assertQueued(AppointmentCancelled::class, 2); // client + admin
+    Mail::assertQueued(AppointmentCancelled::class, 2);
 });
 
 it('refuses to cancel a past appointment', function () {
@@ -92,10 +85,8 @@ it('refuses to reserve a slot already taken (atomic guard)', function () {
     $service = serviceWithDailyAvailability();
     $start = CarbonImmutable::now()->addDays(3)->setTime(10, 0);
 
-    // Premier RDV occupe le créneau.
     futureAppointment($service, $start);
 
-    // La réservation atomique doit refuser le même créneau.
     $second = app(AppointmentSlotService::class)->reserve($service, $start, [
         'reference' => Appointment::generateReference(),
         'token' => Appointment::generateToken(),
@@ -125,6 +116,6 @@ it('reschedules an appointment without creating a new one', function () {
     expect(Appointment::query()->count())->toBe(1)
         ->and($appointment->fresh()->starts_at->equalTo($newStart))->toBeTrue();
 
-    Mail::assertQueued(AppointmentRescheduled::class, 2); // client + admin
+    Mail::assertQueued(AppointmentRescheduled::class, 2);
     Mail::assertNotQueued(AppointmentConfirmation::class);
 });

@@ -13,7 +13,8 @@ use Symfony\Component\Process\Process;
  *
  * Le dump est importé via le client natif (mariadb/mysql) car il contient des
  * directives transactionnelles (AUTOCOMMIT, DROP/CREATE) que PHP/PDO gère mal :
- * c'est rapide (~1s) et fiable. Bascule sur DB::unprepared() si le binaire manque.
+ * c'est rapide (~1s) et fiable. Bascule sur DB::unprepared() si le binaire
+ * manque.
  */
 class ContentSeeder extends Seeder
 {

@@ -8,6 +8,7 @@ use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
+use Filament\Support\Icons\Heroicon;
 use Illuminate\Support\Str;
 
 class AppointmentServiceForm
@@ -16,6 +17,7 @@ class AppointmentServiceForm
     {
         return $schema->components([
             Section::make('Prestation')
+                ->icon(Heroicon::OutlinedSparkles)
                 ->columns(2)
                 ->schema([
                     TextInput::make('name')
@@ -43,6 +45,7 @@ class AppointmentServiceForm
                 ]),
 
             Section::make('Durée & tarif')
+                ->icon(Heroicon::OutlinedCurrencyEuro)
                 ->columns(2)
                 ->schema([
                     TextInput::make('duration_minutes')
@@ -79,6 +82,7 @@ class AppointmentServiceForm
                 ]),
 
             Section::make('Règles de réservation')
+                ->icon(Heroicon::OutlinedShieldCheck)
                 ->columns(2)
                 ->schema([
                     TextInput::make('min_notice_hours')

@@ -62,6 +62,7 @@ class ProductForm
                                 ->label('Prix')
                                 ->numeric()
                                 ->step(0.01)
+                                ->minValue(0)
                                 ->suffix('€')
                                 ->required(),
 

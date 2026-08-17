@@ -10,29 +10,12 @@
         'Facebook' => 'M22 12a10 10 0 1 0-11.56 9.88v-6.99H7.9V12h2.54V9.8c0-2.51 1.5-3.9 3.78-3.9 1.1 0 2.24.2 2.24.2v2.46h-1.26c-1.24 0-1.63.77-1.63 1.56V12h2.77l-.44 2.89h-2.33v6.99A10 10 0 0 0 22 12z',
         'YouTube' => 'M23.5 6.2a3 3 0 0 0-2.1-2.12C19.55 3.5 12 3.5 12 3.5s-7.55 0-9.4.58A3 3 0 0 0 .5 6.2C0 8.05 0 12 0 12s0 3.95.5 5.8a3 3 0 0 0 2.1 2.12c1.85.58 9.4.58 9.4.58s7.55 0 9.4-.58a3 3 0 0 0 2.1-2.12C24 15.95 24 12 24 12s0-3.95-.5-5.8zM9.6 15.6V8.4l6.3 3.6-6.3 3.6z',
         'TikTok' => 'M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64 2.93 2.93 0 0 1 .88.13V9.4a6.84 6.84 0 0 0-5.86 11.95 6.85 6.85 0 0 0 11.13-5.37V8.6a8.16 8.16 0 0 0 4.77 1.52v-3.4a4.85 4.85 0 0 1-.81-.03z',
+        'LinkedIn' => 'M20.45 20.45h-3.55v-5.57c0-1.33-.02-3.04-1.85-3.04-1.85 0-2.14 1.45-2.14 2.94v5.67H9.36V9h3.41v1.56h.05c.48-.9 1.64-1.85 3.38-1.85 3.61 0 4.28 2.38 4.28 5.47v6.27zM5.34 7.43A2.06 2.06 0 1 1 5.33 3.3a2.06 2.06 0 0 1 .01 4.13zM7.12 20.45H3.56V9h3.56v11.45z',
     ];
 
-    $contactFaq = [
-        [
-            'q' => "Que se passe-t-il après l'envoi de mon message ?",
-            'a' => "Votre message m'arrive directement. Je le lis personnellement et je vous réponds sous 48h ouvrées, à l'adresse email que vous avez indiquée. Pensez à vérifier vos courriers indésirables au cas où.",
-        ],
-        [
-            'q' => "Quel est le délai de réponse ?",
-            'a' => "Je réponds à tous les messages sous 48h ouvrées (du lundi au vendredi). Pour une demande urgente, n'hésitez pas à l'indiquer dans votre message.",
-        ],
-        [
-            'q' => "Comment prendre rendez-vous plutôt que d'écrire ?",
-            'a' => "Si vous souhaitez directement réserver votre rendez-vous découverte gratuit, vous pouvez le faire en quelques clics depuis la page de réservation. Le formulaire de contact, lui, est parfait pour une question avant de vous lancer.",
-        ],
-        [
-            'q' => "Vous avez déjà la réponse à ma question ?",
-            'a' => "Pensez à consulter la FAQ générale et les articles du blog avant. Beaucoup de questions sur les troubles anxieux, l'accompagnement ou les tarifs y trouvent déjà une réponse.",
-        ],
-    ];
 @endphp
 
-@section('title', 'Contact · Laura Baechlé – Vivre Pleinement')
+@section('title', 'Contact · Laura Baechlé - Vivre Pleinement')
 @section('description', "Une question, une demande d'accompagnement ? Contactez Laura Baechlé via le formulaire, par email, par téléphone ou sur les réseaux sociaux.")
 @section('canonical', route('contact'))
 
@@ -52,7 +35,6 @@
 
             <div class="mt-6 max-w-3xl">
                 <p class="inline-flex items-center gap-2 rounded-full bg-white/80 px-4 py-1.5 text-xs font-medium text-teal-700 ring-1 ring-teal-200">
-                    <span class="size-1.5 rounded-full bg-teal-500"></span>
                     Me contacter
                 </p>
                 <h1 class="text-ink mt-5 font-serif text-4xl font-medium tracking-tight sm:text-5xl lg:text-6xl">
@@ -90,7 +72,7 @@
 
                     <form method="POST" action="{{ route('contact.send') }}" class="space-y-5" novalidate>
                         @csrf
-                        <input type="hidden" name="ts" value="{{ time() }}">
+                        <input type="hidden" name="ts" value="{{ \App\Support\SubmissionStamp::issue() }}">
 
                         {{-- Honeypot --}}
                         <div aria-hidden="true" class="absolute top-auto -left-[9999px] size-px overflow-hidden">
@@ -99,38 +81,22 @@
                         </div>
 
                         <div class="grid grid-cols-1 gap-5 sm:grid-cols-2">
-                            <div>
-                                <label for="first_name" class="text-ink-muted block text-xs font-medium tracking-wider uppercase">Prénom *</label>
-                                <input type="text" id="first_name" name="first_name" value="{{ old('first_name') }}" required autocomplete="given-name"
-                                       class="{{ $fieldClasses }} @error('first_name') {{ $fieldError }} @enderror">
-                                @error('first_name')<p class="mt-1 text-xs text-rose-700">{{ $message }}</p>@enderror
-                            </div>
-                            <div>
-                                <label for="last_name" class="text-ink-muted block text-xs font-medium tracking-wider uppercase">Nom</label>
-                                <input type="text" id="last_name" name="last_name" value="{{ old('last_name') }}" autocomplete="family-name"
-                                       class="{{ $fieldClasses }} @error('last_name') {{ $fieldError }} @enderror">
-                            </div>
+                            <x-form-field name="first_name" label="Prénom *" :value="old('first_name')" required autocomplete="given-name" error-class="ring-rose-400 bg-rose-soft/20" />
+
+                            <x-form-field name="last_name" label="Nom" :value="old('last_name')" autocomplete="family-name" error-class="ring-rose-400 bg-rose-soft/20" :show-error-message="false" />
                         </div>
 
                         <div class="grid grid-cols-1 gap-5 sm:grid-cols-2">
-                            <div>
-                                <label for="email" class="text-ink-muted block text-xs font-medium tracking-wider uppercase">Email *</label>
-                                <input type="email" id="email" name="email" value="{{ old('email') }}" required autocomplete="email"
-                                       class="{{ $fieldClasses }} @error('email') {{ $fieldError }} @enderror">
-                                @error('email')<p class="mt-1 text-xs text-rose-700">{{ $message }}</p>@enderror
-                            </div>
-                            <div>
-                                <label for="phone" class="text-ink-muted block text-xs font-medium tracking-wider uppercase">Téléphone</label>
-                                <input type="tel" id="phone" name="phone" value="{{ old('phone') }}" autocomplete="tel" placeholder="Optionnel"
-                                       class="{{ $fieldClasses }}">
-                            </div>
+                            <x-form-field name="email" label="Email *" type="email" :value="old('email')" required autocomplete="email" error-class="ring-rose-400 bg-rose-soft/20" />
+
+                            <x-form-field name="phone" label="Téléphone" type="tel" :value="old('phone')" autocomplete="tel" placeholder="Optionnel" :show-error-ring="false" :show-error-message="false" />
                         </div>
 
                         <div>
                             <label for="subject" class="text-ink-muted block text-xs font-medium tracking-wider uppercase">Objet *</label>
                             <select id="subject" name="subject" required
                                     class="{{ $fieldClasses }} @error('subject') {{ $fieldError }} @enderror">
-                                <option value="">– Choisir l'objet –</option>
+                                <option value="">- Choisir l'objet -</option>
                                 <option value="rdv" @selected(old('subject', request('subject')) ==='rdv')>Prendre rendez-vous</option>
                                 <option value="question" @selected(old('subject', request('subject')) ==='question')>Question sur l'accompagnement</option>
                                 <option value="partenariat" @selected(old('subject', request('subject')) ==='partenariat')>Partenariat</option>
@@ -172,7 +138,7 @@
                 <aside class="space-y-6 lg:col-span-5">
                     <div class="text-cream-100 rounded-4xl bg-linear-to-br from-teal-700 to-teal-800 p-6 sm:p-8">
                         <h2 class="font-serif text-2xl font-medium text-white">Autres moyens</h2>
-                        <p class="text-cream-100/80 mt-2 text-sm">Préférez le téléphone ou l'email ? C'est aussi possible.</p>
+                        <p class="text-cream-100/80 mt-2 text-sm">Vous pouvez aussi me joindre directement&nbsp;:</p>
 
                         <ul class="mt-6 space-y-4">
                             <li>
@@ -246,20 +212,6 @@
             </div>
         </div>
     </main>
-
-    <x-section
-        eyebrow="Avant de m'écrire"
-        title="Quelques questions fréquentes."
-        bg="bg-white"
-    >
-        <div class="mx-auto max-w-3xl space-y-4">
-            @foreach ($contactFaq as $item)
-                <x-accordion-item :question="$item['q']" :open="$loop->first">
-                    {{ $item['a'] }}
-                </x-accordion-item>
-            @endforeach
-        </div>
-    </x-section>
 
     @include('home.sections.footer')
 @endsection

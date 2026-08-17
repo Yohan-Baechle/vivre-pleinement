@@ -27,9 +27,16 @@ class RedirectResource extends Resource
 
     protected static ?string $pluralModelLabel = 'Redirections';
 
-    protected static string|UnitEnum|null $navigationGroup = 'SEO';
+    protected static string|UnitEnum|null $navigationGroup = 'Réglages du site';
 
     protected static ?int $navigationSort = 20;
+
+    protected static ?string $recordTitleAttribute = 'from_path';
+
+    public static function getGloballySearchableAttributes(): array
+    {
+        return ['from_path', 'to_path'];
+    }
 
     public static function form(Schema $schema): Schema
     {

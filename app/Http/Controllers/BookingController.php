@@ -2,29 +2,33 @@
 
 namespace App\Http\Controllers;
 
-use App\Enums\AppointmentStatus;
 use App\Enums\PaymentStatus;
-use App\Mail\AppointmentCancelled;
 use App\Models\Appointment;
 use App\Models\AppointmentService;
+use App\Services\AppointmentLifecycleService;
+use App\Services\AppointmentSlotService;
 use App\Services\BookingPaymentService;
+use App\Support\BookingFaq;
 use App\Support\IcsCalendar;
-use App\Support\Settings;
-use Carbon\CarbonImmutable;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Response;
-use Illuminate\Support\Facades\Mail;
 use Illuminate\View\View;
+use Stripe\Exception\ApiErrorException;
 
 class BookingController extends Controller
 {
-    public function index(): View
+    public function index(AppointmentSlotService $slots): View
     {
         $services = AppointmentService::query()->active()->orderBy('sort_order')->get();
+        $primaryService = $services->first();
 
         return view('booking.index', [
             'services' => $services,
-            'primaryService' => $services->first(),
+            'primaryService' => $primaryService,
+            'upcomingSlots' => $primaryService
+                ? $slots->nextAvailableSlots($primaryService, 3)
+                : collect(),
+            'faq' => BookingFaq::all(),
         ]);
     }
 
@@ -43,19 +47,26 @@ class BookingController extends Controller
     }
 
     /**
-     * On-site payment page (Stripe Payment Element) for a payable appointment.
+     * Page de paiement sur le site (Stripe Payment Element) pour un
+     * rendez-vous payant.
      */
     public function pay(Appointment $appointment, BookingPaymentService $payments): View|RedirectResponse
     {
         $appointment->load('service');
 
         if ($appointment->payment_status === PaymentStatus::Paid) {
-            return redirect()->route('booking.confirmation', $appointment->reference);
+            return redirect()->route('booking.confirmation', $appointment->token);
         }
 
         abort_unless($appointment->price_cents > 0 && $appointment->isManageable(), 404);
 
-        $intent = $payments->createPaymentIntent($appointment);
+        try {
+            $intent = $payments->createPaymentIntent($appointment);
+        } catch (ApiErrorException $e) {
+            report($e);
+
+            abort(503, 'Le paiement est momentanément indisponible. Merci de réessayer dans quelques instants.');
+        }
 
         return view('booking.pay', [
             'appointment' => $appointment,
@@ -65,7 +76,8 @@ class BookingController extends Controller
     }
 
     /**
-     * Payment was abandoned: keep the (unpaid) appointment but inform the visitor.
+     * Paiement abandonné : on conserve le rendez-vous (impayé) mais on en
+     * informe le visiteur.
      */
     public function paymentCancelled(Appointment $appointment): View
     {
@@ -75,7 +87,8 @@ class BookingController extends Controller
     }
 
     /**
-     * Self-service page (via secure token) to view, cancel or reschedule.
+     * Page d'autogestion (via le token secret) : consulter, annuler ou
+     * reprogrammer le rendez-vous.
      */
     public function manage(Appointment $appointment): View
     {
@@ -84,24 +97,18 @@ class BookingController extends Controller
         return view('booking.manage', ['appointment' => $appointment]);
     }
 
-    public function cancel(Appointment $appointment): RedirectResponse
+    public function cancel(Appointment $appointment, AppointmentLifecycleService $lifecycle): RedirectResponse
     {
         abort_unless($appointment->isManageable(), 403, 'Ce rendez-vous ne peut plus être annulé.');
 
-        $appointment->update([
-            'status' => AppointmentStatus::Cancelled,
-            'cancelled_at' => CarbonImmutable::now(),
-        ]);
-
-        Mail::to($appointment->customer_email)->send(new AppointmentCancelled($appointment));
-        Mail::to(Settings::get('notify_email', config('mail.contact_to', 'contact@vivre-pleinement.fr')))
-            ->send(new AppointmentCancelled($appointment, forAdmin: true));
+        $lifecycle->cancel($appointment);
 
         return redirect()->route('booking.manage', $appointment->token);
     }
 
     /**
-     * Reschedule: reuse the booking calendar in "report" mode for this appointment.
+     * Reprogrammation : réutilise le calendrier de réservation en mode
+     * « report » pour ce rendez-vous.
      */
     public function reschedule(Appointment $appointment): View
     {
@@ -113,8 +120,8 @@ class BookingController extends Controller
     }
 
     /**
-     * Download an iCalendar (.ics) file for the appointment so the visitor
-     * can add it to any calendar app – a simple lever against no-shows.
+     * Télécharge le rendez-vous au format iCalendar (.ics) pour que le
+     * visiteur l'ajoute à son agenda — levier simple contre les absences.
      */
     public function ics(Appointment $appointment): Response
     {

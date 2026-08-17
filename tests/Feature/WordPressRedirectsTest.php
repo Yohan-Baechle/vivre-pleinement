@@ -3,9 +3,10 @@
 use App\Models\Category;
 use App\Models\Post;
 use App\Models\Redirect;
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
+use Illuminate\Support\Facades\DB;
 
-uses(RefreshDatabase::class);
+uses(LazilyRefreshDatabase::class);
 
 it('generates a 301 redirect for every published post from its old WordPress URL', function () {
     Post::factory()->create(['slug' => 'burn-out', 'status' => 'published']);
@@ -60,12 +61,47 @@ it('maps the old WooCommerce product categories to the book page', function () {
         ->to_path->toBe('/livre');
 });
 
-it('preserves the URL fragment when redirecting to an internal anchor', function () {
-    Redirect::create(['from_path' => '/a-propos', 'to_path' => '/#a-propos', 'status_code' => 301]);
+it('maps WordPress blog pagination and the indexed legacy image', function () {
+    $this->artisan('seo:wp-redirects')->assertSuccessful();
 
-    $this->get('/a-propos')
+    expect(Redirect::where('from_path', '/blog/page/3')->first())
+        ->not->toBeNull()
+        ->to_path->toBe('/blog?page=3')
+        ->and(Redirect::where('from_path', '/wp-content/uploads/2020/10/Liberer-pression-sociale.jpg')->first())
+        ->not->toBeNull()
+        ->to_path->toBe('/blog/normes-sociales');
+});
+
+it('redirects a paginated WordPress URL even with its Divi query string', function () {
+    Redirect::create(['from_path' => '/blog/page/3', 'to_path' => '/blog?page=3', 'status_code' => 301]);
+
+    $this->get('/blog/page/3/?et_blog')->assertStatus(301)->assertRedirect(url('/blog?page=3'));
+});
+
+it('preserves the URL fragment when redirecting to an internal anchor', function () {
+    Redirect::create(['from_path' => '/ancienne-page', 'to_path' => '/#a-propos', 'status_code' => 301]);
+
+    $this->get('/ancienne-page')
         ->assertStatus(301)
         ->assertRedirect(url('/#a-propos'));
+});
+
+it('tracks hit_count and last_hit_at in a single update query', function () {
+    $redirect = Redirect::create(['from_path' => '/burn-out', 'to_path' => '/blog/burn-out', 'status_code' => 301]);
+
+    DB::enableQueryLog();
+    $this->get('/burn-out');
+    $log = DB::getQueryLog();
+    DB::disableQueryLog();
+
+    $updateQueries = collect($log)->filter(fn ($q) => str_starts_with(strtolower($q['query']), 'update')
+        && (str_contains($q['query'], 'redirects')));
+
+    expect($updateQueries)->toHaveCount(1);
+
+    $fresh = $redirect->fresh();
+    expect($fresh->hit_count)->toBe(1)
+        ->and($fresh->last_hit_at)->not->toBeNull();
 });
 
 it('does not redirect an unknown URL', function () {

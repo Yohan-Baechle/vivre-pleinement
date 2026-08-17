@@ -29,24 +29,16 @@ class AvailabilityResource extends Resource
 
     protected static string|UnitEnum|null $navigationGroup = 'Rendez-vous';
 
-    protected static ?int $navigationSort = 20;
+    protected static ?int $navigationSort = 30;
 
     /**
-     * Libellés des jours de la semaine, indexés par le dayOfWeek de Carbon (0 = dimanche).
-     *
-     * @return array<int, string>
+     * La saisie courante passe par la page « Horaires de la semaine ». Ce
+     * CRUD reste accessible par URL pour les corrections ponctuelles, mais
+     * n'encombre plus la navigation.
      */
-    public static function weekdays(): array
+    public static function shouldRegisterNavigation(): bool
     {
-        return [
-            1 => 'Lundi',
-            2 => 'Mardi',
-            3 => 'Mercredi',
-            4 => 'Jeudi',
-            5 => 'Vendredi',
-            6 => 'Samedi',
-            0 => 'Dimanche',
-        ];
+        return false;
     }
 
     public static function form(Schema $schema): Schema

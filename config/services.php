@@ -35,8 +35,22 @@ return [
         ],
     ],
 
+    'indexnow' => [
+        'key' => env('INDEXNOW_KEY'),
+    ],
+
     'youtube' => [
         'api_key' => env('YOUTUBE_API_KEY'),
         'channel_id' => env('YOUTUBE_CHANNEL_ID'),
+        // OAuth propriétaire de la chaîne, requis pour captions.download.
+        'oauth_client_id' => env('YOUTUBE_OAUTH_CLIENT_ID'),
+        'oauth_client_secret' => env('YOUTUBE_OAUTH_CLIENT_SECRET'),
+        'oauth_refresh_token' => env('YOUTUBE_OAUTH_REFRESH_TOKEN'),
+    ],
+
+    'brevo' => [
+        'key' => env('BREVO_API_KEY'),
+        'video_list_id' => (int) env('BREVO_VIDEO_LIST_ID', 6),
+        'doi_template_id' => (int) env('BREVO_DOI_TEMPLATE_ID', 6),
     ],
 ];
