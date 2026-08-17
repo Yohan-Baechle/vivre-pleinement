@@ -1,17 +1,14 @@
 @php
     $benefits = [
-        "Laisser passer les pensées dérangeantes sans paniquer",
-        "Reprendre votre enfant dans les bras sans calculer chaque geste",
-        "Sortir, conduire, cuisiner, sans le poids permanent de l'angoisse",
-        "Dormir sans ressasser, vous réveiller sans cette boule au ventre",
-        "Cesser de chercher sur internet « suis-je un monstre ? »",
-        "Retrouver des moments de joie pleins, sans qu'une pensée vienne tout gâcher",
-        "Pouvoir en parler enfin, à quelqu'un qui ne vous jugera pas",
-        "Vivre vos relations sans la peur de « passer à l'acte »",
+        "Laisser passer facilement vos pensées tordues, car vous savez que tout le monde en a et que cela ne fait pas de vous quelqu'un de bizarre",
+        "Profiter pleinement de vos moments de joie sans que des pensées intrusives ne viennent les gâcher",
+        "Avoir confiance en vous. Vous savez maintenant que vous êtes une personne normale, comme les autres et que vous ne pourrez jamais passer à l'acte. Vous savez ce que vous valez.",
+        "Avoir des relations saines et apaisées avec votre entourage",
+        "Aller travailler sans angoisse et avec entrain",
     ];
 @endphp
 
-<x-section bg="bg-cream-50" title="Et si, dans quelques semaines…">
+<x-section bg="bg-cream-50" title="Qu'accomplirez-vous en étant guéri ?" lead="Ce guide vous permettra de commencer à changer. Vous allez progressivement désormais :">
     <div class="mx-auto max-w-3xl">
         <ul class="grid grid-cols-1 gap-x-8 gap-y-4 sm:grid-cols-2">
             @foreach ($benefits as $benefit)
@@ -25,9 +22,5 @@
                 </li>
             @endforeach
         </ul>
-
-        <p class="mt-10 text-center font-serif text-xl text-teal-700 italic sm:text-2xl">
-            « Ce n'est pas une promesse magique. C'est un chemin. <br class="hidden sm:block">Et il commence par tourner la première page. »
-        </p>
     </div>
 </x-section>

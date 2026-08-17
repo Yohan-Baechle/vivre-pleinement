@@ -22,22 +22,21 @@
         <div class="relative z-10 text-center lg:text-left">
             <p class="inline-flex items-center gap-2 rounded-full bg-white/80 px-4 py-1.5 text-xs font-medium text-teal-700 ring-1 ring-teal-200">
                 <svg class="size-3.5" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2 4 12l8 10 8-10z"/></svg>
-                Le livre, 77 pages en PDF
+                12 fiches pratiques pour vous accompagner
             </p>
 
             <h1 class="text-ink mt-6 font-serif text-4xl leading-tight font-medium tracking-tight sm:text-5xl lg:text-6xl">
-                Vos pensées intrusives ne disent
-                <span class="font-normal text-teal-700 italic">rien</span>
-                de vous.
+                Soigner le TOC de la phobie d'impulsion à l'aide de
+                <span class="font-normal text-teal-700 italic">traitements naturels</span>
             </h1>
 
             <p class="text-lead text-ink-soft mt-6 max-w-xl text-balance lg:mx-0">
-                Et il existe un chemin, doux et concret, pour qu'elles cessent de gouverner votre quotidien. Sans médicaments, sans années de thérapie, à votre rythme.
+                Vous allez obtenir aujourd'hui un guide qui vous accompagnera dans votre guérison. Vous pouvez le télécharger immédiatement et vous le recevrez tout de suite par email.
             </p>
 
             <div class="mt-8 flex flex-wrap items-center justify-center gap-3 sm:gap-4 lg:justify-start">
                 <a href="#offres" class="group inline-flex items-center gap-2 rounded-full bg-teal-700 px-7 py-3.5 text-sm font-medium text-white shadow-lg shadow-teal-700/20 transition hover:bg-teal-800 sm:text-base">
-                    Découvrir le livre
+                    Obtenir le livre
                     <span class="transition group-hover:translate-x-0.5" aria-hidden="true">→</span>
                 </a>
                 <a href="#sommaire" class="text-ink-soft inline-flex items-center gap-2 text-sm font-medium transition hover:text-teal-700 sm:text-base">
@@ -56,7 +55,7 @@
                 </span>
                 <span class="inline-flex items-center gap-1.5">
                     <svg class="size-4 text-teal-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 12 2 2 4-4"/><path d="M21 12c0 4.97-4.03 9-9 9s-9-4.03-9-9 4.03-9 9-9 9 4.03 9 9z"/></svg>
-                    Garantie 30 jours
+                    Suivi par mail compris
                 </span>
             </div>
         </div>
@@ -68,7 +67,7 @@
                 @if (file_exists(public_path('images/book-cover.webp')))
                     <img
                         src="{{ asset('images/book-cover.webp') }}"
-                        alt="Couverture du livre 'Soigner les pensées intrusives et le TOC, naturellement' par Laura Baechlé"
+                        alt="Couverture du livre 'Soigner le TOC de la phobie d'impulsion à l'aide de traitements naturels' par Laura Baechlé"
                         width="450"
                         height="788"
                         class="w-full rotate-2 [filter:drop-shadow(0_25px_25px_rgb(0_0_0/0.25))] transition hover:rotate-0"
@@ -80,9 +79,9 @@
                         <p class="text-xs font-medium tracking-[0.2em] text-teal-100 uppercase">Laura Baechlé</p>
                         <div class="bg-rose-soft my-6 h-px w-12"></div>
                         <h3 class="font-serif text-2xl leading-tight font-medium sm:text-3xl">
-                            Soigner les pensées intrusives & le TOC
+                            Soigner le TOC de la phobie d'impulsion
                         </h3>
-                        <p class="mt-3 font-serif text-sm text-teal-100 italic">naturellement</p>
+                        <p class="mt-3 font-serif text-sm text-teal-100 italic">à l'aide de traitements naturels</p>
                         <div class="mt-6 inline-flex items-center gap-2 rounded-full bg-white/15 px-3 py-1 text-[10px] font-medium tracking-wider uppercase ring-1 ring-white/20 backdrop-blur-sm">
                             77 pages · 12 fiches
                         </div>

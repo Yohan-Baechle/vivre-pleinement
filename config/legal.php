@@ -18,6 +18,7 @@ return [
         'domain' => env('LEGAL_SITE_DOMAIN', 'vivre-pleinement.fr'),
         'url' => env('APP_URL', 'https://vivre-pleinement.fr'),
         'tagline' => 'Accompagnement spécialisé dans les troubles anxieux',
+        'contact_email' => 'contact@vivre-pleinement.fr',
     ],
 
     'editor' => [
