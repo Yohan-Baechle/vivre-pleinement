@@ -194,15 +194,22 @@ function sessionError(TestResponse $response, string $key): string
  * Recharge config/session.php pour un environnement donné,
  * SESSION_SECURE_COOKIE absent, afin de vérifier la valeur de repli.
  *
+ * `env()` interroge trois sources : $_ENV, putenv() puis $_SERVER. Quand le
+ * fichier d'environnement porte la variable — c'est le cas de `.env.example`,
+ * que la CI copie en `.env` — la vider des seuls tableaux laisse putenv() la
+ * servir, et le repli n'est jamais atteint. Il faut donc neutraliser les trois.
+ *
  * @return array<string, mixed>
  */
 function sessionConfigFor(string $environment): array
 {
     $previousEnv = $_SERVER['APP_ENV'] ?? null;
     $previousSecure = $_SERVER['SESSION_SECURE_COOKIE'] ?? null;
+    $previousPutenv = getenv('SESSION_SECURE_COOKIE');
 
     $_SERVER['APP_ENV'] = $environment;
     unset($_SERVER['SESSION_SECURE_COOKIE'], $_ENV['SESSION_SECURE_COOKIE']);
+    putenv('SESSION_SECURE_COOKIE');
 
     try {
         return require base_path('config/session.php');
@@ -211,6 +218,10 @@ function sessionConfigFor(string $environment): array
 
         if ($previousSecure !== null) {
             $_SERVER['SESSION_SECURE_COOKIE'] = $previousSecure;
+        }
+
+        if ($previousPutenv !== false) {
+            putenv('SESSION_SECURE_COOKIE='.$previousPutenv);
         }
     }
 }
