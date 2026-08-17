@@ -1,0 +1,18 @@
+# Planificateur Laravel.
+#
+# Une seule entrée : Laravel décide ensuite quelles tâches sont dues. Elle
+# déclenche notamment appointments:send-reminders, qui tourne toutes les 15
+# minutes et envoie les rappels de rendez-vous.
+#
+# Installation, sur le serveur :
+#   sudo crontab -u www-data -e
+# puis coller la ligne ci-dessous.
+#
+# Vérification que les tâches sont bien vues :
+#   php artisan schedule:list
+#
+# Le planificateur n'est PAS géré par Supervisor : `schedule:work` est prévu
+# pour le développement local. Sur un serveur, cron est le mécanisme attendu,
+# et il redémarre de lui-même après un redémarrage machine.
+
+* * * * * cd /var/www/vivre-pleinement && php artisan schedule:run >> /dev/null 2>&1
