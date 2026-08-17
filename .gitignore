@@ -41,3 +41,8 @@ Thumbs.db
 /database/seed.sql.bak-*
 /seo/
 /vivre-pleinement.fr-audit/
+
+# Produits vendus : ils vivent sur le disque prive via la mediatheque,
+# jamais dans le depot.
+*.pdf
+!resources/**/*.pdf

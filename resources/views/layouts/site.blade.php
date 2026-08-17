@@ -24,7 +24,12 @@
     <meta name="twitter:description" content="@yield('og_description', 'Tous les outils, pas à pas, pour les personnes souffrant d\'anxiété généralisée, de phobies ou de TOC. Accompagnement par Laura Baechlé.')">
     <meta name="twitter:image" content="@yield('og_image', asset('images/laura-portrait-1200.webp'))">
 
-    <link rel="icon" href="{{ asset('favicon.ico') }}">
+    {{-- Grue origami du logotype, isolée du logotype complet : à la taille
+         d'un onglet, le lettrage serait illisible. --}}
+    <link rel="icon" href="{{ asset('favicon.ico') }}" sizes="16x16 32x32 48x48">
+    <link rel="apple-touch-icon" href="{{ asset('apple-touch-icon.png') }}">
+    <link rel="manifest" href="{{ asset('site.webmanifest') }}">
+    <meta name="theme-color" content="#117d89">
     @fonts
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 
