@@ -1,4 +1,8 @@
-{!! '<?xml version="1.0" encoding="UTF-8"?>' !!}
+{{-- L'ouverture de la déclaration XML est reconstituée à l'exécution. Écrite
+     littéralement, elle ouvre un bloc PHP pour token_get_all() quand
+     short_open_tag est actif, et Blade cesse alors de compiler ses directives
+     dans ce fichier. --}}
+{!! '<'.'?xml version="1.0" encoding="UTF-8"?'.'>' !!}
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
         xmlns:video="http://www.google.com/schemas/sitemap-video/1.1">
     @foreach ($videos as $video)
