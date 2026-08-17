@@ -40,13 +40,41 @@ it('renders the book landing page', function () {
     $this->get(route('book.show'))->assertOk();
 });
 
+/**
+ * La page reprend les textes de la page de vente WordPress d'origine :
+ * si une section est vidée ou débranchée du gabarit, ces repères tombent.
+ */
+it('reprend les textes de la page de vente d\'origine', function () {
+    $response = $this->get(route('book.show'))->assertOk();
+
+    foreach ([
+        'Soigner le TOC de la phobie d\'impulsion',
+        '12 fiches pratiques pour vous accompagner',
+        'Dans ce cas, lisez vite ce qui suit',
+        'Je sais, c\'est douloureux.',
+        'Vous n\'avez pas eu les bonnes informations pour aller mieux',
+        'Chapitre 4 – 12 fiches pratiques à suivre',
+        'Attention, les places sont limitées',
+        'Foire aux questions (FAQ)',
+    ] as $excerpt) {
+        $response->assertSee($excerpt, false);
+    }
+});
+
+it('n\'annonce plus de garantie satisfait ou remboursé', function () {
+    $this->get(route('book.show'))
+        ->assertOk()
+        ->assertDontSee('Garantie 30 jours', false)
+        ->assertDontSee('satisfait ou remboursé', false);
+});
+
 it('affiche les prix du catalogue plutôt que des montants figés', function () {
     $this->solo->update(['price_cents' => 4200]);
 
     $this->get(route('book.show'))
         ->assertOk()
         ->assertSee('42', false)
-        ->assertDontSee('Obtenir le livre · 37', false);
+        ->assertDontSee('Obtenir le livre uniquement · 37', false);
 });
 
 it('affiche le formulaire de commande pour chaque formule', function (string $offer, string $expected) {

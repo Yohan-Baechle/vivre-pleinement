@@ -15,16 +15,11 @@
         </p>
 
         <h2 class="text-ink mt-6 font-serif text-3xl leading-tight font-medium tracking-tight sm:text-4xl lg:text-5xl">
-            Vous avez déjà attendu trop longtemps.
+            Et si vous achetiez mon guide maintenant ?
         </h2>
 
         <div class="text-ink-soft mt-6 space-y-4 text-base sm:text-lg">
-            <p>
-                Si vous êtes arrivé(e) jusqu'ici, c'est que quelque chose en vous reconnaît ce dont je parle.
-            </p>
-            <p>
-                Ces pensées peuvent continuer à voler des jours, des mois, des années de votre vie. Ou vous pouvez tourner la première page ce soir.
-            </p>
+            <p>Vous pouvez le télécharger immédiatement&nbsp;:</p>
         </div>
 
         {{-- Bloc de conversion, pas de comparaison : tant que rien n'est en
@@ -36,20 +31,21 @@
                     <x-book-offer-cta
                         slug="livre"
                         :available="$offerAvailable('livre')"
-                        :label="'Obtenir le livre · '.$offerPrice($offerSolo)"
+                        :label="'Obtenir le livre uniquement · '.$offerPrice($offerSolo)"
                         class="inline-flex w-full items-center justify-center gap-2 rounded-full bg-teal-700 px-7 py-3.5 text-sm font-medium text-white shadow-lg shadow-teal-700/20 transition hover:bg-teal-800 sm:w-auto sm:text-base" />
                 </div>
                 <div class="w-full sm:w-auto">
                     <x-book-offer-cta
                         slug="livre-coaching"
                         :available="$offerAvailable('livre-coaching')"
-                        :label="'Livre + coaching · '.$offerPrice($offerCoaching)"
+                        :label="'Obtenir le livre + le coaching · '.$offerPrice($offerCoaching)"
                         class="hover:bg-cream-50 inline-flex w-full items-center justify-center gap-2 rounded-full bg-white px-7 py-3.5 text-sm font-medium text-teal-800 shadow-xs ring-1 ring-teal-200 transition sm:w-auto sm:text-base" />
                 </div>
             </div>
 
-            <p class="text-ink-muted mt-8 text-xs sm:text-sm">
-                Téléchargement immédiat, paiement sécurisé, garantie 30 jours
+            <p class="text-ink-soft mt-8 text-sm sm:text-base">
+                Dès que vous voyez les premiers résultats, envoyez-moi un mail à l'adresse
+                <a href="mailto:{{ config('legal.site.contact_email') }}" class="border-b border-teal-700/30 text-teal-700">{{ config('legal.site.contact_email') }}</a>
             </p>
         @else
             <div class="mt-10">
