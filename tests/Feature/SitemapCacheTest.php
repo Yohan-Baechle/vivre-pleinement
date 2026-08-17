@@ -48,3 +48,18 @@ it('keeps legal pages indexable (no robots noindex)', function () {
         ->assertOk()
         ->assertDontSee('noindex', false);
 });
+
+/**
+ * Blade analyse le gabarit avec token_get_all() avant de le compiler. Un "<?"
+ * littéral y ouvre un bloc PHP quand short_open_tag est actif — ce qui est le
+ * cas du serveur de production — et Blade cesse alors de compiler ses
+ * directives dans le fichier : la vue rendue part en erreur 500.
+ *
+ * Le réglage n'étant pas modifiable à l'exécution, on vérifie la source plutôt
+ * que le rendu.
+ */
+it('keeps the sitemap views free of literal PHP open tags', function (string $view) {
+    $source = file_get_contents(resource_path("views/{$view}"));
+
+    expect(str_contains($source, '<'.'?'))->toBeFalse();
+})->with(['sitemap.blade.php', 'sitemap-videos.blade.php']);
