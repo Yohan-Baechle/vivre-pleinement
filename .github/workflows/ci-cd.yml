@@ -19,12 +19,6 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
 
-    # Les runners partagent une IP publique : sans jeton, Composer tape le
-    # quota anonyme de codeload.github.com et se fait renvoyer des 429 sur la
-    # moitié des paquets. GITHUB_TOKEN est fourni d'office à chaque workflow.
-    env:
-      COMPOSER_AUTH: '{"github-oauth":{"github.com":"${{ secrets.GITHUB_TOKEN }}"}}'
-
     services:
       mariadb:
         image: mariadb:11
@@ -102,11 +96,6 @@ jobs:
     if: github.ref == 'refs/heads/main' && github.event_name == 'push'
     runs-on: ubuntu-latest
     timeout-minutes: 15
-
-    # Même raison que pour le job ci : l'installation de production tape les
-    # mêmes archives et se ferait rejeter de la même façon.
-    env:
-      COMPOSER_AUTH: '{"github-oauth":{"github.com":"${{ secrets.GITHUB_TOKEN }}"}}'
 
     steps:
       - name: Checkout
