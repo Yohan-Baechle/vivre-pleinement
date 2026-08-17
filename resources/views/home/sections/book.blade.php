@@ -58,7 +58,7 @@
                         </a>
                         <span class="inline-flex items-center gap-1.5 text-xs text-teal-100 sm:text-sm">
                             <svg class="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 12 2 2 4-4"/><path d="M21 12c0 4.97-4.03 9-9 9s-9-4.03-9-9 4.03-9 9-9 9 4.03 9 9z"/></svg>
-                            Garantie 30 jours satisfait ou remboursé
+                            Téléchargement immédiat, suivi par mail compris
                         </span>
                     </div>
                 </div>
