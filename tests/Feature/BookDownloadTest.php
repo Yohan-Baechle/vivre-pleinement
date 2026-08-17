@@ -3,8 +3,15 @@
 use App\Models\BookOrder;
 use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Storage;
 
 uses(LazilyRefreshDatabase::class);
+
+/**
+ * Disque simulé : sans cela, chaque exécution laisse un faux PDF dans
+ * storage/app/private, que le rollback de la base ne nettoie pas.
+ */
+beforeEach(fn () => Storage::fake('local'));
 
 /**
  * Attache un fichier vendu au produit de la commande, comme le ferait un

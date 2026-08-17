@@ -3,9 +3,16 @@
 use App\Models\Product;
 use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Storage;
 use Symfony\Component\Finder\Finder;
 
 uses(LazilyRefreshDatabase::class);
+
+/**
+ * Disque simulé : sans cela, chaque exécution laisse un faux PDF dans
+ * storage/app/private, que le rollback de la base ne nettoie pas.
+ */
+beforeEach(fn () => Storage::fake('local'));
 
 /**
  * Conventions de design tenues mécaniquement. Elles se redégradent seules
