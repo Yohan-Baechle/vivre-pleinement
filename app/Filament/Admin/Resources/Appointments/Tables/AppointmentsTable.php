@@ -31,6 +31,7 @@ use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Number;
 use Illuminate\Support\Str;
 
 class AppointmentsTable
@@ -58,6 +59,18 @@ class AppointmentsTable
                     ->label('Réf.')
                     ->searchable()
                     ->toggleable(),
+
+                /**
+                 * Date de réservation, à ne pas confondre avec celle du
+                 * rendez-vous : elle dit depuis combien de temps le créneau
+                 * est retenu, ce que « Date & heure » ne raconte pas.
+                 */
+                TextColumn::make('created_at')
+                    ->label('Réservé le')
+                    ->dateTime('d/m/Y · H:i')
+                    ->description(fn (Appointment $record) => $record->created_at?->diffForHumans())
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
 
                 TextColumn::make('customer_full_name')
                     ->label('Client')
@@ -152,18 +165,43 @@ class AppointmentsTable
                             Notification::make()->success()->title('Client marqué absent')->send();
                         }),
 
-                    Action::make('markRefunded')
-                        ->label('Marquer remboursé')
+                    /**
+                     * Cette action déplace de l'argent chez Stripe et rien ne
+                     * l'annule : d'où le montant rappelé dans la confirmation,
+                     * et le statut qui ne bascule qu'en cas de succès réel.
+                     */
+                    Action::make('refund')
+                        ->label('Rembourser')
                         ->icon('heroicon-o-arrow-uturn-left')
                         ->color('danger')
-                        ->visible(fn (Appointment $record) => $record->payment_status === PaymentStatus::Paid)
+                        ->visible(fn (Appointment $record) => $record->payment_status === PaymentStatus::Paid
+                            && $record->stripe_payment_intent_id !== null)
                         ->requiresConfirmation()
-                        ->modalHeading('Marquer comme remboursé')
-                        ->modalDescription('Le rendez-vous reste au planning : seul son paiement passe en remboursé. Le remboursement lui-même doit être émis depuis le dashboard Stripe (il déclenche aussi cette mise à jour automatiquement via le webhook charge.refunded). Pour libérer le créneau, annulez le rendez-vous.')
+                        ->modalHeading('Rembourser ce rendez-vous')
+                        ->modalDescription(fn (Appointment $record) => 'Stripe va recréditer '
+                            .Number::currency($record->price_cents / 100, 'EUR', 'fr')
+                            .' à '.$record->customer_full_name.'. Le remboursement est définitif et '
+                            .'peut mettre plusieurs jours à apparaître sur le compte du client. '
+                            .'Le rendez-vous reste au planning : pour libérer le créneau, annulez-le.')
+                        ->modalSubmitActionLabel('Rembourser définitivement')
                         ->action(function (Appointment $record): void {
-                            app(BookingPaymentService::class)->refund($record);
+                            if (! app(BookingPaymentService::class)->issueRefund($record)) {
+                                Notification::make()
+                                    ->danger()
+                                    ->title('Remboursement refusé par Stripe')
+                                    ->body('Rien n\'a été débité et le statut est inchangé. '
+                                        .'Vérifiez le paiement dans le dashboard Stripe.')
+                                    ->persistent()
+                                    ->send();
 
-                            Notification::make()->success()->title('Paiement marqué remboursé')->send();
+                                return;
+                            }
+
+                            Notification::make()
+                                ->success()
+                                ->title('Remboursement émis')
+                                ->body('Stripe a recrédité le client.')
+                                ->send();
                         }),
 
                     EditAction::make(),

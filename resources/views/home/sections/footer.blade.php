@@ -7,12 +7,16 @@
             ['Comment ça se passe', $home.'#methode'],
             ['Témoignages', $home.'#temoignages'],
         ],
-        'Ressources' => [
-            ['Les formations', route('courses.index')],
+        /**
+         * Le catalogue n'apparaît qu'une fois une formation publiée : même
+         * règle que le menu, pour ne pas renvoyer vers une page vide.
+         */
+        'Ressources' => array_values(array_filter([
+            \App\Models\Course::hasPublished() ? ['Les formations', route('courses.index')] : null,
             ['Le blog', route('blog.index')],
             ['Les vidéos', route('videos.index')],
             ['Vidéo offerte', $home.'#capture'],
-        ],
+        ])),
         'À propos' => [
             ['Qui suis-je', route('about')],
             ['Contact', route('contact')],
@@ -30,7 +34,7 @@
 @endphp
 
 <footer class="text-cream-100 relative overflow-hidden bg-teal-900">
-    <div class="site-container relative pt-6 pb-10 lg:pt-12">
+    <div class="site-container relative pt-6 pb-5 lg:pt-12 lg:pb-10">
         <div class="grid grid-cols-1 gap-12 lg:grid-cols-12 lg:gap-16">
             <div class="lg:col-span-4">
                 <a href="/" class="inline-flex items-center" aria-label="Accueil">
@@ -79,17 +83,30 @@
             </nav>
         </div>
 
-        <div class="mt-16 flex flex-col gap-4 border-t border-white/10 pt-8 sm:flex-row sm:items-center sm:justify-between">
-            <p class="text-cream-100/60 text-xs">
+        {{-- Sur mobile, une grille à deux colonnes plutôt qu'un flex-wrap : les
+             cinq intitulés ont des longueurs très inégales et s'enroulaient de
+             façon imprévisible selon la largeur de l'écran. --}}
+        <div class="mt-16 flex flex-col gap-6 border-t border-white/10 pt-8 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
+            <ul class="text-cream-100/60 grid grid-cols-2 gap-x-4 text-xs sm:order-2 sm:flex sm:flex-wrap sm:items-center sm:gap-x-6">
+                <li>
+                    <a href="{{ route('legal.mentions') }}" class="block py-1.5 transition hover:text-white">Mentions légales</a>
+                </li>
+                <li>
+                    <a href="{{ route('legal.privacy') }}" class="block py-1.5 transition hover:text-white">Politique de confidentialité</a>
+                </li>
+                <li>
+                    <a href="{{ route('legal.cookies') }}" class="block py-1.5 transition hover:text-white">Politique cookies</a>
+                </li>
+                <li>
+                    <a href="{{ route('legal.cgv') }}" class="block py-1.5 transition hover:text-white">CGV</a>
+                </li>
+                <li class="col-span-2 sm:col-span-1">
+                    <a href="#" data-cookie-open class="block py-1.5 transition hover:text-white">Gérer les cookies</a>
+                </li>
+            </ul>
+            <p class="text-cream-100/60 text-xs sm:order-1">
                 © {{ $year }} Laura Baechlé · Vivre Pleinement. Tous droits réservés.
             </p>
-            <ul class="text-cream-100/60 flex flex-wrap items-center gap-x-6 gap-y-2 text-xs">
-                <li><a href="{{ route('legal.mentions') }}" class="transition hover:text-white">Mentions légales</a></li>
-                <li><a href="{{ route('legal.privacy') }}" class="transition hover:text-white">Politique de confidentialité</a></li>
-                <li><a href="{{ route('legal.cookies') }}" class="transition hover:text-white">Politique cookies</a></li>
-                <li><a href="{{ route('legal.cgv') }}" class="transition hover:text-white">CGV</a></li>
-                <li><a href="#" data-cookie-open class="transition hover:text-white">Gérer les cookies</a></li>
-            </ul>
         </div>
     </div>
 </footer>
