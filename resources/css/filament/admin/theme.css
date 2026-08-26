@@ -152,10 +152,22 @@
     background-color: #0c1f23;
 }
 
+/* La sidebar était en teal-900 (#135561), trois crans plus claire et bien
+   plus saturée que le corps (#0c1f23) et les sections (#103039) : elle
+   semblait appartenir à un autre thème. Elle se pose désormais juste
+   au-dessus du corps, et un filet la sépare du contenu. */
 .dark .fi-sidebar,
 .dark .fi-sidebar-header,
 .dark .fi-topbar > nav {
-    background-color: var(--color-teal-900);
+    background-color: #0e262b;
+}
+
+.dark .fi-sidebar {
+    border-right: 1px solid rgb(255 255 255 / 0.06);
+}
+
+.dark .fi-topbar > nav {
+    border-bottom: 1px solid rgb(255 255 255 / 0.06);
 }
 
 .dark .fi-section:not(.fi-section-not-contained) {
