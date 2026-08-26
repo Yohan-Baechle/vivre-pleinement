@@ -58,8 +58,42 @@ it('keeps legal pages indexable (no robots noindex)', function () {
  * Le réglage n'étant pas modifiable à l'exécution, on vérifie la source plutôt
  * que le rendu.
  */
-it('keeps the sitemap views free of literal PHP open tags', function (string $view) {
-    $source = file_get_contents(resource_path("views/{$view}"));
+it('keeps every blade view free of literal PHP open tags', function () {
+    $offenders = [];
 
-    expect(str_contains($source, '<'.'?'))->toBeFalse();
-})->with(['sitemap.blade.php', 'sitemap-videos.blade.php']);
+    $files = new RecursiveIteratorIterator(
+        new RecursiveDirectoryIterator(resource_path('views'), FilesystemIterator::SKIP_DOTS),
+    );
+
+    foreach ($files as $file) {
+        if (! str_ends_with($file->getFilename(), '.blade.php')) {
+            continue;
+        }
+
+        if (str_contains(file_get_contents($file->getPathname()), '<'.'?')) {
+            $offenders[] = str_replace(resource_path('views').'/', '', $file->getPathname());
+        }
+    }
+
+    expect($offenders)->toBeEmpty();
+});
+
+/**
+ * Une page vide annoncée à Google dessert le reste du site : l'index des
+ * formations n'entre au sitemap qu'une fois une formation publiée.
+ */
+it('omits the courses index from the sitemap while none is published', function () {
+    Course::query()->forceDelete();
+
+    $this->get('/sitemap.xml')
+        ->assertOk()
+        ->assertDontSee(route('courses.index'), false);
+});
+
+it('lists the courses index once a course is published', function () {
+    Course::factory()->create();
+
+    $this->get('/sitemap.xml')
+        ->assertOk()
+        ->assertSee(route('courses.index'), false);
+});
