@@ -5,11 +5,20 @@
      * couleur plus soutenue, pour qu'un article gratuit n'ait pas le même
      * poids visuel qu'une formation payante.
      */
-    $offerLinks = [
+    /**
+     * Sans formation publiée, « Formations » et la connexion élève mènent à un
+     * espace vide : on les retire du menu plutôt que d'offrir des impasses.
+     * Elles reviennent d'elles-mêmes dès la première publication.
+     */
+    $hasCourses = \App\Models\Course::hasPublished();
+
+    $offerLinks = array_values(array_filter([
         ['label' => 'Accompagnement', 'href' => route('booking.index'),  'active' => request()->routeIs('booking.*')],
-        ['label' => 'Formations',     'href' => route('courses.index'),  'active' => request()->routeIs('courses.*') || request()->routeIs('student.*')],
+        $hasCourses
+            ? ['label' => 'Formations', 'href' => route('courses.index'), 'active' => request()->routeIs('courses.*') || request()->routeIs('student.*')]
+            : null,
         ['label' => 'Le livre',       'href' => route('book.show'),      'active' => request()->routeIs('book.*')],
-    ];
+    ]));
 
     $discoverLinks = [
         ['label' => 'Blog',     'href' => route('blog.index'),   'active' => request()->routeIs('blog.*')],
@@ -112,7 +121,7 @@
                             </form>
                         </div>
                     </details>
-                @else
+                @elseif ($hasCourses)
                     <a href="{{ route('student.login') }}" class="text-ink-soft hidden items-center gap-2 rounded-full py-1.5 pr-4 pl-1.5 text-xs font-medium transition hover:bg-teal-50 hover:text-teal-700 md:inline-flex sm:text-sm">
                         <span class="flex size-6 items-center justify-center rounded-full bg-teal-100 text-teal-800">
                             <svg class="size-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 10v6M2 10l10-5 10 5-10 5-10-5Z"/><path d="M6 12v5c0 1.5 2.5 3 6 3s6-1.5 6-3v-5"/></svg>
@@ -143,13 +152,18 @@
         {{-- Navigation mobile --}}
         <ul class="border-ink/5 text-ink-soft flex flex-col border-t p-2 text-sm font-medium md:hidden">
             @foreach ($mobileSections as $sectionLabel => $sectionLinks)
-                <li>
-                    <p class="text-ink-muted px-4 pt-2 pb-1 text-xs font-semibold tracking-wider uppercase">{{ $sectionLabel }}</p>
+                {{-- Ces intitulés ne sont pas cliquables. Le filet qui les
+                     prolonge est la convention d'un en-tête de section, et la
+                     graisse allégée les détache des liens qu'ils coiffent :
+                     ils étaient auparavant plus lourds qu'eux. --}}
+                <li class="mt-4 flex items-center gap-3 px-2 first:mt-1">
+                    <span class="text-ink-muted/60 cursor-default text-xs font-medium tracking-widest uppercase select-none">{{ $sectionLabel }}</span>
+                    <span class="bg-ink/10 h-px flex-1" aria-hidden="true"></span>
                 </li>
                 @foreach ($sectionLinks as $link)
                     <li>
                         <a href="{{ $link['href'] }}" @class([
-                            'block rounded-2xl px-4 py-3 transition hover:bg-teal-50 hover:text-teal-700',
+                            'block rounded-2xl py-3 pr-4 pl-6 transition hover:bg-teal-50 hover:text-teal-700',
                             'text-teal-700' => $link['active'],
                         ]) @if($link['active']) aria-current="page" @endif>
                             {{ $link['label'] }}
@@ -160,16 +174,19 @@
 
             <li class="border-ink/5 mt-1 border-t pt-1">
                 @auth('student')
-                    <p class="text-ink-muted px-4 pt-2 pb-1 text-xs font-semibold tracking-wider uppercase">Mon espace</p>
+                    <p class="mt-3 flex items-center gap-3 px-2">
+                        <span class="text-ink-muted/60 cursor-default text-xs font-medium tracking-widest uppercase select-none">Mon espace</span>
+                        <span class="bg-ink/10 h-px flex-1" aria-hidden="true"></span>
+                    </p>
                     <a href="{{ route('student.dashboard') }}" @class([
-                        'flex items-center gap-2 rounded-2xl px-4 py-3 transition hover:bg-teal-50 hover:text-teal-700',
+                        'flex items-center gap-2 rounded-2xl py-3 pr-4 pl-6 transition hover:bg-teal-50 hover:text-teal-700',
                         'text-teal-700' => request()->routeIs('student.dashboard') || request()->routeIs('student.course') || request()->routeIs('student.lesson'),
                     ])>
                         <svg class="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M3 9 12 2l9 7"/><path d="M5 10v10a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V10"/></svg>
                         Mes formations
                     </a>
                     <a href="{{ route('student.account.edit') }}" @class([
-                        'flex items-center gap-2 rounded-2xl px-4 py-3 transition hover:bg-teal-50 hover:text-teal-700',
+                        'flex items-center gap-2 rounded-2xl py-3 pr-4 pl-6 transition hover:bg-teal-50 hover:text-teal-700',
                         'text-teal-700' => request()->routeIs('student.account.*') || request()->routeIs('student.verification.*'),
                     ])>
                         <svg class="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M12 12a5 5 0 1 0 0-10 5 5 0 0 0 0 10Z"/><path d="M3 21a9 9 0 0 1 18 0"/></svg>
@@ -177,12 +194,12 @@
                     </a>
                     <form method="POST" action="{{ route('student.logout') }}">
                         @csrf
-                        <button type="submit" class="text-ink-soft flex w-full items-center gap-2 rounded-2xl px-4 py-3 text-left transition hover:bg-rose-50 hover:text-rose-700">
+                        <button type="submit" class="text-ink-soft flex w-full items-center gap-2 rounded-2xl py-3 pr-4 pl-6 text-left transition hover:bg-rose-50 hover:text-rose-700">
                             <svg class="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="m16 17 5-5-5-5"/><path d="M21 12H9"/></svg>
                             Se déconnecter
                         </button>
                     </form>
-                @else
+                @elseif ($hasCourses)
                     <a href="{{ route('student.login') }}" class="flex items-center gap-2.5 rounded-2xl px-4 py-3 transition hover:bg-teal-50 hover:text-teal-700">
                         <span class="flex size-7 items-center justify-center rounded-full bg-teal-100 text-teal-800">
                             <svg class="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 10v6M2 10l10-5 10 5-10 5-10-5Z"/><path d="M6 12v5c0 1.5 2.5 3 6 3s6-1.5 6-3v-5"/></svg>

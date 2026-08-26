@@ -1,5 +1,7 @@
 <?php
 
+use App\Models\Course;
+use App\Models\Student;
 use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
 
 uses(LazilyRefreshDatabase::class);
@@ -12,11 +14,44 @@ it('expose l\'accompagnement dans le menu principal', function () {
 });
 
 it('affiche les trois offres et les trois entrées de découverte', function () {
+    Course::factory()->create();
+
     $response = $this->get(route('home'))->assertOk();
 
     foreach (['Accompagnement', 'Formations', 'Le livre', 'Blog', 'Vidéos', 'À propos'] as $label) {
         $response->assertSee($label, false);
     }
+});
+
+/**
+ * L'espace élève ne sert qu'aux formations : sans formation publiée, ces deux
+ * entrées mènent à un catalogue vide et à un compte sans contenu.
+ */
+it('retire les formations et la connexion du menu quand rien n\'est publié', function () {
+    Course::query()->forceDelete();
+
+    $this->get(route('home'))
+        ->assertOk()
+        ->assertDontSee('Formations', false)
+        ->assertDontSee(route('courses.index'), false)
+        ->assertDontSee(route('student.login'), false);
+});
+
+it('rend les formations et la connexion au menu dès la première publication', function () {
+    Course::factory()->create();
+
+    $this->get(route('home'))
+        ->assertOk()
+        ->assertSee('Formations', false)
+        ->assertSee(route('courses.index'), false)
+        ->assertSee(route('student.login'), false);
+});
+
+it('garde le menu de l\'élève connecté même sans formation publiée', function () {
+    $this->actingAs(Student::factory()->create(), 'student')
+        ->get(route('home'))
+        ->assertOk()
+        ->assertSee(route('student.dashboard'), false);
 });
 
 it('sort « Me contacter » du menu au profit du footer', function () {

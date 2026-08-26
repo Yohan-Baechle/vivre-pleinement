@@ -5,6 +5,8 @@ use App\Enums\PaymentStatus;
 use App\Filament\Admin\Resources\Appointments\Pages\ListAppointments;
 use App\Models\Appointment;
 use App\Models\User;
+use App\Services\BookingPaymentService;
+use App\Services\StripePaymentIntents;
 use Filament\Actions\Testing\TestAction;
 use Filament\Facades\Filament;
 use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
@@ -78,15 +80,62 @@ it('est idempotent sur un rendez-vous déjà remboursé', function () {
     expect($appointment->fresh()->payment_status)->toBe(PaymentStatus::Refunded);
 });
 
-it('permet à un admin de marquer un rendez-vous remboursé', function () {
+it('permet à un admin de rembourser un rendez-vous', function () {
     $this->actingAs(User::factory()->create());
     Filament::setCurrentPanel(Filament::getPanel('admin'));
 
     $appointment = paidAppointment();
 
+    $this->partialMock(StripePaymentIntents::class, function ($mock) {
+        $mock->shouldReceive('refundQuietly')
+            ->once()
+            ->with('pi_appointment_refund')
+            ->andReturnTrue();
+    });
+
     Livewire::test(ListAppointments::class)
-        ->callAction(TestAction::make('markRefunded')->table($appointment))
+        ->callAction(TestAction::make('refund')->table($appointment))
         ->assertHasNoActionErrors();
 
     expect($appointment->fresh()->payment_status)->toBe(PaymentStatus::Refunded);
+});
+
+/**
+ * Le statut ne doit jamais devancer Stripe : un rendez-vous affiché
+ * « remboursé » sans crédit réel ne se découvre qu'à la réclamation du client.
+ */
+it('laisse le paiement intact quand Stripe refuse le remboursement', function () {
+    $appointment = paidAppointment();
+
+    $this->partialMock(StripePaymentIntents::class, function ($mock) {
+        $mock->shouldReceive('refundQuietly')->once()->andReturnFalse();
+    });
+
+    expect(app(BookingPaymentService::class)->issueRefund($appointment))->toBeFalse()
+        ->and($appointment->fresh()->payment_status)->toBe(PaymentStatus::Paid);
+});
+
+it('ne rembourse rien quand aucun paiement Stripe n\'est rattaché', function () {
+    $appointment = Appointment::factory()->create([
+        'payment_status' => PaymentStatus::Paid,
+        'stripe_payment_intent_id' => null,
+    ]);
+
+    $this->partialMock(StripePaymentIntents::class, function ($mock) {
+        $mock->shouldNotReceive('refundQuietly');
+    });
+
+    expect(app(BookingPaymentService::class)->issueRefund($appointment))->toBeFalse()
+        ->and($appointment->fresh()->payment_status)->toBe(PaymentStatus::Paid);
+});
+
+it('ne rembourse pas deux fois un rendez-vous déjà remboursé', function () {
+    $appointment = paidAppointment();
+    $appointment->update(['payment_status' => PaymentStatus::Refunded]);
+
+    $this->partialMock(StripePaymentIntents::class, function ($mock) {
+        $mock->shouldNotReceive('refundQuietly');
+    });
+
+    expect(app(BookingPaymentService::class)->issueRefund($appointment))->toBeFalse();
 });
