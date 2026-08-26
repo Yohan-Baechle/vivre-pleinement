@@ -99,6 +99,15 @@ class SitemapController extends Controller
         $entries = [];
 
         foreach (self::STATIC_PAGES as $name => [$changefreq, $priority]) {
+            /**
+             * Sans formation publiée, l'index des formations est une page vide :
+             * l'annoncer à Google dessert le reste du site. Elle revient au
+             * sitemap dès la première publication, l'observateur vidant ce cache.
+             */
+            if ($name === 'courses.index' && ! Course::hasPublished()) {
+                continue;
+            }
+
             $entries[] = ['loc' => route($name), 'changefreq' => $changefreq, 'priority' => $priority];
         }
 
