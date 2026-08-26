@@ -159,6 +159,13 @@ class BookingPaymentService
      * d'annulation que personne n'a demandés. L'annulation reste une action
      * explicite.
      */
+    /**
+     * Enregistre qu'un remboursement a eu lieu, sans rien demander à Stripe.
+     *
+     * C'est la voie du webhook charge.refunded, qui arrive précisément parce
+     * que Stripe a déjà crédité le client : y déclencher un remboursement en
+     * émettrait un second.
+     */
     public function refund(Appointment $appointment): void
     {
         if ($appointment->payment_status !== PaymentStatus::Paid) {
@@ -171,6 +178,43 @@ class BookingPaymentService
             'appointment_id' => $appointment->id,
             'reference' => $appointment->reference,
         ]);
+    }
+
+    /**
+     * Émet le remboursement chez Stripe, puis seulement s'il a abouti,
+     * l'enregistre. L'ordre importe : l'inverse laisserait un rendez-vous
+     * affiché « remboursé » que Stripe n'a jamais crédité, ce qui ne se
+     * découvrirait qu'à la réclamation du client.
+     *
+     * C'est la voie de l'administration, à l'inverse de refund() qui ne fait
+     * qu'acter un remboursement décidé ailleurs.
+     *
+     * @return bool false si rien n'a été remboursé
+     */
+    public function issueRefund(Appointment $appointment): bool
+    {
+        if ($appointment->payment_status !== PaymentStatus::Paid) {
+            return false;
+        }
+
+        $paymentIntentId = $appointment->stripe_payment_intent_id;
+
+        if ($paymentIntentId === null) {
+            Log::warning('Remboursement demandé sur un rendez-vous sans paiement Stripe.', [
+                'appointment_id' => $appointment->id,
+                'reference' => $appointment->reference,
+            ]);
+
+            return false;
+        }
+
+        if (! $this->intents->refundQuietly($paymentIntentId)) {
+            return false;
+        }
+
+        $this->refund($appointment);
+
+        return true;
     }
 
     private function refundAndApologise(Appointment $appointment, ?string $paymentIntentId): void
