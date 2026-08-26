@@ -77,3 +77,23 @@ it('keeps every blade view free of literal PHP open tags', function () {
 
     expect($offenders)->toBeEmpty();
 });
+
+/**
+ * Une page vide annoncée à Google dessert le reste du site : l'index des
+ * formations n'entre au sitemap qu'une fois une formation publiée.
+ */
+it('omits the courses index from the sitemap while none is published', function () {
+    Course::query()->forceDelete();
+
+    $this->get('/sitemap.xml')
+        ->assertOk()
+        ->assertDontSee(route('courses.index'), false);
+});
+
+it('lists the courses index once a course is published', function () {
+    Course::factory()->create();
+
+    $this->get('/sitemap.xml')
+        ->assertOk()
+        ->assertSee(route('courses.index'), false);
+});
