@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use App\Enums\ContactSubject;
 use App\Http\Requests\Concerns\ChecksSubmissionDelay;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
@@ -21,7 +22,7 @@ class ContactFormRequest extends FormRequest
             'last_name' => ['nullable', 'string', 'max:80'],
             'email' => ['required', 'email:rfc,dns', 'max:160'],
             'phone' => ['nullable', 'string', 'max:30'],
-            'subject' => ['required', Rule::in(['rdv', 'question', 'partenariat', 'media', 'autre'])],
+            'subject' => ['required', Rule::in(ContactSubject::availableValues())],
             'message' => ['required', 'string', 'min:20', 'max:5000'],
             'consent' => ['accepted'],
             'website' => ['nullable', 'prohibited'],
@@ -50,12 +51,8 @@ class ContactFormRequest extends FormRequest
 
     public function subjectLabel(): string
     {
-        return match ($this->input('subject')) {
-            'rdv' => 'Prise de rendez-vous',
-            'question' => 'Question sur l\'accompagnement',
-            'partenariat' => 'Partenariat',
-            'media' => 'Demande presse / média',
-            default => 'Autre',
-        };
+        $subject = ContactSubject::tryFrom((string) $this->input('subject'));
+
+        return ($subject ?? ContactSubject::Autre)->notificationLabel();
     }
 }

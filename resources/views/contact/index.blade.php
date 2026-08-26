@@ -97,11 +97,9 @@
                             <select id="subject" name="subject" required
                                     class="{{ $fieldClasses }} @error('subject') {{ $fieldError }} @enderror">
                                 <option value="">- Choisir l'objet -</option>
-                                <option value="rdv" @selected(old('subject', request('subject')) ==='rdv')>Prendre rendez-vous</option>
-                                <option value="question" @selected(old('subject', request('subject')) ==='question')>Question sur l'accompagnement</option>
-                                <option value="partenariat" @selected(old('subject', request('subject')) ==='partenariat')>Partenariat</option>
-                                <option value="media" @selected(old('subject', request('subject')) ==='media')>Demande presse / média</option>
-                                <option value="autre" @selected(old('subject', request('subject')) ==='autre')>Autre</option>
+                                @foreach (\App\Enums\ContactSubject::available() as $subject)
+                                    <option value="{{ $subject->value }}" @selected(old('subject', request('subject')) === $subject->value)>{{ $subject->label() }}</option>
+                                @endforeach
                             </select>
                             @error('subject')<p class="mt-1 text-xs text-rose-700">{{ $message }}</p>@enderror
                         </div>
