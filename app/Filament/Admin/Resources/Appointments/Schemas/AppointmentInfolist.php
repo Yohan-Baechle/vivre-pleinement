@@ -28,6 +28,15 @@ class AppointmentInfolist
                         ->label('Référence')
                         ->copyable(),
 
+                    /**
+                     * Date de réservation, distincte de celle du rendez-vous :
+                     * elle situe la prise de contact dans le temps.
+                     */
+                    TextEntry::make('created_at')
+                        ->label('Réservé le')
+                        ->dateTime('d/m/Y à H:i')
+                        ->helperText(fn ($record) => $record->created_at?->diffForHumans()),
+
                     TextEntry::make('status')
                         ->label('Statut')
                         ->badge(),

@@ -97,6 +97,22 @@ class Course extends Model implements HasMedia
     }
 
     /**
+     * Indique qu'au moins une formation est publiée.
+     *
+     * Le menu et le sitemap s'en servent pour ne pas exposer un espace vide :
+     * sans formation, ni l'entrée « Formations » ni la connexion élève n'ont
+     * de destination, l'espace élève ne servant qu'aux formations.
+     *
+     * Volontairement sans cache : un `exists()` indexé sur une table de
+     * quelques lignes ne coûte rien, alors qu'une valeur mémorisée se périme
+     * et rend la bascule dépendante d'une invalidation à ne pas oublier.
+     */
+    public static function hasPublished(): bool
+    {
+        return static::query()->published()->exists();
+    }
+
+    /**
      * @param  Builder<Course>  $query
      */
     public function scopePublished(Builder $query): void
