@@ -41,18 +41,21 @@
                 </p>
             </div>
 
-            <dl class="border-ink/10 mt-8 grid grid-cols-3 gap-4 border-t pt-6">
+            {{-- Trois colonnes dès le mobile laissaient une centaine de pixels
+                 par cellule, où « scientifiquement » débordait en serif 24 px.
+                 Les colonnes n'arrivent qu'à partir de sm. --}}
+            <dl class="border-ink/10 mt-8 grid gap-4 border-t pt-6 sm:grid-cols-3">
                 <div>
                     <dt class="text-ink-muted text-xs font-medium tracking-wider uppercase">Approche</dt>
-                    <dd class="mt-1 font-serif text-2xl font-medium text-teal-700">ACT</dd>
+                    <dd class="mt-1 font-serif text-xl font-medium text-teal-700 sm:text-2xl">ACT</dd>
                 </div>
                 <div>
                     <dt class="text-ink-muted text-xs font-medium tracking-wider uppercase">Méthode</dt>
-                    <dd class="mt-1 font-serif text-2xl leading-tight font-medium text-teal-700">Validée<br>scientifiquement</dd>
+                    <dd class="mt-1 font-serif text-xl leading-tight font-medium text-teal-700 sm:text-2xl">Validée<br class="hidden sm:inline">scientifiquement</dd>
                 </div>
                 <div>
                     <dt class="text-ink-muted text-xs font-medium tracking-wider uppercase">Format</dt>
-                    <dd class="mt-1 font-serif text-2xl font-medium text-teal-700">À distance</dd>
+                    <dd class="mt-1 font-serif text-xl font-medium text-teal-700 sm:text-2xl">À distance</dd>
                 </div>
             </dl>
 
