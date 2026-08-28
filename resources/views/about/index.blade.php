@@ -66,7 +66,7 @@
                         </p>
 
                         <h2 class="text-ink mt-10 pt-2 font-serif text-2xl font-medium tracking-tight sm:text-3xl">
-                            Quand le tempérament devient trouble
+                            Quand le tempérament devient un trouble
                         </h2>
                         <p>
                             À partir du collège, gros changement pour moi et donc, grosse angoisse. À ce moment, mon tempérament anxieux s'est vraiment transformé en trouble anxieux, ce qui m'a fait manquer énormément de cours. J'ai ainsi souffert principalement de&nbsp;:
@@ -112,11 +112,9 @@
                             L'ACT est une approche thérapeutique dont l'efficacité est <strong class="text-ink font-medium">validée scientifiquement</strong>. Elle fait partie des TCC de 3<sup>e</sup> vague, qui enrichissent les thérapies cognitives et comportementales classiques.
                         </p>
 
-                        <div class="rounded-3xl bg-white p-6 ring-1 ring-ink/5 sm:p-8">
-                            <p class="text-ink font-serif text-xl font-medium leading-relaxed sm:text-2xl">
-                                J'ai transformé mon expérience avec les troubles anxieux en force afin de vivre ma vie pleinement. Ne vous découragez surtout pas&nbsp;: quel que soit le degré de votre anxiété, il existe une solution à tout&nbsp;!
-                            </p>
-                        </div>
+                        <p>
+                            J'ai transformé mon expérience avec les troubles anxieux en force afin de vivre ma vie pleinement. Ne vous découragez surtout pas&nbsp;: quel que soit le degré de votre anxiété, il existe une solution à tout&nbsp;!
+                        </p>
                     </div>
 
                     <x-health-disclaimer class="mt-12" />

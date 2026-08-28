@@ -13,7 +13,7 @@
         [
             'num' => '03',
             'title' => 'Séances régulières',
-            'desc' => 'Séances individuelles en visio, dans un cadre bienveillant et confidentiel. Entre les séances, des outils concrets à appliquer au quotidien.',
+            'desc' => 'Séances individuelles en visio ou par téléphone, dans un cadre bienveillant et confidentiel. Entre les séances, des outils concrets à appliquer au quotidien.',
         ],
     ];
 @endphp

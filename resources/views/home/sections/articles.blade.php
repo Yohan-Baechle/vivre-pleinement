@@ -3,7 +3,7 @@
         id="blog"
        
         title="Lire pour mieux comprendre."
-        lead="Des articles fouillés pour comprendre l'anxiété et avancer entre les séances."
+        lead="Des articles pour comprendre l'anxiété et avancer entre les séances."
         bg="bg-cream-50"
     >
         <div class="grid grid-cols-1 gap-6 md:grid-cols-3">

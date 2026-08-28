@@ -36,7 +36,7 @@
                 <p>
                     Les antidépresseurs n'ont pas l'air de changer grand-chose, puisque vous continuez à aller sur les forums pour tenter de vous apaiser. D'ailleurs, vous avez déjà changé plusieurs fois d'antidépresseurs, car certains ne fonctionnaient pas ou provoquaient trop d'effets secondaires indésirables.
                 </p>
-                <p class="text-teal-700">
+                <p>
                     Puisque les solutions principales ne marchent pas réellement sur vous, vous commencez à désespérer d'aller mieux un jour. Vous vous sentez frustré, triste, en colère. Vous pensez être trop faible pour réussir à guérir.
                 </p>
             </div>

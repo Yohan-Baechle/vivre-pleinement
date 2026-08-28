@@ -82,3 +82,23 @@ it('renders and saves the contact settings admin page', function () {
         ->and(Settings::get('contact_phone'))->toBe('06 12 34 56 78')
         ->and(Settings::get('social_instagram'))->toBe('https://instagram.com/laura');
 });
+
+/**
+ * L'adresse de contact est pilotée depuis l'admin : les pages légales et la
+ * page de rendez-vous doivent la refléter, sans adresse figée dans le code.
+ */
+it('shows the admin contact email on the legal and booking pages', function () {
+    Settings::set('contact_email', 'nouvelle-adresse@example.com');
+
+    foreach ([
+        route('legal.mentions'),
+        route('legal.privacy'),
+        route('legal.cookies'),
+        route('legal.cgv'),
+        route('booking.index'),
+    ] as $url) {
+        $this->get($url)
+            ->assertOk()
+            ->assertSee('nouvelle-adresse@example.com');
+    }
+});

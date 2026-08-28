@@ -18,7 +18,7 @@ class HomeController extends Controller
                 ->with(['categories', 'media'])
                 ->orderByDesc('published_at')
                 ->limit(3)
-                ->get(['id', 'slug', 'title', 'excerpt', 'published_at', 'reading_time_minutes']),
+                ->get(['id', 'slug', 'title', 'excerpt', 'published_at', 'updated_at', 'reading_time_minutes']),
             'videos' => Video::query()
                 ->published()
                 ->with('categories')

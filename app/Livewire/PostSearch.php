@@ -151,7 +151,7 @@ class PostSearch extends Component
             ))
             ->orderBy('published_at', $this->sort === 'oldest' ? 'asc' : 'desc')
             ->paginate(self::PER_PAGE, [
-                'id', 'slug', 'title', 'excerpt', 'published_at', 'reading_time_minutes',
+                'id', 'slug', 'title', 'excerpt', 'published_at', 'updated_at', 'reading_time_minutes',
             ]);
 
         return view('livewire.post-search', [

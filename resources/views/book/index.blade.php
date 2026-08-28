@@ -105,7 +105,6 @@
     @include('book.sections.benefits')
     @include('book.sections.author')
     @include('book.sections.contents')
-    @include('book.sections.scarcity')
     @include('book.sections.faq')
     @include('book.sections.final-cta')
     </main>
