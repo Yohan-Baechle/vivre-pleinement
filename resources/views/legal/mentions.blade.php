@@ -1,5 +1,6 @@
 @php
     $editor = config('legal.editor');
+    $contactEmail = \App\Support\SiteContact::email();
     $host = config('legal.host');
     $webmaster = config('legal.webmaster');
     $site = config('legal.site');
@@ -19,14 +20,14 @@
         <li>Adresse : {{ $editor['address'] }}</li>
         <li>SIRET : {{ $editor['siret'] }}</li>
         <li>{{ $editor['vat'] }}</li>
-        <li>Email : <a href="mailto:{{ $editor['email'] }}">{{ $editor['email'] }}</a></li>
+        <li>Email : <a href="mailto:{{ $contactEmail }}">{{ $contactEmail }}</a></li>
         @if ($editor['phone'])
             <li>Téléphone : <a href="tel:{{ str_replace(' ', '', $editor['phone']) }}">{{ $editor['phone'] }}</a></li>
         @endif
     </ul>
 
     <h2>2. Directrice de la publication</h2>
-    <p>{{ $editor['publication_director'] }}, joignable à l'adresse <a href="mailto:{{ $editor['email'] }}">{{ $editor['email'] }}</a>.</p>
+    <p>{{ $editor['publication_director'] }}, joignable à l'adresse <a href="mailto:{{ $contactEmail }}">{{ $contactEmail }}</a>.</p>
 
     <h2>3. Hébergement</h2>
     <p>Le site est hébergé par :</p>

@@ -1,8 +1,8 @@
 <x-section id="a-propos" bg="bg-white">
     <div class="grid grid-cols-1 items-center gap-12 lg:grid-cols-2 lg:gap-16">
         <div class="relative mx-auto w-full max-w-md">
-            <div class="rounded-5xl via-cream-100 to-rose-soft/40 absolute inset-0 -z-10 bg-linear-to-br from-teal-100/60 blur-2xl"></div>
-            <div class="bg-cream-100 relative aspect-square overflow-hidden rounded-4xl shadow-2xl ring-8 ring-white">
+            <div class="via-cream-100 to-rose-soft/40 absolute inset-0 -z-10 rounded-tl-[6rem] rounded-tr-3xl rounded-br-[6rem] rounded-bl-3xl sm:rounded-tl-[9rem] sm:rounded-br-[9rem] bg-linear-to-br from-teal-100/60 blur-2xl"></div>
+            <div class="bg-cream-100 relative aspect-square overflow-hidden rounded-tl-[6rem] rounded-tr-3xl rounded-br-[6rem] rounded-bl-3xl sm:rounded-tl-[9rem] sm:rounded-br-[9rem] shadow-2xl ring-8 ring-white">
                 <img
                     src="{{ asset('images/laura-about-800.webp') }}"
                     srcset="{{ asset('images/laura-about-400.webp') }} 400w, {{ asset('images/laura-about-800.webp') }} 800w, {{ asset('images/laura-about-1200.webp') }} 1200w"

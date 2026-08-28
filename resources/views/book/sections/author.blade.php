@@ -33,7 +33,7 @@
                     Dans mon enfance, on m'a toujours dit que j'étais fragile. Et à force de répéter quelque chose à un enfant, il finit par le croire. Je l'ai donc cru et j'ai développé de multiples troubles anxieux. C'est lorsque ceux-ci sont devenus bien trop handicapants que je me suis sérieusement prise en main. J'ai été voir de nombreux psychothérapeutes, dévoré énormément de livres de développement personnel, pratiqué des médecines alternatives&hellip; je me suis introspectée et j'ai effectué un immense travail sur moi-même.
                 </p>
                 <p>
-                    Depuis, j'ai obtenu un certificat en pensée positive et en santé mentale.
+                    Depuis, je suis devenue praticienne ACT (thérapie d'acceptation et d'engagement). L'ACT est une approche thérapeutique dont l'efficacité est validée scientifiquement. Elle fait partie des TCC de 3<sup>e</sup> vague, qui enrichissent les thérapies cognitives et comportementales classiques.
                 </p>
                 <p class="text-ink">Nous avons donc beaucoup de choses en commun.</p>
                 <p>

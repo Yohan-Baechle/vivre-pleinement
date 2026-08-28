@@ -6,6 +6,8 @@
 
 @php
     use Illuminate\Support\Number;
+
+    $contactEmail = \App\Support\SiteContact::email();
 @endphp
 
 @push('head')
@@ -61,7 +63,7 @@
     <main id="main">
 
     {{-- ════════ HERO : point de départ du parcours ════════ --}}
-    <header data-booking-hero class="to-cream-50 relative overflow-hidden bg-linear-to-b from-teal-100 via-teal-50/70 pt-32 pb-16 sm:pt-36 sm:pb-24">
+    <header data-booking-hero class="to-cream-50 relative overflow-hidden bg-linear-to-b from-teal-100 via-teal-50/70 pt-32 pb-8 sm:pt-36 sm:pb-12">
         <div class="site-container">
             <x-breadcrumb :items="[
                 ['label' => 'Accueil', 'url' => route('home')],
@@ -69,11 +71,8 @@
             ]" />
 
             <div class="mx-auto mt-10 max-w-4xl text-center lg:mt-14">
-                <p class="inline-flex items-center gap-2 rounded-full bg-white/80 px-4 py-1.5 text-xs font-medium text-teal-700 ring-1 ring-teal-200">
+                <h1 class="text-ink font-serif text-3xl/tight font-medium tracking-tight sm:text-4xl/tight lg:text-5xl/tight">
                     Accompagnement en thérapie d'acceptation et d'engagement (ACT)
-                </p>
-                <h1 class="text-ink mt-6 font-serif text-3xl/tight font-medium tracking-tight sm:text-4xl/tight lg:text-5xl/tight">
-                    Oui, vous pouvez vous libérer de vos troubles anxieux&nbsp;: laissez-moi vous accompagner sur le chemin de la guérison&nbsp;!
                 </h1>
                 <p class="text-ink font-serif mt-5 text-xl font-medium sm:text-2xl">
                     Par téléphone ou en visio
@@ -84,24 +83,23 @@
                         <span class="text-ink-soft text-sm">· séance de {{ $primaryService->duration_minutes }} min</span>
                     </p>
                 @endif
-                <p class="text-ink-soft mx-auto mt-5 max-w-2xl text-base sm:text-lg">
-                    Afin d'obtenir un accompagnement individuel, personnalisé et unique pour vous libérer de
-                    vos troubles anxieux
-                </p>
-
                 {{-- Modalités : avatars --}}
                 <div class="mt-10 flex items-center justify-center gap-8 sm:gap-12">
+                    {{-- Cadre « feuille » : les clichés sont en 2:3, un disque
+                         perdrait soit le visage, soit l'ordinateur. Les deux
+                         angles adoucis sont inversés d'une photo à l'autre pour
+                         que la paire se réponde. --}}
                     @foreach ([
-                        ['img' => 'consultation-visio', 'alt' => 'Laura en visio', 'label' => 'En visio'],
-                        ['img' => 'consultation-telephone', 'alt' => 'Laura au téléphone', 'label' => 'Par téléphone'],
+                        ['img' => 'consultation-visio', 'alt' => 'Laura en visio', 'label' => 'En visio', 'shape' => 'rounded-tl-[4rem] rounded-br-[4rem] rounded-tr-2xl rounded-bl-2xl sm:rounded-tl-[6rem] sm:rounded-br-[6rem]'],
+                        ['img' => 'consultation-telephone', 'alt' => 'Laura au téléphone', 'label' => 'Par téléphone', 'shape' => 'rounded-tr-[4rem] rounded-bl-[4rem] rounded-tl-2xl rounded-br-2xl sm:rounded-tr-[6rem] sm:rounded-bl-[6rem]'],
                     ] as $mode)
                         <figure class="flex flex-col items-center gap-3">
                             <img
                                 src="{{ asset('images/'.$mode['img'].'-400.webp') }}"
                                 srcset="{{ asset('images/'.$mode['img'].'-400.webp') }} 400w, {{ asset('images/'.$mode['img'].'-800.webp') }} 800w"
-                                sizes="(min-width: 640px) 144px, 112px" width="144" height="144"
+                                sizes="(min-width: 640px) 200px, 144px" width="200" height="267"
                                 alt="{{ $mode['alt'] }}"
-                                class="size-28 shrink-0 rounded-full object-cover object-top shadow-lg ring-4 ring-white sm:size-36"
+                                class="{{ $mode['shape'] }} aspect-3/4 w-36 shrink-0 object-cover shadow-lg ring-4 ring-white sm:w-50"
                                 loading="eager" decoding="async">
                             <figcaption class="text-ink text-sm font-medium sm:text-base">{{ $mode['label'] }}</figcaption>
                         </figure>
@@ -140,7 +138,7 @@
 
                 <p class="text-ink-muted mt-6 text-sm">
                     <strong class="text-teal-700">Une question&nbsp;?</strong>
-                    Contactez-moi&nbsp;: <a href="mailto:contact@vivre-pleinement.fr" class="font-medium text-teal-700 underline-offset-2 hover:underline">contact@vivre-pleinement.fr</a>
+                    Contactez-moi&nbsp;: <a href="mailto:{{ $contactEmail }}" class="font-medium text-teal-700 underline-offset-2 hover:underline">{{ $contactEmail }}</a>
                 </p>
             </div>
         </div>
@@ -181,22 +179,16 @@
         {{-- Mise en exergue : le passage clé --}}
         <figure class="mx-auto mt-12 max-w-3xl border-l-2 border-teal-300 pl-6 sm:pl-8">
             <blockquote class="text-ink font-serif text-xl leading-snug font-medium sm:text-2xl">
-                <p class="mb-4">
+                <p>
                     En fait, ce n'est pas de votre faute si vous vous sentez si mal. Vous n'avez simplement pas eu
                     les bons outils jusqu'à maintenant.
-                </p>
-                <p>
-                    Écoutez&nbsp;: si vous souhaitez aller mieux, vous devez agir. Mais si vous vous trouvez sur cette
-                    page, c'est que quelque chose a changé en vous. En effet, il existe deux types de personnes&nbsp;: les
-                    victimes, qui se plaignent constamment sans agir, et les autres, qui agissent et prennent leur
-                    vie en main. Et vous rejoignez, désormais, les personnes qui passent à l'action.
                 </p>
             </blockquote>
         </figure>
 
         <div class="mt-10 text-center">
             <a href="#reserver" class="inline-flex items-center gap-2 text-sm font-medium text-teal-700 transition hover:text-teal-800">
-                <span class="border-b border-teal-700/30">Si vous êtes motivé, vous pouvez prendre rendez-vous avec moi.</span>
+                <span class="border-b border-teal-700/30">Si la prestation que je propose vous intéresse, vous pouvez prendre rendez-vous avec moi.</span>
                 <span aria-hidden="true">→</span>
             </a>
         </div>
@@ -205,11 +197,6 @@
     {{-- Pour qui --}}
     <x-section bg="bg-white" eyebrow="Pour qui ?" title="Pour qui est fait cet accompagnement en ACT ?" headerWidth="max-w-3xl">
         <div class="text-ink-soft mx-auto max-w-2xl space-y-6 text-base leading-relaxed sm:text-lg">
-            <p>
-                Admettez-le&nbsp;: vous souhaitez des résultats rapides. Et c'est normal, puisque vous ne supportez
-                plus de vivre avec toute cette anxiété. C'est ici que j'interviens en vous proposant mes services
-                d'accompagnement.
-            </p>
             <p>
                 L'ACT est une approche thérapeutique dont l'efficacité est validée scientifiquement. Elle fait
                 partie des TCC de 3ᵉ vague, qui enrichissent les thérapies cognitives et comportementales
@@ -315,7 +302,7 @@
         @if (! $primaryService)
             <p class="text-ink-soft ring-ink/5 mx-auto max-w-xl rounded-3xl bg-white p-8 text-center ring-1">
                 Aucun créneau n'est disponible à la réservation pour le moment.
-                <a href="mailto:contact@vivre-pleinement.fr" class="font-medium text-teal-700 hover:text-teal-800">Écrivez-moi</a> directement.
+                <a href="mailto:{{ $contactEmail }}" class="font-medium text-teal-700 hover:text-teal-800">Écrivez-moi</a> directement.
             </p>
         @else
             <div class="mx-auto max-w-3xl">
