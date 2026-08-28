@@ -1,5 +1,6 @@
 @php
     $editor = config('legal.editor');
+    $contactEmail = \App\Support\SiteContact::email();
     $mediator = config('legal.mediator');
 
     $title = 'Conditions générales de vente';
@@ -51,7 +52,7 @@
     </p>
     <p>
         Les prestations ne sont pas remboursées par la Sécurité sociale. Certaines mutuelles peuvent
-        prendre en charge tout ou partie des séances de coaching ; il appartient au Client de se
+        prendre en charge tout ou partie des séances d'accompagnement ; il appartient au Client de se
         renseigner auprès de la sienne.
     </p>
 
@@ -74,7 +75,7 @@
     </p>
     <p>
         Pour exercer ce droit, le Client doit notifier sa décision par email à
-        <a href="mailto:{{ $editor['email'] }}">{{ $editor['email'] }}</a>.
+        <a href="mailto:{{ $contactEmail }}">{{ $contactEmail }}</a>.
     </p>
     <p>
         Si le Client demande expressément le commencement de la prestation avant la fin du délai de
@@ -164,12 +165,6 @@
         <li>Adresse : {{ $mediator['address'] }}</li>
         <li>Site : <a href="{{ $mediator['website'] }}" target="_blank" rel="noopener">{{ $mediator['website'] }}</a></li>
     </ul>
-    <p>
-        Le Client peut également recourir à la plateforme européenne de Règlement en Ligne des
-        Litiges (RLL) :
-        <a href="https://ec.europa.eu/consumers/odr" target="_blank" rel="noopener">ec.europa.eu/consumers/odr</a>.
-    </p>
-
     <h2>15. Loi applicable et juridiction</h2>
     <p>
         Les présentes CGV sont soumises au droit français. En cas de litige et après échec de toute

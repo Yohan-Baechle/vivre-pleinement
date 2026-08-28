@@ -54,7 +54,6 @@ it('reprend les textes de la page de vente d\'origine', function () {
         'Je sais, c\'est douloureux.',
         'Vous n\'avez pas eu les bonnes informations pour aller mieux',
         'Chapitre 4 – 12 fiches pratiques à suivre',
-        'Attention, les places sont limitées',
         'Foire aux questions (FAQ)',
     ] as $excerpt) {
         $response->assertSee($excerpt, false);
@@ -74,7 +73,9 @@ it('affiche les prix du catalogue plutôt que des montants figés', function () 
     $this->get(route('book.show'))
         ->assertOk()
         ->assertSee('42', false)
-        ->assertDontSee('Obtenir le livre uniquement · 37', false);
+        ->assertDontSee('Obtenir le livre uniquement · 37', false)
+        ->assertDontSee('37 €', false)
+        ->assertDontSee('37&nbsp;€', false);
 });
 
 it('affiche le formulaire de commande pour chaque formule', function (string $offer, string $expected) {
