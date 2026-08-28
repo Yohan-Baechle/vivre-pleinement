@@ -125,6 +125,12 @@ class AppointmentSlotService
      * doivent produire qu'un seul créneau par horaire de début, sans quoi le
      * client voit le même horaire proposé plusieurs fois.
      *
+     * Le délai de prévenance est ramené à minuit du jour qu'il atteint : sans
+     * cet arrondi, une consultation à 17 h 03 escamotait le créneau de 17 h du
+     * jour ouvert par le délai, et la liste s'érodait heure par heure au fil de
+     * la journée. La borne est malgré tout maintenue à l'instant présent, pour
+     * qu'un délai nul ne ressorte pas les créneaux déjà passés du jour même.
+     *
      * @param  array{
      *     availabilities: Collection<int, Availability>,
      *     overridesByDate: Collection<string, Collection<int, DateOverride>>,
@@ -150,7 +156,7 @@ class AppointmentSlotService
             return collect();
         }
 
-        $minBookable = $now->addHours($service->min_notice_hours);
+        $minBookable = $now->addHours($service->min_notice_hours)->startOfDay()->max($now);
 
         $booked = $context['bookedByDate']->get($date->toDateString(), collect())
             ->map(fn (Appointment $appointment) => [
