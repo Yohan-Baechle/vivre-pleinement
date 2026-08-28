@@ -7,7 +7,7 @@
     'headerWidth' => 'max-w-2xl',
 ])
 
-<section @if($id) id="{{ $id }}" @endif {{ $attributes->class([$bg, 'relative py-20 sm:py-24 lg:py-32']) }}>
+<section @if($id) id="{{ $id }}" @endif {{ $attributes->class([$bg, 'relative py-9 sm:py-11 lg:py-14']) }}>
     <div class="site-container">
         @if($eyebrow || $title || $lead)
             <div class="mx-auto {{ $headerWidth }} text-center">
@@ -29,7 +29,7 @@
             </div>
         @endif
 
-        <div @class(['mt-12 sm:mt-16' => $eyebrow || $title || $lead])>
+        <div @class(['mt-8 sm:mt-10' => $eyebrow || $title || $lead])>
             {{ $slot }}
         </div>
     </div>

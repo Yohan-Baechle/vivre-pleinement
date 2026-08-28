@@ -1,5 +1,6 @@
 @php
     $controller = config('legal.data_controller');
+    $contactEmail = \App\Support\SiteContact::email();
 
     $title = 'Politique cookies';
     $intro = "Cette politique explique quels cookies et traceurs sont utilisés sur le site et comment vous pouvez les gérer, conformément à la recommandation CNIL du 17 septembre 2020 (délibération 2020-091).";
@@ -92,6 +93,6 @@
     <h2>7. Contact</h2>
     <p>
         Pour toute question relative à l'usage des cookies, vous pouvez nous contacter à
-        <a href="mailto:{{ $controller['email'] }}">{{ $controller['email'] }}</a>.
+        <a href="mailto:{{ $contactEmail }}">{{ $contactEmail }}</a>.
     </p>
 @endsection

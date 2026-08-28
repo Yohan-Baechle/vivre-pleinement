@@ -38,14 +38,14 @@
                     <x-book-offer-cta
                         slug="livre-coaching"
                         :available="$offerAvailable('livre-coaching')"
-                        :label="'Obtenir le livre + le coaching · '.$offerPrice($offerCoaching)"
+                        :label="'Obtenir le livre + l\'accompagnement · '.$offerPrice($offerCoaching)"
                         class="hover:bg-cream-50 inline-flex w-full items-center justify-center gap-2 rounded-full bg-white px-7 py-3.5 text-sm font-medium text-teal-800 shadow-xs ring-1 ring-teal-200 transition sm:w-auto sm:text-base" />
                 </div>
             </div>
 
             <p class="text-ink-soft mt-8 text-sm sm:text-base">
                 Dès que vous voyez les premiers résultats, envoyez-moi un mail à l'adresse
-                <a href="mailto:{{ config('legal.site.contact_email') }}" class="border-b border-teal-700/30 text-teal-700">{{ config('legal.site.contact_email') }}</a>
+                <a href="mailto:{{ \App\Support\SiteContact::email() }}" class="border-b border-teal-700/30 text-teal-700">{{ \App\Support\SiteContact::email() }}</a>
             </p>
         @else
             <div class="mt-10">

@@ -102,7 +102,7 @@ class PostController extends Controller
             ->whereHas('categories', fn ($query) => $query->where('categories.id', $category->id))
             ->orderByDesc('published_at')
             ->paginate(self::PER_PAGE, [
-                'id', 'slug', 'title', 'excerpt', 'published_at', 'reading_time_minutes',
+                'id', 'slug', 'title', 'excerpt', 'published_at', 'updated_at', 'reading_time_minutes',
             ])
             ->withQueryString();
 
@@ -123,7 +123,7 @@ class PostController extends Controller
             ->whereHas('tags', fn ($query) => $query->where('tags.id', $tag->id))
             ->orderByDesc('published_at')
             ->paginate(self::PER_PAGE, [
-                'id', 'slug', 'title', 'excerpt', 'published_at', 'reading_time_minutes',
+                'id', 'slug', 'title', 'excerpt', 'published_at', 'updated_at', 'reading_time_minutes',
             ])
             ->withQueryString();
 

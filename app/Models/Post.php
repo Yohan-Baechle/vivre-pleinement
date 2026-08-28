@@ -266,4 +266,18 @@ class Post extends Model implements HasMedia
             ? $this->updated_at
             : $this->published_at;
     }
+
+    /**
+     * Vrai lorsque l'article a été retouché après sa publication : la date
+     * affichée est alors celle de la mise à jour, plus rassurante qu'une date
+     * de publication ancienne sur un contenu santé.
+     */
+    public function wasUpdatedSincePublication(): bool
+    {
+        $modified = $this->lastModifiedAt();
+
+        return $modified !== null
+            && $this->published_at !== null
+            && $modified->greaterThan($this->published_at);
+    }
 }

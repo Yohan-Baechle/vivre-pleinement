@@ -44,8 +44,8 @@ class ContentCta
 
         return [
             'kind' => 'book',
-            'title' => 'Soigner les pensées intrusives & le TOC, naturellement',
-            'description' => 'Le livre de Laura pour comprendre vos pensées intrusives et vous en libérer, étape par étape.',
+            'title' => "Soigner le TOC de la phobie d'impulsion à l'aide de traitements naturels",
+            'description' => 'Mon livre pour comprendre vos pensées intrusives et vous en libérer, étape par étape.',
             'url' => route('book.show'),
             'label' => 'Découvrir le livre',
         ];
