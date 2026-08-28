@@ -54,14 +54,36 @@ it('generates slots stepped by the service duration', function () {
         ->and($slots->last()['label'])->toBe('11:30');
 });
 
-it('excludes slots inside the minimum-notice window', function () {
+it('excludes the days inside the minimum-notice window', function () {
     $today = CarbonImmutable::now();
-    $service = serviceWithAvailability($today->dayOfWeek, '00:00', '23:30', ['min_notice_hours' => 12]);
+    $service = serviceWithAvailability($today->dayOfWeek, '00:00', '23:30', ['min_notice_hours' => 24]);
 
-    $slots = app(AppointmentSlotService::class)->slotsForDate($service, $today->startOfDay());
+    expect(app(AppointmentSlotService::class)->slotsForDate($service, $today->startOfDay()))->toBeEmpty();
+});
 
-    $minBookable = $today->addHours(12);
-    expect($slots->every(fn ($slot) => $slot['start']->greaterThanOrEqualTo($minBookable)))->toBeTrue();
+it('keeps the late slots of an open day whatever the hour of the day', function () {
+    $monday = CarbonImmutable::now()->startOfWeek()->addWeek()->setTime(17, 3);
+    $this->travelTo($monday);
+
+    $service = serviceWithAvailability(3, '17:00', '19:00', ['min_notice_hours' => 48]);
+    $wednesday = $monday->startOfDay()->addDays(2);
+
+    $labels = app(AppointmentSlotService::class)->slotsForDate($service, $wednesday)->pluck('label');
+
+    expect($labels)->toContain('17:00')
+        ->and($labels)->toContain('18:00');
+});
+
+it('never offers a slot already gone when no notice is required', function () {
+    $this->travelTo(CarbonImmutable::now()->startOfDay()->addHours(12));
+
+    $today = CarbonImmutable::now();
+    $service = serviceWithAvailability($today->dayOfWeek, '09:00', '18:00', ['min_notice_hours' => 0]);
+
+    $labels = app(AppointmentSlotService::class)->slotsForDate($service, $today->startOfDay())->pluck('label');
+
+    expect($labels)->not->toContain('09:00')
+        ->and($labels)->toContain('12:00');
 });
 
 it('excludes dates beyond the booking horizon', function () {
