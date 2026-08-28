@@ -1,10 +1,10 @@
 @php
-    $authorEmail = config('legal.site.contact_email');
+    $authorEmail = \App\Support\SiteContact::email();
 
     $faq = [
         [
             'q' => "Comment se passe le règlement ? Aurais-je un justificatif d'achat ?",
-            'a' => "En cliquant sur le bouton « obtenir le livre + le coaching » ou « obtenir le livre uniquement », vous allez arriver sur une page de paiement sécurisé. Vous devrez remplir les informations demandées pour finaliser la commande. Vous recevrez ensuite un courriel de confirmation de commande directement dans votre boîte mail et bien évidemment, avec le livre numérique à télécharger.",
+            'a' => "En cliquant sur le bouton « obtenir le livre + l'accompagnement » ou « obtenir le livre uniquement », vous allez arriver sur une page de paiement sécurisé. Vous devrez remplir les informations demandées pour finaliser la commande. Vous recevrez ensuite un courriel de confirmation de commande directement dans votre boîte mail et bien évidemment, avec le livre numérique à télécharger.",
         ],
         [
             'q' => "Je n'aime pas acheter des produits sur Internet, car je n'ai pas confiance. L'achat est-il vraiment sécurisé ?",
@@ -15,12 +15,12 @@
             'a' => "Les données remplies lors de la commande restent anonymes pour votre banque. L'achat sur votre compte bancaire portera la mention : vivre pleinement.",
         ],
         [
-            'q' => "Si j'opte pour le pack avec coaching, comment cela va-t-il se passer pour prendre rendez-vous ?",
-            'a' => "Après avoir validé votre commande et renseigné vos coordonnées, un email vous sera envoyé automatiquement. Cet email contiendra un lien de téléchargement ainsi qu'un code unique. Ce code vous permettra de planifier un rendez-vous de coaching directement sur le site dans la rubrique « Prendre rendez-vous » et la prestation sera affichée à 0 €.",
+            'q' => "Si j'opte pour le pack avec accompagnement, comment cela va-t-il se passer pour prendre rendez-vous ?",
+            'a' => "Après avoir validé votre commande et renseigné vos coordonnées, un email vous sera envoyé automatiquement. Cet email contiendra un lien de téléchargement ainsi qu'un code unique. Ce code vous permettra de planifier un rendez-vous directement sur le site dans la rubrique « Prendre rendez-vous » et la prestation sera affichée à 0 €.",
         ],
         [
-            'q' => "Est-ce qu'un accompagnement à distance est aussi efficace qu'un coaching en présentiel ?",
-            'a' => "Les coachings à distance se font de plus en plus. Certains coachs arrivent à utiliser l'hypnose à distance, par exemple. Pour quelques cas particuliers, le coaching en présentiel apparaît nécessaire, comme aller se promener avec son coach dans le cadre d'un exercice pour lutter contre la timidité. Autrement, le coaching à distance vaut autant qu'un accompagnement en présentiel. Vous évitez de prendre la voiture, restez chez vous dans votre confort, et surtout : vous pouvez joindre votre coach où que vous vous trouviez dans le monde ! Et certaines personnes, réticentes à aller confier leurs soucis anxieux à un coach, éprouvent moins de difficultés à le faire à distance.",
+            'q' => "Est-ce qu'un accompagnement à distance est aussi efficace qu'un accompagnement en présentiel ?",
+            'a' => "Les accompagnements à distance se font de plus en plus. Certains praticiens arrivent à utiliser l'hypnose à distance, par exemple. Pour quelques cas particuliers, un accompagnement en présentiel apparaît nécessaire, comme aller se promener avec son praticien dans le cadre d'un exercice pour lutter contre la timidité. Autrement, un accompagnement à distance vaut autant qu'un accompagnement en présentiel. Vous évitez de prendre la voiture, restez chez vous dans votre confort, et surtout : vous pouvez joindre votre praticien où que vous vous trouviez dans le monde ! Et certaines personnes, réticentes à aller confier leurs soucis anxieux à un praticien, éprouvent moins de difficultés à le faire à distance.",
         ],
         [
             'q' => "Ce n'est qu'un simple fichier PDF et non un livre ?",

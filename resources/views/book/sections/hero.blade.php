@@ -100,7 +100,7 @@
 
                 <div class="absolute -bottom-4 -left-4 z-10 rounded-2xl bg-white/95 px-4 py-3 shadow-xl ring-1 ring-black/5 backdrop-blur-sm">
                     <p class="text-xs font-medium tracking-wider text-teal-700 uppercase">À partir de</p>
-                    <p class="text-ink mt-0.5 font-serif text-2xl font-medium">37 €</p>
+                    <p class="text-ink mt-0.5 font-serif text-2xl font-medium">{!! $offerPrice($offerSolo) !!}</p>
                 </div>
             </div>
         </div>

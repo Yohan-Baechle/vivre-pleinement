@@ -19,7 +19,7 @@
     id="troubles"
     eyebrow="Mon accompagnement"
     title="Sur quels types de troubles anxieux puis-je intervenir ?"
-    lead="Je peux vous accompagner dans les troubles et problèmes émotionnels suivants :"
+    lead="Je peux vous accompagner dans les troubles anxieux et problèmes émotionnels suivants :"
 >
     <ul class="mx-auto grid max-w-4xl grid-cols-1 gap-x-8 gap-y-1 sm:grid-cols-2">
         @foreach ($troubles as $trouble)

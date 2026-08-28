@@ -120,8 +120,8 @@
                             <span class="text-ink font-medium">Laura Baechlé</span>
                         </div>
                         <span aria-hidden="true">·</span>
-                        <time datetime="{{ $post->published_at?->toIso8601String() }}">
-                            {{ $post->published_at?->isoFormat('D MMMM YYYY') }}
+                        <time datetime="{{ $post->lastModifiedAt()?->toIso8601String() }}">
+                            {{ $post->wasUpdatedSincePublication() ? 'Mis à jour le ' : 'Publié le ' }}{{ $post->lastModifiedAt()?->isoFormat('D MMMM YYYY') }}
                         </time>
                         <span aria-hidden="true">·</span>
                         <span>{{ $post->readingTimeMinutes() }} min de lecture</span>
