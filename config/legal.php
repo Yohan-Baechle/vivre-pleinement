@@ -18,7 +18,6 @@ return [
         'domain' => env('LEGAL_SITE_DOMAIN', 'vivre-pleinement.fr'),
         'url' => env('APP_URL', 'https://vivre-pleinement.fr'),
         'tagline' => 'Accompagnement spécialisé dans les troubles anxieux',
-        'contact_email' => 'contact@vivre-pleinement.fr',
     ],
 
     'editor' => [
@@ -27,7 +26,6 @@ return [
         'address' => '7 Rue du Moulin Saintin',
         'siret' => '90377213500013',
         'vat' => 'TVA non applicable, article 293 B du CGI',
-        'email' => 'jasiewicz.laura@gmail.com',
         'phone' => env('LEGAL_PHONE'),
         'publication_director' => 'Laura Baechlé',
     ],
@@ -40,20 +38,19 @@ return [
     ],
 
     'webmaster' => [
-        'name' => 'Evogenis',
-        'email' => 'contact@evogenis.com',
+        'name' => 'Byohan',
+        'email' => 'contact@byohan.fr',
     ],
 
     'data_controller' => [
         'name' => 'Laura Baechlé',
-        'email' => 'jasiewicz.laura@gmail.com',
         'address' => '7 Rue du Moulin Saintin',
     ],
 
     'mediator' => [
-        'name' => 'CNPM Médiation Consommation',
-        'address' => '27 Avenue de la Libération, 42400 Saint-Chamond',
-        'website' => 'https://cnpm-mediation-consommation.eu',
+        'name' => 'CM2C — Centre de la Médiation de la Consommation de Conciliateurs de Justice',
+        'address' => '49 rue de Ponthieu, 75008 Paris',
+        'website' => 'https://www.cm2c.net',
     ],
 
     'cnil' => [

@@ -3,8 +3,8 @@
     $home = route('home');
     $nav = [
         'Accompagnement' => [
-            ['Troubles accompagnés', $home.'#troubles'],
-            ['Comment ça se passe', $home.'#methode'],
+            ["Domaines d'accompagnement", $home.'#troubles'],
+            ['Déroulé des séances', $home.'#methode'],
             ['Témoignages', $home.'#temoignages'],
         ],
         /**
@@ -47,7 +47,7 @@
                     >
                 </a>
                 <p class="text-cream-100/70 mt-5 max-w-sm text-sm leading-relaxed">
-                    Accompagnement spécialisé pour se libérer des troubles anxieux : anxiété généralisée, phobies, TOC, burnout. À votre rythme, en toute bienveillance.
+                    Accompagnement ACT (thérapie d'acceptation et d'engagement) pour se libérer des troubles anxieux. À votre rythme, en toute bienveillance.
                 </p>
 
                 @if (! empty($socials))

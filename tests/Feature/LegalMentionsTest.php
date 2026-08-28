@@ -15,6 +15,15 @@ it('affiche la mention de franchise en base de TVA', function (): void {
         ->assertSee('TVA non applicable, article 293 B du CGI');
 });
 
+it('affiche le médiateur de la consommation dans les CGV', function (): void {
+    $this->get(route('legal.cgv'))
+        ->assertOk()
+        ->assertSee(config('legal.mediator.name'), false)
+        ->assertSee(config('legal.mediator.address'))
+        ->assertSee(config('legal.mediator.website'))
+        ->assertDontSee('ec.europa.eu/consumers/odr');
+});
+
 it('declare OVH comme hébergeur et la franchise en base', function (): void {
     expect(config('legal.host.name'))->toBe('OVH SAS')
         ->and(config('legal.editor.vat'))

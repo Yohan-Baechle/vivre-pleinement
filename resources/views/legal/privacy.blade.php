@@ -1,5 +1,6 @@
 @php
     $editor = config('legal.editor');
+    $contactEmail = \App\Support\SiteContact::email();
     $controller = config('legal.data_controller');
     $cnil = config('legal.cnil');
     $site = config('legal.site');
@@ -19,7 +20,7 @@
     <ul>
         <li><strong>{{ $controller['name'] }}</strong></li>
         <li>Adresse : {{ $controller['address'] }}</li>
-        <li>Email : <a href="mailto:{{ $controller['email'] }}">{{ $controller['email'] }}</a></li>
+        <li>Email : <a href="mailto:{{ $contactEmail }}">{{ $contactEmail }}</a></li>
     </ul>
     <p>
         Compte tenu de la nature et du volume des traitements, la désignation d'un Délégué à la
@@ -117,7 +118,7 @@
     </ul>
     <p>
         Pour exercer ces droits, contactez-nous à l'adresse
-        <a href="mailto:{{ $controller['email'] }}">{{ $controller['email'] }}</a> en joignant
+        <a href="mailto:{{ $contactEmail }}">{{ $contactEmail }}</a> en joignant
         un justificatif d'identité. Nous nous engageons à répondre dans un délai d'un mois maximum
         (prorogeable à trois mois si la demande est complexe).
     </p>

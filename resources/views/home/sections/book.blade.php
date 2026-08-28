@@ -9,7 +9,7 @@
         : '';
 @endphp
 
-<section class="relative overflow-hidden bg-white py-20 sm:py-24 lg:py-32">
+<section class="relative overflow-hidden bg-white py-9 sm:py-11 lg:py-14">
     <div class="site-container">
         <div class="group relative overflow-hidden rounded-4xl bg-linear-to-br from-teal-700 to-teal-800 shadow-2xl shadow-teal-700/20">
             {{-- Halo sous la couverture : la section a déjà son sujet visuel,
@@ -49,7 +49,7 @@
                         Pensées intrusives, TOC, phobie d'impulsion&nbsp;?
                     </h2>
                     <p class="mt-5 max-w-xl text-base leading-relaxed text-teal-50 sm:text-lg lg:mx-0">
-                        77 pages claires et 12 fiches pratiques pour comprendre ce qui vous arrive et vous en libérer, sans médicaments, à votre rythme.
+                        77 pages et 12 fiches pratiques pour comprendre ce qui vous arrive et vous en libérer, à l'aide de traitements naturels, à votre rythme.
                     </p>
 
                     <div class="mt-8 flex flex-wrap items-center justify-center gap-3 sm:gap-4 lg:justify-start">

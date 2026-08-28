@@ -64,10 +64,10 @@
                     Le problème, c'est que même si vous suivez ce guide, vous risquez de vivre des moments de doutes et de rechutes. Vous pourriez alors vous démotiver et abandonner l'idée d'aller mieux.
                 </p>
                 <p>
-                    C'est pourquoi je vous invite à vous procurer le pack coaching + livre. En effet, l'information seule ne suffit pas&nbsp;: il vous faut un encadrement pour vous investir.
+                    C'est pourquoi je vous invite à vous procurer le pack accompagnement + livre. En effet, l'information seule ne suffit pas&nbsp;: il vous faut un encadrement pour vous investir.
                 </p>
                 <p>
-                    En étant atteint du TOC de la phobie d'impulsion, vous savez ce que cela fait de souffrir depuis longtemps. Donc, autant mettre toutes les chances de votre côté pour aller mieux. En optant pour le pack coaching + livre, vous mettrez ainsi toutes les chances de votre côté.
+                    En étant atteint du TOC de la phobie d'impulsion, vous savez ce que cela fait de souffrir depuis longtemps. Donc, autant mettre toutes les chances de votre côté pour aller mieux. En optant pour le pack accompagnement + livre, vous mettrez ainsi toutes les chances de votre côté.
                 </p>
             </div>
         </div>
