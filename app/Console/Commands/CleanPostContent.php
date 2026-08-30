@@ -31,7 +31,9 @@ class CleanPostContent extends Command
                 continue;
             }
 
-            $post->forceFill(['content' => $clean])->saveQuietly();
+            Post::withoutTimestamps(
+                fn () => $post->forceFill(['content' => $clean])->saveQuietly()
+            );
         }
 
         $verb = $dryRun ? 'à nettoyer' : 'nettoyé(s)';

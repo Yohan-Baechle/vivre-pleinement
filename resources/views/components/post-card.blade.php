@@ -43,10 +43,12 @@
                 </a>
                 <span class="text-ink-muted" aria-hidden="true">·</span>
             @endif
-            <time datetime="{{ $post->lastModifiedAt()?->toIso8601String() }}" class="text-ink-muted">
-                {{ $post->wasUpdatedSincePublication() ? 'Maj ' : '' }}{{ $post->lastModifiedAt()?->isoFormat('D MMM YYYY') }}
-            </time>
-            <span class="text-ink-muted" aria-hidden="true">·</span>
+            @if ($post->wasUpdatedSincePublication())
+                <time datetime="{{ $post->lastModifiedAt()?->toIso8601String() }}" class="text-ink-muted">
+                    Maj {{ $post->lastModifiedAt()?->isoFormat('D MMM YYYY') }}
+                </time>
+                <span class="text-ink-muted" aria-hidden="true">·</span>
+            @endif
             <span class="text-ink-muted">{{ $post->readingTimeMinutes() }} min de lecture</span>
         </div>
 

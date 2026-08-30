@@ -39,7 +39,9 @@ class FixPostSeo extends Command
                 continue;
             }
 
-            $post->forceFill(['content' => $clean])->saveQuietly();
+            Post::withoutTimestamps(
+                fn () => $post->forceFill(['content' => $clean])->saveQuietly()
+            );
         }
 
         $verb = $dryRun ? 'à corriger' : 'corrigé(s)';

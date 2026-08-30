@@ -37,7 +37,7 @@ class TrimPostSeoDescriptions extends Command
             }
 
             $post->seo_description = $description;
-            $post->save();
+            Post::withoutTimestamps(fn () => $post->save());
         }
 
         $this->newLine();
