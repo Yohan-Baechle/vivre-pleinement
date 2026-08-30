@@ -119,10 +119,12 @@
                             <img src="{{ asset('images/laura-portrait-400.webp') }}" alt="" width="32" height="32" class="size-8 rounded-full object-cover ring-2 ring-white" loading="lazy">
                             <span class="text-ink font-medium">Laura Baechlé</span>
                         </div>
-                        <span aria-hidden="true">·</span>
-                        <time datetime="{{ $post->lastModifiedAt()?->toIso8601String() }}">
-                            {{ $post->wasUpdatedSincePublication() ? 'Mis à jour le ' : 'Publié le ' }}{{ $post->lastModifiedAt()?->isoFormat('D MMMM YYYY') }}
-                        </time>
+                        @if ($post->wasUpdatedSincePublication())
+                            <span aria-hidden="true">·</span>
+                            <time datetime="{{ $post->lastModifiedAt()?->toIso8601String() }}">
+                                Mis à jour le {{ $post->lastModifiedAt()?->isoFormat('D MMMM YYYY') }}
+                            </time>
+                        @endif
                         <span aria-hidden="true">·</span>
                         <span>{{ $post->readingTimeMinutes() }} min de lecture</span>
                     </div>
