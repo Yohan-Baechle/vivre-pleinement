@@ -46,7 +46,9 @@ class FixLegacyContentLinks extends Command
             $this->line(sprintf('%s%s : %d lien(s) réécrit(s)', $dryRun ? '[DRY-RUN] ' : '', $post->slug, $count));
 
             if (! $dryRun) {
-                $post->forceFill(['content' => $content])->saveQuietly();
+                Post::withoutTimestamps(
+                    fn () => $post->forceFill(['content' => $content])->saveQuietly()
+                );
             }
         }
 
