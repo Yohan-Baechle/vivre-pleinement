@@ -53,10 +53,12 @@ class Post extends Model implements HasMedia
     public const ROBOTS_HIDDEN = 'noindex, follow';
 
     /**
-     * Borne haute de l'import WordPress : un updated_at antérieur correspond
-     * à la migration, pas à une vraie édition.
+     * Borne haute des traitements automatisés passés : import WordPress puis
+     * passes SEO en masse. Un updated_at antérieur ne correspond pas à une
+     * vraie révision éditoriale. Les commandes écrivent désormais via
+     * Post::withoutTimestamps(), cette borne n'a donc plus à bouger.
      */
-    private const MIGRATION_IMPORTED_AT = '2026-05-25 23:59:59';
+    private const LAST_AUTOMATED_PASS_AT = '2026-07-06 23:59:59';
 
     /** @use HasFactory<PostFactory> */
     use HasFactory;
@@ -251,10 +253,10 @@ class Post extends Model implements HasMedia
     /**
      * Date de dernière modification réelle, pour le dateModified SEO.
      *
-     * Les articles migrés depuis WordPress ont tous un updated_at à la date
-     * d'import : on retombe alors sur published_at pour ne pas signaler à
-     * Google une modification fictive. Une édition postérieure à l'import est
-     * respectée.
+     * Les articles migrés depuis WordPress puis retouchés par les passes SEO
+     * en masse portent tous un updated_at de traitement : on retombe alors sur
+     * published_at pour ne pas signaler à Google une modification fictive.
+     * Une révision postérieure est respectée.
      */
     public function lastModifiedAt(): ?Carbon
     {
@@ -262,15 +264,16 @@ class Post extends Model implements HasMedia
             return $this->published_at;
         }
 
-        return $this->updated_at->greaterThan(self::MIGRATION_IMPORTED_AT)
+        return $this->updated_at->greaterThan(self::LAST_AUTOMATED_PASS_AT)
             ? $this->updated_at
             : $this->published_at;
     }
 
     /**
-     * Vrai lorsque l'article a été retouché après sa publication : la date
-     * affichée est alors celle de la mise à jour, plus rassurante qu'une date
-     * de publication ancienne sur un contenu santé.
+     * Vrai lorsque l'article a été révisé après sa publication. Le blog étant
+     * du contenu froid, c'est la seule situation où une date est affichée :
+     * une date de publication vieille de plusieurs années dessert un contenu
+     * toujours valable.
      */
     public function wasUpdatedSincePublication(): bool
     {
