@@ -83,6 +83,11 @@
                         <span class="text-ink-soft text-sm">· séance de {{ $primaryService->duration_minutes }} min</span>
                     </p>
                 @endif
+                <p class="text-ink-soft mx-auto mt-5 max-w-2xl text-base sm:text-lg">
+                    Accompagnement individuel, personnalisé et unique pour vous libérer de
+                    vos troubles anxieux
+                </p>
+
                 {{-- Modalités : avatars --}}
                 <div class="mt-10 flex items-center justify-center gap-8 sm:gap-12">
                     {{-- Cadre « feuille » : les clichés sont en 2:3, un disque
