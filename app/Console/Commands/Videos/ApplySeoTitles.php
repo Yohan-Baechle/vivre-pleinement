@@ -160,6 +160,9 @@ class ApplySeoTitles extends Command
             'remerciements-1-000-abonnes-faq-et-projets-a-venir' => '1 000 abonnés : remerciements, FAQ et projets à venir',
             'comment-surmonter-le-syndrome-du-dimanche-mes-conseils-incontournables' => 'Syndrome du dimanche : comment le surmonter',
             'ce-que-cachent-vraiment-les-ruminations-mentales' => 'Ce que cachent vraiment les ruminations mentales',
+            'hypocondrie-pourquoi-vous-doutez-toujours-de-votre-sante' => 'Hypocondrie : pourquoi vous doutez toujours de votre santé',
+            'le-vrai-probleme-du-trouble-anxieux-generalise-nest-pas-lanxiete' => 'Trouble anxieux généralisé : le vrai problème à comprendre',
+            'pourquoi-les-compulsions-soulagent-mais-aggravent-le-toc' => 'TOC : pourquoi les compulsions soulagent mais aggravent tout',
         ];
     }
 }
