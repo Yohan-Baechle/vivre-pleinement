@@ -4,6 +4,7 @@ use App\Http\Controllers\SitemapController;
 use App\Models\Post;
 use App\Models\Video;
 use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 
@@ -102,4 +103,18 @@ it('flushes both sitemap caches when a video is saved', function () {
 
     expect(Cache::has('sitemap.urls'))->toBeFalse()
         ->and(Cache::has(SitemapController::VIDEOS_CACHE_KEY))->toBeFalse();
+});
+
+it('advertises the youtube publication date rather than the last sync', function () {
+    $video = Video::factory()->create([
+        'youtube_published_at' => Carbon::parse('2025-11-03 18:00:00'),
+    ]);
+    $video->forceFill(['updated_at' => Carbon::parse('2026-08-30 11:19:43')])->saveQuietly();
+
+    Cache::forget('sitemap.urls');
+
+    $this->get('/sitemap.xml')
+        ->assertOk()
+        ->assertSee('2025-11-03T18:00:00', escape: false)
+        ->assertDontSee('2026-08-30T11:19:43', escape: false);
 });

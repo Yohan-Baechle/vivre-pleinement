@@ -9,6 +9,7 @@ use App\Models\Tag;
 use App\Models\Video;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\Response;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Cache;
 
 class SitemapController extends Controller
@@ -58,10 +59,11 @@ class SitemapController extends Controller
         return [
             ...$this->staticEntries(),
             ...$this->entries(
-                Post::query()->indexable()->orderByDesc('updated_at')->get(['slug', 'updated_at']),
+                Post::query()->indexable()->orderByDesc('updated_at')->get(['slug', 'published_at', 'updated_at']),
                 fn (Post $post): string => route('blog.show', $post),
                 'monthly',
                 '0.8',
+                fn (Post $post): ?Carbon => $post->lastModifiedAt(),
             ),
             ...$this->entries(
                 Category::query()->get(['slug', 'updated_at']),
@@ -76,10 +78,11 @@ class SitemapController extends Controller
                 '0.4',
             ),
             ...$this->entries(
-                Video::query()->indexable()->orderByDesc('updated_at')->get(['slug', 'updated_at']),
+                Video::query()->indexable()->orderByDesc('updated_at')->get(['slug', 'youtube_published_at', 'updated_at']),
                 fn (Video $video): string => route('videos.show', $video),
                 'monthly',
                 '0.7',
+                fn (Video $video): ?Carbon => $video->youtube_published_at,
             ),
             ['loc' => route('videos.index'), 'changefreq' => 'weekly', 'priority' => '0.8'],
             ...$this->entries(
@@ -116,19 +119,28 @@ class SitemapController extends Controller
 
     /**
      * Transforme une collection de modèles en entrées de sitemap. `lastmod`
-     * vient de `updated_at` ; la vue omet la balise lorsqu'il est absent.
+     * vient de `updated_at`, sauf résolveur explicite : les traitements
+     * automatisés (passes SEO, sync YouTube) touchent `updated_at` sans que la
+     * page change, et annoncer ces dates à Google discrédite le sitemap.
+     * La vue omet la balise lorsque la date est absente.
      *
      * @template TModel of \Illuminate\Database\Eloquent\Model
      *
      * @param  Collection<int, TModel>  $models
      * @param  callable(TModel): string  $loc
+     * @param  (callable(TModel): ?Carbon)|null  $lastmod
      * @return list<array<string, string|null>>
      */
-    private function entries(Collection $models, callable $loc, string $changefreq, string $priority): array
-    {
+    private function entries(
+        Collection $models,
+        callable $loc,
+        string $changefreq,
+        string $priority,
+        ?callable $lastmod = null,
+    ): array {
         return $models->map(fn ($model): array => [
             'loc' => $loc($model),
-            'lastmod' => $model->updated_at?->toAtomString(),
+            'lastmod' => ($lastmod ? $lastmod($model) : $model->updated_at)?->toAtomString(),
             'changefreq' => $changefreq,
             'priority' => $priority,
         ])->all();
