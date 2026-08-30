@@ -122,7 +122,7 @@ class ConvertContentImages extends Command
             }
 
             $post->content = $content;
-            $post->save();
+            Post::withoutTimestamps(fn () => $post->save());
         }
 
         return $rewritten;

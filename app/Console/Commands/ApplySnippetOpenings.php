@@ -35,7 +35,7 @@ class ApplySnippetOpenings extends Command
             $post->faq = $opt['faq'];
 
             if (! $dry) {
-                $post->save();
+                Post::withoutTimestamps(fn () => $post->save());
             }
 
             $this->info(($dry ? '[dry] ' : '')."✓ {$slug} — title ".mb_strlen($opt['seo_title']).' car., '.count($opt['faq']).' questions FAQ');
