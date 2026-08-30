@@ -3,6 +3,7 @@
 use App\Models\Post;
 use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Cache;
 
 uses(LazilyRefreshDatabase::class);
 
@@ -66,4 +67,16 @@ it('does not touch updated_at when a bulk command rewrites content', function ()
     );
 
     expect($post->fresh()->updated_at->toDateString())->toBe('2026-07-06');
+});
+
+it('advertises the publication date in the sitemap for an unrevised article', function () {
+    $post = Post::factory()->create(['published_at' => Carbon::parse('2019-06-21 20:30:00')]);
+    $post->forceFill(['updated_at' => Carbon::parse('2026-07-06 17:28:38')])->saveQuietly();
+
+    Cache::forget('sitemap.urls');
+
+    $this->get('/sitemap.xml')
+        ->assertOk()
+        ->assertSee('2019-06-21T20:30:00', escape: false)
+        ->assertDontSee('2026-07-06T17:28:38', escape: false);
 });
