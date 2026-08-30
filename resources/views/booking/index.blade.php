@@ -174,20 +174,14 @@
                 souhaite transmettre cette approche à mon tour puisque celle-ci a littéralement changé mes
                 troubles anxieux.
             </p>
+            <p>
+                <strong class="text-ink font-medium">En fait, ce n'est pas de votre faute si vous vous sentez si mal. Vous n'avez simplement pas eu
+                les bons outils jusqu'à maintenant.</strong>
+            </p>
         </div>
 
-        {{-- Mise en exergue : le passage clé --}}
-        <figure class="mx-auto mt-12 max-w-3xl border-l-2 border-teal-300 pl-6 sm:pl-8">
-            <blockquote class="text-ink font-serif text-xl leading-snug font-medium sm:text-2xl">
-                <p>
-                    En fait, ce n'est pas de votre faute si vous vous sentez si mal. Vous n'avez simplement pas eu
-                    les bons outils jusqu'à maintenant.
-                </p>
-            </blockquote>
-        </figure>
-
         <div class="mt-10 text-center">
-            <a href="#reserver" class="inline-flex items-center gap-2 text-sm font-medium text-teal-700 transition hover:text-teal-800">
+            <a href="#reserver" class="inline-flex items-center gap-2 text-lg font-medium text-teal-700 transition hover:text-teal-800 sm:text-xl">
                 <span class="border-b border-teal-700/30">Si la prestation que je propose vous intéresse, vous pouvez prendre rendez-vous avec moi.</span>
                 <span aria-hidden="true">→</span>
             </a>
