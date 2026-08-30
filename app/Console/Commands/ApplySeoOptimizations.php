@@ -36,7 +36,7 @@ class ApplySeoOptimizations extends Command
             $post->seo_description = $opt['seo_description'];
 
             if (! $dry) {
-                $post->save();
+                Post::withoutTimestamps(fn () => $post->save());
 
                 $tagIds = collect($opt['tags'])->map(fn (string $name) => Tag::query()->firstOrCreate(
                     ['slug' => Str::slug($name)],
