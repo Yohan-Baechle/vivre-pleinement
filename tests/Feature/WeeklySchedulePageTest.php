@@ -4,7 +4,6 @@ use App\Filament\Admin\Pages\WeeklySchedule;
 use App\Models\AppointmentService;
 use App\Models\Availability;
 use App\Models\User;
-use App\Support\Weekdays;
 use Filament\Actions\Testing\TestAction;
 use Filament\Facades\Filament;
 use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
@@ -16,30 +15,6 @@ beforeEach(function () {
     $this->actingAs(User::factory()->create());
     Filament::setCurrentPanel('admin');
 });
-
-/**
- * Construit un état de formulaire complet : tous les jours fermés, sauf ceux
- * décrits par $openDays (clé = dayOfWeek Carbon, valeur = liste de plages).
- *
- * @param  array<int, array<int, array{start_time: string, end_time: string}>>  $openDays
- * @return array<string, mixed>
- */
-function scheduleFormState(array $openDays, ?int $serviceId = null): array
-{
-    $days = [];
-
-    foreach (Weekdays::orderedKeys() as $day) {
-        $days["day_{$day}"] = [
-            'is_open' => isset($openDays[$day]),
-            'ranges' => $openDays[$day] ?? [],
-        ];
-    }
-
-    return [
-        'appointment_service_id' => $serviceId,
-        'days' => $days,
-    ];
-}
 
 it('renders the weekly schedule page', function () {
     $this->get(route('filament.admin.pages.weekly-schedule'))->assertOk();

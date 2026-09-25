@@ -11,7 +11,11 @@ on:
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
+  # Ne jamais interrompre un déploiement en cours sur main
+  cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
+
+env:
+  ARCHIVE: vivre-pleinement-deploy.tar.gz
 
 jobs:
   ci:
@@ -19,25 +23,21 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
 
-    services:
-      mariadb:
-        image: mariadb:11
-        env:
-          MARIADB_ROOT_PASSWORD: root
-          MARIADB_DATABASE: testing
-          MARIADB_USER: testing
-          MARIADB_PASSWORD: testing
-        ports:
-          - 3306:3306
-        options: >-
-          --health-cmd="healthcheck.sh --connect --innodb_initialized"
-          --health-interval=10s
-          --health-timeout=5s
-          --health-retries=10
-
     steps:
       - name: Checkout
         uses: actions/checkout@v6
+
+      # Démarré en arrière-plan : le pull et l'init se font pendant le setup PHP/Node
+      - name: Start MariaDB (background)
+        run: |
+          docker run -d --name mariadb -p 3306:3306 \
+            --tmpfs /var/lib/mysql:rw \
+            -e MARIADB_ROOT_PASSWORD=root \
+            -e MARIADB_DATABASE=testing \
+            --health-cmd="healthcheck.sh --connect --innodb_initialized" \
+            --health-interval=1s --health-retries=90 \
+            mariadb:11 --innodb-flush-log-at-trx-commit=0 \
+            > /tmp/mariadb.log 2>&1 &
 
       - name: Setup PHP 8.5
         uses: shivammathur/setup-php@v2
@@ -63,6 +63,9 @@ jobs:
       - name: Install Composer dependencies
         run: composer install --prefer-dist --no-interaction --no-progress
 
+      - name: Run Pint (code style)
+        run: vendor/bin/pint --test
+
       - name: Install npm dependencies
         run: npm ci
 
@@ -73,29 +76,31 @@ jobs:
         run: |
           cp .env.example .env
           php artisan key:generate
-          # La base de service CI remplace celle de .env.example
+          # Root : Pest --parallel crée une base par process (testing_test_N)
           sed -i 's|^DB_CONNECTION=.*|DB_CONNECTION=mariadb|' .env
           sed -i 's|^DB_HOST=.*|DB_HOST=127.0.0.1|' .env
           sed -i 's|^DB_PORT=.*|DB_PORT=3306|' .env
           sed -i 's|^DB_DATABASE=.*|DB_DATABASE=testing|' .env
-          sed -i 's|^DB_USERNAME=.*|DB_USERNAME=testing|' .env
-          sed -i 's|^DB_PASSWORD=.*|DB_PASSWORD=testing|' .env
+          sed -i 's|^DB_USERNAME=.*|DB_USERNAME=root|' .env
+          sed -i 's|^DB_PASSWORD=.*|DB_PASSWORD=root|' .env
+
+      - name: Wait for MariaDB
+        run: |
+          timeout 90 bash -c 'until [ "$(docker inspect -f {{.State.Health.Status}} mariadb 2>/dev/null)" = healthy ]; do sleep 1; done' \
+            || { cat /tmp/mariadb.log; docker logs mariadb; exit 1; }
 
       - name: Run migrations
         run: php artisan migrate --force
 
-      - name: Run Pint (code style)
-        run: vendor/bin/pint --test
-
       - name: Run Pest
-        run: vendor/bin/pest --compact
+        run: vendor/bin/pest --parallel --compact
 
-  deploy:
-    name: Deploy to production
-    needs: ci
+  # Construit l'archive de production en parallèle des tests
+  build:
+    name: Build release
     if: github.ref == 'refs/heads/main' && github.event_name == 'push'
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 10
 
     steps:
       - name: Checkout
@@ -115,6 +120,13 @@ jobs:
           node-version: '22'
           cache: 'npm'
 
+      - name: Cache Composer dependencies (production)
+        uses: actions/cache@v5
+        with:
+          path: vendor
+          key: composer-prod-${{ runner.os }}-${{ hashFiles('composer.lock') }}
+          restore-keys: composer-prod-${{ runner.os }}-
+
       - name: Install Composer dependencies (production)
         run: composer install --no-dev --prefer-dist --optimize-autoloader --no-interaction --no-progress
 
@@ -126,7 +138,7 @@ jobs:
 
       - name: Create deployment artifact
         run: |
-          tar -czf /tmp/vivre-pleinement-deploy.tar.gz \
+          tar -czf "$RUNNER_TEMP/$ARCHIVE" \
             --exclude='.git' \
             --exclude='.github' \
             --exclude='.agents' \
@@ -144,7 +156,27 @@ jobs:
             --exclude='boost.json' \
             --exclude='skills-lock.json' \
             .
-          ls -lh /tmp/vivre-pleinement-deploy.tar.gz
+          ls -lh "$RUNNER_TEMP/$ARCHIVE"
+
+      - name: Upload release
+        uses: actions/upload-artifact@v7
+        with:
+          name: release
+          path: ${{ runner.temp }}/${{ env.ARCHIVE }}
+          compression-level: 0
+          retention-days: 1
+
+  deploy:
+    name: Deploy to production
+    needs: [ci, build]
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Download release
+        uses: actions/download-artifact@v8
+        with:
+          name: release
 
       - name: Setup SSH
         run: |
@@ -153,19 +185,15 @@ jobs:
           chmod 600 ~/.ssh/deploy_key
           ssh-keyscan -H ${{ secrets.SSH_HOST }} >> ~/.ssh/known_hosts
 
-      - name: Upload artifact to VPS
-        run: |
-          scp -i ~/.ssh/deploy_key \
-            /tmp/vivre-pleinement-deploy.tar.gz \
-            ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:/tmp/vivre-pleinement-deploy.tar.gz
-
-      - name: Trigger deploy on VPS
+      # Upload + déploiement dans une seule connexion SSH
+      - name: Upload and deploy on VPS
         run: |
           ssh -i ~/.ssh/deploy_key \
             ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} \
-            "bash ${{ secrets.DEPLOY_PATH }}/deploy.sh /tmp/vivre-pleinement-deploy.tar.gz"
+            "cat > /tmp/$ARCHIVE && bash ${{ secrets.DEPLOY_PATH }}/deploy.sh /tmp/$ARCHIVE" \
+            < "$ARCHIVE"
 
       - name: Verify deployment
         run: |
-          sleep 2
-          curl -fsS -o /dev/null -w "HTTP %{http_code} in %{time_total}s\n" ${{ vars.DEPLOY_URL }}/up || exit 1
+          curl -fsS --retry 5 --retry-delay 1 --retry-all-errors \
+            -o /dev/null -w "HTTP %{http_code} in %{time_total}s\n" ${{ vars.DEPLOY_URL }}/up
