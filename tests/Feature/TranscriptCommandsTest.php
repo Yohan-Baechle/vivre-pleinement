@@ -59,7 +59,8 @@ it('imports repunctuated chunks and reassembles them into the transcript', funct
 
     expect($transcript)->toContain('Première partie ponctuée.')
         ->and($transcript)->toContain('Deuxième partie ponctuée.')
-        ->and(substr_count($transcript, '<p>'))->toBe(2);
+        ->and(substr_count($transcript, '<p>'))->toBe(2)
+        ->and($video->fresh()->transcript_formatted_at)->not->toBeNull();
 });
 
 it('strips disallowed tags from imported chunks', function () {

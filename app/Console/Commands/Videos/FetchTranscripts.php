@@ -18,6 +18,7 @@ use Throwable;
     {--video= : Limiter à une seule vidéo (id interne)}
     {--limit=0 : Nombre maximum de vidéos à traiter (0 = toutes)}
     {--force : Re-télécharger même les vidéos ayant déjà une transcription}
+    {--since=0 : Vidéos publiées sur YouTube depuis N jours (0 = toutes)}
     {--language=fr : Langue des sous-titres à récupérer}')]
 #[Description('Télécharge les sous-titres YouTube (standard puis ASR) et les stocke comme transcription nettoyée.')]
 class FetchTranscripts extends Command
@@ -41,6 +42,9 @@ class FetchTranscripts extends Command
         }
         if (! $this->option('force')) {
             $query->where(fn ($group) => $group->whereNull('transcript')->orWhere('transcript', ''));
+        }
+        if (($since = (int) $this->option('since')) > 0) {
+            $query->where('youtube_published_at', '>=', now()->subDays($since));
         }
         if (($limit = (int) $this->option('limit')) > 0) {
             $query->limit($limit);
@@ -81,7 +85,10 @@ class FetchTranscripts extends Command
                     continue;
                 }
 
-                $video->update(['transcript' => '<p>'.e($text).'</p>']);
+                $video->update([
+                    'transcript' => '<p>'.e($text).'</p>',
+                    'transcript_formatted_at' => null,
+                ]);
                 $this->line("  ✓ #{$video->id} « {$video->title} » ({$this->wordCount($text)} mots)");
                 $fetched++;
             } catch (Throwable $e) {
