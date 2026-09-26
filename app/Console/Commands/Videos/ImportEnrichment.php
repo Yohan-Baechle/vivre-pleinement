@@ -2,12 +2,11 @@
 
 namespace App\Console\Commands\Videos;
 
-use App\Models\Category;
 use App\Models\Video;
+use App\Services\VideoEnrichment;
 use Illuminate\Console\Attributes\Description;
 use Illuminate\Console\Attributes\Signature;
 use Illuminate\Console\Command;
-use Illuminate\Support\Arr;
 
 #[Signature('videos:import-enrichment
     {path : Chemin du fichier JSON enrichi à importer}
@@ -15,7 +14,7 @@ use Illuminate\Support\Arr;
 #[Description('Importe un fichier JSON enrichi : catégories, intro, summary, SEO description, key takeaways, chapitres.')]
 class ImportEnrichment extends Command
 {
-    public function handle(): int
+    public function handle(VideoEnrichment $enrichment): int
     {
         $path = $this->argument('path');
 
@@ -34,7 +33,6 @@ class ImportEnrichment extends Command
         }
 
         $dryRun = (bool) $this->option('dry-run');
-        $categoryIdsBySlug = Category::query()->pluck('id', 'slug');
 
         $updated = 0;
         $categorized = 0;
@@ -51,47 +49,14 @@ class ImportEnrichment extends Command
                 continue;
             }
 
-            $attributes = [];
+            $result = $enrichment->apply($video, $row, $dryRun);
 
-            foreach (['intro', 'summary', 'seo_description'] as $field) {
-                $value = trim((string) ($row[$field] ?? ''));
-                if ($value !== '') {
-                    $attributes[$field] = $value;
-                }
-            }
+            $updated += (int) $result['updated'];
+            $categorized += (int) $result['categorized'];
 
-            $takeaways = $this->normalizeTakeaways($row['key_takeaways'] ?? []);
-            if ($takeaways !== []) {
-                $attributes['key_takeaways'] = $takeaways;
-            }
-
-            $chapters = $this->normalizeChapters($row['chapters'] ?? []);
-            if ($chapters !== []) {
-                $attributes['chapters'] = $chapters;
-            }
-
-            if ($attributes !== []) {
-                if (! $dryRun) {
-                    $video->update($attributes);
-                }
-                $updated++;
-            }
-
-            $slugs = array_values(array_filter((array) ($row['category_slugs'] ?? [])));
-            if ($slugs !== []) {
-                $ids = $categoryIdsBySlug->only($slugs);
-
-                $unknown = array_diff($slugs, $ids->keys()->all());
-                foreach ($unknown as $slug) {
-                    $warnings[] = "Catégorie inconnue ignorée : « {$slug} » (vidéo {$video->id})";
-                }
-
-                if ($ids->isNotEmpty()) {
-                    if (! $dryRun) {
-                        $video->categories()->sync($ids->values()->all());
-                    }
-                    $categorized++;
-                }
+            foreach ($result['unknown_categories'] as $slug) {
+                $warnings[] = "Catégorie inconnue ignorée : « {$slug} » "
+                    ."(vidéo {$video->id})";
             }
         }
 
@@ -109,53 +74,5 @@ class ImportEnrichment extends Command
         ));
 
         return self::SUCCESS;
-    }
-
-    /**
-     * @return list<array{title: string, content: string}>
-     */
-    private function normalizeTakeaways(mixed $raw): array
-    {
-        if (! is_array($raw)) {
-            return [];
-        }
-
-        $out = [];
-        foreach ($raw as $item) {
-            $title = trim((string) Arr::get($item, 'title', ''));
-            if ($title === '') {
-                continue;
-            }
-            $out[] = [
-                'title' => $title,
-                'content' => trim((string) Arr::get($item, 'content', '')),
-            ];
-        }
-
-        return $out;
-    }
-
-    /**
-     * @return list<array{title: string, start_seconds: int}>
-     */
-    private function normalizeChapters(mixed $raw): array
-    {
-        if (! is_array($raw)) {
-            return [];
-        }
-
-        $out = [];
-        foreach ($raw as $item) {
-            $title = trim((string) Arr::get($item, 'title', ''));
-            if ($title === '') {
-                continue;
-            }
-            $out[] = [
-                'title' => $title,
-                'start_seconds' => (int) Arr::get($item, 'start_seconds', 0),
-            ];
-        }
-
-        return $out;
     }
 }

@@ -39,6 +39,14 @@ return [
         'key' => env('INDEXNOW_KEY'),
     ],
 
+    /**
+     * Jeton partagé avec n8n pour les endpoints /api/automation. Vide, ces
+     * endpoints refusent toute requête.
+     */
+    'automation' => [
+        'token' => env('AUTOMATION_TOKEN'),
+    ],
+
     'youtube' => [
         'api_key' => env('YOUTUBE_API_KEY'),
         'channel_id' => env('YOUTUBE_CHANNEL_ID'),

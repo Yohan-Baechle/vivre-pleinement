@@ -79,6 +79,61 @@ it('fetches, cleans and stores a transcript from the srt subtitles', function ()
         ->and(substr_count($video->transcript, 'Aujourd'))->toBe(1);
 });
 
+it('marks a re-downloaded transcript as raw again', function () {
+    $video = Video::factory()->withFormattedTranscript()->create([
+        'youtube_id' => 'redo',
+    ]);
+
+    Http::fake([
+        'oauth2.googleapis.com/token' => Http::response([
+            'access_token' => 'tok',
+            'expires_in' => 3600,
+        ]),
+        '*/captions?*' => Http::response(['items' => [[
+            'id' => 'cap-1',
+            'snippet' => ['language' => 'fr', 'trackKind' => 'asr'],
+        ]]]),
+        '*/captions/cap-1*' => Http::response(
+            "1\n00:00:01,000 --> 00:00:04,000\nbonjour\n",
+        ),
+    ]);
+
+    $this->artisan('youtube:fetch-transcripts', [
+        '--video' => $video->id,
+        '--force' => true,
+    ])->assertSuccessful();
+
+    expect($video->fresh()->transcript_formatted_at)->toBeNull();
+});
+
+it('only fetches recent videos with --since', function () {
+    Video::factory()->create([
+        'youtube_id' => 'old',
+        'transcript' => null,
+        'youtube_published_at' => now()->subMonth(),
+    ]);
+    $recent = Video::factory()->create([
+        'youtube_id' => 'new',
+        'transcript' => null,
+        'youtube_published_at' => now()->subDay(),
+    ]);
+
+    Http::fake([
+        'oauth2.googleapis.com/token' => Http::response([
+            'access_token' => 'tok',
+            'expires_in' => 3600,
+        ]),
+        '*/captions?*' => Http::response(['items' => []]),
+    ]);
+
+    $this->artisan('youtube:fetch-transcripts', ['--since' => 14])
+        ->expectsOutputToContain("#{$recent->id}")
+        ->doesntExpectOutputToContain('Traitement de 2')
+        ->assertSuccessful();
+
+    Http::assertSentCount(2);
+});
+
 it('skips a video that has no subtitles in the requested language', function () {
     $video = Video::factory()->create(['youtube_id' => 'nosubs', 'duration_seconds' => 600, 'transcript' => null]);
 
