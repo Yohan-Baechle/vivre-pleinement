@@ -133,17 +133,29 @@ class Video extends Model
     }
 
     /**
-     * Vidéos publiées, transcription mise en forme, sans contenu éditorial.
+     * Vidéos publiées, transcription mise en forme, sans intro ou sans
+     * points clés.
      *
-     * Une intro ou un résumé déjà saisi suffit à exclure la vidéo : on
-     * n'écrase jamais un contenu rédigé à la main.
+     * L'enrichissement ne complète que les champs vides : un résumé déjà
+     * rédigé n'empêche donc pas d'ajouter l'intro qui manque.
      */
     public function scopeAwaitingEnrichment(Builder $query): void
     {
         $query->published()
             ->whereNotNull('transcript_formatted_at')
-            ->whereNull('intro')
-            ->whereNull('summary');
+            ->where(function (Builder $query): void {
+                $query->whereNull('intro')
+                    ->orWhereNull('key_takeaways')
+                    ->orWhereJsonLength('key_takeaways', 0);
+            });
+    }
+
+    /**
+     * Intro et points clés présents : plus rien à compléter.
+     */
+    public function isFullyEnriched(): bool
+    {
+        return filled($this->intro) && ! empty($this->key_takeaways);
     }
 
     public function isShort(): bool

@@ -10,7 +10,9 @@ use Illuminate\Support\Arr;
  * Applique à une vidéo le contenu éditorial produit par l'étape IA :
  * catégories, intro, résumé, description SEO, points clés et chapitres.
  *
- * Un champ vide n'écrase jamais la valeur existante.
+ * Un champ vide n'écrase jamais la valeur existante. Avec $onlyMissing,
+ * seuls les champs encore vides de la vidéo sont remplis, et les
+ * catégories ne sont posées que si elle n'en a aucune.
  */
 class VideoEnrichment
 {
@@ -29,17 +31,28 @@ class VideoEnrichment
         Video $video,
         array $row,
         bool $dryRun = false,
+        bool $onlyMissing = false,
     ): array {
         $attributes = $this->attributes($row);
+
+        if ($onlyMissing) {
+            $attributes = array_filter(
+                $attributes,
+                fn (string $field): bool => blank($video->{$field}),
+                ARRAY_FILTER_USE_KEY,
+            );
+        }
 
         if ($attributes !== [] && ! $dryRun) {
             $video->update($attributes);
         }
 
-        $slugs = array_values(array_filter(
-            (array) ($row['category_slugs'] ?? []),
-            fn (mixed $slug): bool => is_string($slug) && $slug !== '',
-        ));
+        $slugs = $onlyMissing && $video->categories()->exists()
+            ? []
+            : array_values(array_filter(
+                (array) ($row['category_slugs'] ?? []),
+                fn (mixed $slug): bool => is_string($slug) && $slug !== '',
+            ));
 
         $ids = Category::query()
             ->whereIn('slug', $slugs)
