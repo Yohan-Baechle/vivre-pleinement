@@ -106,16 +106,17 @@ it('marks a re-downloaded transcript as raw again', function () {
     expect($video->fresh()->transcript_formatted_at)->toBeNull();
 });
 
-it('only fetches recent videos with --since', function () {
+it('only fetches videos added recently with --since', function () {
     Video::factory()->create([
         'youtube_id' => 'old',
         'transcript' => null,
-        'youtube_published_at' => now()->subMonth(),
+        'created_at' => now()->subMonth(),
     ]);
-    $recent = Video::factory()->create([
+    $discovered = Video::factory()->create([
         'youtube_id' => 'new',
         'transcript' => null,
-        'youtube_published_at' => now()->subDay(),
+        'youtube_published_at' => now()->subMonth(),
+        'created_at' => now()->subHour(),
     ]);
 
     Http::fake([
@@ -127,7 +128,7 @@ it('only fetches recent videos with --since', function () {
     ]);
 
     $this->artisan('youtube:fetch-transcripts', ['--since' => 14])
-        ->expectsOutputToContain("#{$recent->id}")
+        ->expectsOutputToContain("#{$discovered->id}")
         ->doesntExpectOutputToContain('Traitement de 2')
         ->assertSuccessful();
 
