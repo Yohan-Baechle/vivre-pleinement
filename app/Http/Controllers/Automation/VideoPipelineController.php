@@ -133,17 +133,24 @@ class VideoPipelineController extends Controller
         Video $video,
         VideoEnrichment $enrichment,
     ): JsonResponse {
-        if ($video->intro !== null || $video->summary !== null) {
+        if ($video->isFullyEnriched()) {
             return response()->json([
                 'message' => 'Vidéo déjà enrichie : rien n\'est écrasé.',
             ], 409);
         }
 
-        $result = $enrichment->apply($video, $request->validated());
+        $isNewVideo = blank($video->summary);
+
+        $result = $enrichment->apply(
+            $video,
+            $request->validated(),
+            onlyMissing: true,
+        );
 
         return response()->json([
             'id' => $video->id,
             'title' => $video->title,
+            'notify' => $isNewVideo,
             'public_url' => route('videos.show', $video),
             'admin_url' => VideoResource::getUrl(
                 'edit',

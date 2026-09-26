@@ -111,8 +111,19 @@ it('lists formatted videos awaiting enrichment with categories', function () {
         ['slug' => 'phobies'],
         ['name' => 'Phobies'],
     );
-    Video::factory()->withFormattedTranscript()->create(['title' => 'À faire']);
-    Video::factory()->withFormattedTranscript()->create(['summary' => 'Fait']);
+    Video::factory()->withFormattedTranscript()->create([
+        'title' => 'À faire',
+        'youtube_published_at' => now(),
+    ]);
+    Video::factory()->withFormattedTranscript()->create([
+        'title' => 'Résumé seul',
+        'summary' => 'Un résumé',
+        'youtube_published_at' => now()->subYear(),
+    ]);
+    Video::factory()->withFormattedTranscript()->create([
+        'intro' => '<p>Intro</p>',
+        'key_takeaways' => [['title' => 'Point', 'content' => 'Détail']],
+    ]);
     Video::factory()->withRawTranscript()->create();
 
     $response = $this->getJson(
@@ -120,7 +131,7 @@ it('lists formatted videos awaiting enrichment with categories', function () {
         automation(),
     )->assertSuccessful();
 
-    expect($response->json('data'))->toHaveCount(1);
+    expect($response->json('data.*.title'))->toBe(['À faire', 'Résumé seul']);
 
     $payload = decodePayload($response->json('data.0.payload'));
 
@@ -144,6 +155,7 @@ it('stores the enrichment and sanitizes the intro', function () {
     )
         ->assertSuccessful()
         ->assertJson([
+            'notify' => true,
             'public_url' => route('videos.show', $video),
             'unknown_categories' => ['inconnue'],
         ]);
@@ -156,9 +168,42 @@ it('stores the enrichment and sanitizes the intro', function () {
         ->and($video->categories->pluck('id')->all())->toBe([$category->id]);
 });
 
-it('never overwrites an already enriched video', function () {
+it('only fills the missing fields of an existing video', function () {
+    $existing = Category::query()->firstOrCreate(
+        ['slug' => 'anxiete-et-angoisses'],
+        ['name' => 'Anxiété & angoisses'],
+    );
+    Category::query()->firstOrCreate(
+        ['slug' => 'phobies'],
+        ['name' => 'Phobies'],
+    );
     $video = Video::factory()->withFormattedTranscript()->create([
         'summary' => 'Rédigé à la main',
+        'seo_description' => 'SEO à la main',
+    ]);
+    $video->categories()->attach($existing);
+
+    $this->putJson(
+        route('automation.videos.enrichment.store', $video),
+        enrichmentBody(),
+        automation(),
+    )
+        ->assertSuccessful()
+        ->assertJson(['notify' => false]);
+
+    $video->refresh();
+
+    expect($video->summary)->toBe('Rédigé à la main')
+        ->and($video->seo_description)->toBe('SEO à la main')
+        ->and($video->intro)->toStartWith('<p>Une intro.</p>')
+        ->and($video->key_takeaways)->toHaveCount(1)
+        ->and($video->categories->pluck('id')->all())->toBe([$existing->id]);
+});
+
+it('refuses a video that has nothing left to fill', function () {
+    $video = Video::factory()->withFormattedTranscript()->create([
+        'intro' => '<p>Rédigée à la main</p>',
+        'key_takeaways' => [['title' => 'Point', 'content' => 'Détail']],
     ]);
 
     $this->putJson(
@@ -167,7 +212,7 @@ it('never overwrites an already enriched video', function () {
         automation(),
     )->assertConflict();
 
-    expect($video->fresh()->summary)->toBe('Rédigé à la main');
+    expect($video->fresh()->intro)->toBe('<p>Rédigée à la main</p>');
 });
 
 it('validates the enrichment body', function () {
