@@ -3,6 +3,7 @@
 namespace App\Console\Commands\Videos;
 
 use App\Models\Video;
+use App\Support\TranscriptChunks;
 use Illuminate\Console\Attributes\Description;
 use Illuminate\Console\Attributes\Signature;
 use Illuminate\Console\Command;
@@ -18,9 +19,6 @@ use Illuminate\Support\Str;
 #[Description('Réimporte les transcriptions reponctuées (paragraphes HTML).')]
 class ImportTranscripts extends Command
 {
-    /** Balises autorisées dans une transcription reponctuée. */
-    private const ALLOWED_TAGS = '<p><br><em><strong>';
-
     public function handle(): int
     {
         $path = $this->argument('path');
@@ -52,7 +50,7 @@ class ImportTranscripts extends Command
                 continue;
             }
 
-            $html = $this->assemble($row['chunks'] ?? []);
+            $html = TranscriptChunks::assemble($row['chunks'] ?? []);
 
             if ($html === '') {
                 $skipped++;
@@ -61,7 +59,10 @@ class ImportTranscripts extends Command
             }
 
             if (! $dryRun) {
-                $video->update(['transcript' => $html]);
+                $video->update([
+                    'transcript' => $html,
+                    'transcript_formatted_at' => now(),
+                ]);
             }
 
             $this->line("  ✓ #{$video->id} « {$video->title} » ({$this->wordCount($html)} mots, ".substr_count($html, '<p>').' paragraphes)');
@@ -72,26 +73,6 @@ class ImportTranscripts extends Command
         $this->info("{$prefix}{$updated} transcription(s) importée(s), {$skipped} ignorée(s).");
 
         return self::SUCCESS;
-    }
-
-    /**
-     * Recolle les morceaux reponctués en un seul HTML propre.
-     */
-    private function assemble(mixed $chunks): string
-    {
-        if (! is_array($chunks)) {
-            return '';
-        }
-
-        $clean = [];
-        foreach ($chunks as $chunk) {
-            $chunk = trim(strip_tags((string) $chunk, self::ALLOWED_TAGS));
-            if ($chunk !== '') {
-                $clean[] = $chunk;
-            }
-        }
-
-        return Str::of(implode("\n", $clean))->trim()->value();
     }
 
     private function wordCount(string $html): int

@@ -37,4 +37,27 @@ class VideoFactory extends Factory
     {
         return $this->state(fn () => ['duration_seconds' => 45]);
     }
+
+    /**
+     * Sous-titres tout juste récupérés : un seul bloc sans ponctuation.
+     */
+    public function withRawTranscript(int $words = 300): static
+    {
+        return $this->state(fn () => [
+            'transcript' => '<p>'.implode(' ', fake()->words($words)).'</p>',
+            'transcript_formatted_at' => null,
+        ]);
+    }
+
+    /**
+     * Transcription reponctuée en paragraphes par l'étape IA.
+     */
+    public function withFormattedTranscript(): static
+    {
+        return $this->state(fn () => [
+            'transcript' => '<p>'.fake()->paragraph().'</p>'
+                .'<p>'.fake()->paragraph().'</p>',
+            'transcript_formatted_at' => now(),
+        ]);
+    }
 }

@@ -26,6 +26,7 @@ use Illuminate\Support\Str;
     'intro',
     'key_takeaways',
     'transcript',
+    'transcript_formatted_at',
     'chapters',
     'thumbnail_url',
     'related_post_id',
@@ -78,6 +79,7 @@ class Video extends Model
             'youtube_published_at' => 'datetime',
             'published_at' => 'datetime',
             'synced_at' => 'datetime',
+            'transcript_formatted_at' => 'datetime',
         ];
     }
 
@@ -117,6 +119,31 @@ class Video extends Model
         $query->published()->where(function (Builder $query): void {
             $query->whereNull('seo_robots')->orWhere('seo_robots', 'not like', '%noindex%');
         });
+    }
+
+    /**
+     * Vidéos publiées dont la transcription brute attend sa mise en forme.
+     */
+    public function scopeAwaitingTranscriptFormatting(Builder $query): void
+    {
+        $query->published()
+            ->whereNotNull('transcript')
+            ->where('transcript', '!=', '')
+            ->whereNull('transcript_formatted_at');
+    }
+
+    /**
+     * Vidéos publiées, transcription mise en forme, sans contenu éditorial.
+     *
+     * Une intro ou un résumé déjà saisi suffit à exclure la vidéo : on
+     * n'écrase jamais un contenu rédigé à la main.
+     */
+    public function scopeAwaitingEnrichment(Builder $query): void
+    {
+        $query->published()
+            ->whereNotNull('transcript_formatted_at')
+            ->whereNull('intro')
+            ->whereNull('summary');
     }
 
     public function isShort(): bool

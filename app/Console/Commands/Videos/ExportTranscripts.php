@@ -3,10 +3,10 @@
 namespace App\Console\Commands\Videos;
 
 use App\Models\Video;
+use App\Support\TranscriptChunks;
 use Illuminate\Console\Attributes\Description;
 use Illuminate\Console\Attributes\Signature;
 use Illuminate\Console\Command;
-use Illuminate\Support\Str;
 
 /**
  * Exporte les transcriptions brutes (texte continu non ponctué) découpées en
@@ -37,7 +37,7 @@ class ExportTranscripts extends Command
         $payload = ['videos' => $videos->map(fn (Video $v) => [
             'id' => $v->id,
             'title' => $v->title,
-            'chunks' => $this->chunk(html_entity_decode(strip_tags($v->transcript)), $chunkWords),
+            'chunks' => TranscriptChunks::split($v->transcript, $chunkWords),
         ])->all()];
 
         $path = $this->argument('path');
@@ -51,27 +51,5 @@ class ExportTranscripts extends Command
         $this->info("{$videos->count()} transcription(s) exportée(s) en {$totalChunks} morceau(x) vers {$path}");
 
         return self::SUCCESS;
-    }
-
-    /**
-     * Découpe un texte en morceaux d'environ $chunkWords mots, sans couper un
-     * mot.
-     *
-     * @return list<string>
-     */
-    private function chunk(string $text, int $chunkWords): array
-    {
-        $words = preg_split('/\s+/u', trim($text), -1, PREG_SPLIT_NO_EMPTY) ?: [];
-
-        if ($words === []) {
-            return [];
-        }
-
-        $chunks = [];
-        foreach (array_chunk($words, $chunkWords) as $group) {
-            $chunks[] = Str::of(implode(' ', $group))->trim()->value();
-        }
-
-        return $chunks;
     }
 }
