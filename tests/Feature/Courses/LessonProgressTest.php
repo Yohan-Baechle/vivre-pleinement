@@ -165,3 +165,11 @@ it('empêche un élève non inscrit de valider une leçon', function () {
 
     $this->assertDatabaseCount('lesson_progress', 0);
 });
+
+it('envoie le referer au lecteur vidéo, exigé par YouTube', function () {
+    [$course, $lessons, $student] = enrolledCourse();
+
+    Livewire::actingAs($student, 'student')
+        ->test(LessonPlayer::class, ['course' => $course, 'lesson' => $lessons[0]])
+        ->assertSeeHtml('referrerpolicy="strict-origin-when-cross-origin"');
+});
